@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+/* 
+ * Theme colors are defined in theme/colors.ts
+ * CSS variables are synchronized with the TypeScript theme file
+ * Update theme/colors.ts when adding new colors
+ */
+
+:root {
+  /* Base colors */
+  --background: #ffffff;
+  --foreground: #171717;
+  --background-secondary: #f9fafb;
+  --background-dark: #000000;
+  --foreground-light: #ffffff;
+
+  /* Gray scale */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* Blue colors */
+  --color-blue-100: #dbeafe;
+  --color-blue-400: #60a5fa;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+
+  /* Red colors */
+  --color-red-100: #fee2e2;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+
+  /* Zinc colors */
+  --color-zinc-50: #fafafa;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-600: #52525b;
+  --color-zinc-950: #09090b;
+
+  /* Semantic colors */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Custom colors */
+  --color-hover-dark: #383838;
+  --color-hover-light: #ccc;
+  --color-hover-bg: #1a1a1a;
+  --color-header-blue: #003C8F;
+  --color-sidebar-bg: #dcddddff;
+  --color-menu-active: #1c1c21;
+
+  /* Border colors */
+  --color-border-default: #d1d5db;
+  --color-border-error: #ef4444;
+  --color-border-focus: #2563eb;
+  --color-border-focus-ring-blue: #60a5fa;
+  --color-border-focus-ring-red: #f87171;
+
+  /* Text colors */
+  --color-text-primary: #111827;
+  --color-text-secondary: #1f2937;
+  --color-text-muted: #4b5563;
+  --color-text-link: #2563eb;
+  --color-text-error: #dc2626;
+}
+
+@theme inline {
+  /* Base */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  /* Gray scale - mapped to Tailwind classes */
+  --color-gray-50: var(--color-gray-50);
+  --color-gray-100: var(--color-gray-100);
+  --color-gray-300: var(--color-gray-300);
+  --color-gray-400: var(--color-gray-400);
+  --color-gray-600: var(--color-gray-600);
+  --color-gray-700: var(--color-gray-700);
+  --color-gray-800: var(--color-gray-800);
+  --color-gray-900: var(--color-gray-900);
+
+  /* Blue - mapped to Tailwind classes */
+  --color-blue-100: var(--color-blue-100);
+  --color-blue-400: var(--color-blue-400);
+  --color-blue-600: var(--color-blue-600);
+  --color-blue-700: var(--color-blue-700);
+
+  /* Red - mapped to Tailwind classes */
+  --color-red-100: var(--color-red-100);
+  --color-red-400: var(--color-red-400);
+  --color-red-500: var(--color-red-500);
+  --color-red-600: var(--color-red-600);
+  --color-red-700: var(--color-red-700);
+
+  /* Zinc - mapped to Tailwind classes */
+  --color-zinc-50: var(--color-zinc-50);
+  --color-zinc-400: var(--color-zinc-400);
+  --color-zinc-600: var(--color-zinc-600);
+  --color-zinc-950: var(--color-zinc-950);
+
+  /* Semantic */
+  --color-white: var(--color-white);
+  --color-black: var(--color-black);
+
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
