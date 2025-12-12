@@ -1,3 +1,3 @@
-import UserProfile from '@/pages-dir/user-profile/index'
+import UserProfile from '@/components/pages/user-profile/index'
 
 export default UserProfile

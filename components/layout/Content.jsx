@@ -1,14 +1,13 @@
 // Theme colors - Tailwind classes like bg-gray-100 use theme colors via CSS variables
-import { themeColors } from '@/theme';
+import { themeColors } from '@/theme'
 
-const Content = ({ 
-  children, 
+const Content = ({
+  children,
   containerType = 'none', // 'none' | 'fixed' | 'fluid'
   padding = 'p-6',
   background = 'bg-gray-100',
-  isSidebarExpanded = false // Add this prop
+  isSidebarExpanded = false, // Add this prop
 }) => {
-
   const getContainerClass = () => {
     switch (containerType) {
       case 'fixed':
@@ -25,15 +24,13 @@ const Content = ({
       className={`
         flex-1 overflow-x-hidden overflow-y-auto min-h-0
         transition-all duration-500 ease-in-out
-        ${isSidebarExpanded ? 'ml-72' : 'ml-20'} // Dynamic margin based on sidebar state
+        ${isSidebarExpanded ? 'ml-72' : 'ml-0'} // Dynamic margin based on sidebar state
         ${background}
         ${padding}
       `.trim()}
     >
       {containerType !== 'none' ? (
-        <div className={getContainerClass()}>
-          {children}
-        </div>
+        <div className={getContainerClass()}>{children}</div>
       ) : (
         <>{children}</>
       )}
@@ -41,4 +38,4 @@ const Content = ({
   )
 }
 
-export {Content}
+export { Content }

@@ -129,34 +129,42 @@ const DataTable: React.FC<DataTableProps> = ({
         <table className="w-full border-collapse text-sm text-gray-700">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              {columns.map(column => (
-                <th
-                  key={column.key}
-                  className={`px-4 py-3 font-semibold text-gray-800 ${getAlignmentClass(column.align)}`}
-                  style={column.width ? { width: column.width } : {}}
-                >
-                  <div className="flex items-center">
-                    {column.label}
-                    {column.sortable && (
-                      <button className="ml-1 text-gray-400 hover:text-gray-600">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                          />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                </th>
-              ))}
+              {columns.map(column => {
+                const isCenter = column.align === 'center'
+                const isRight = column.align === 'right'
+                return (
+                  <th
+                    key={column.key}
+                    className={`px-4 py-3 font-semibold text-gray-800 ${getAlignmentClass(column.align)}`}
+                    style={column.width ? { width: column.width } : {}}
+                  >
+                    <div
+                      className={`flex items-center ${
+                        isCenter ? 'justify-center' : isRight ? 'justify-end' : 'justify-start'
+                      }`}
+                    >
+                      {column.label}
+                      {column.sortable && (
+                        <button className="ml-1 text-gray-400 hover:text-gray-600">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </th>
+                )
+              })}
             </tr>
           </thead>
 

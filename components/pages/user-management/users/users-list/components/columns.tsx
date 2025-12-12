@@ -15,9 +15,8 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       align: 'left' as const,
       render: (value: any, user: any) => {
         const userImage = user.profile_image_path || user.image || user.profile_image
-        const userName = user.full_name ||
-          `${user.first_name || ''} ${user.last_name || ''}`.trim() ||
-          'User'
+        const userName =
+          user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User'
 
         return (
           <Link href={`#`} className="block">
@@ -59,9 +58,11 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       render: (value: any, user: any) => {
         const role = user.role || user.roles?.[0] || 'N/A'
         return (
-          <span className="inline-flex items-center px-1 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-            {role}
-          </span>
+          <div className="flex justify-center">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+              {role}
+            </span>
+          </div>
         )
       },
     },
@@ -89,12 +90,12 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       width: '15%',
       align: 'center' as const,
       render: (value: any, user: any) => (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={user}
             from="id"
-            editBtnPath={`/user-management/users/edit/${user.id || user.uuid}`}
-            showBtnPath={`/user-management/users/${user.id || user.uuid}`}
+            editBtnPath={`/user-management/users/edit-user/${user.id || user.uuid}`}
+            showBtnPath={`/user-management/users/users-detail/${user.id || user.uuid}`}
             deleteResourceId={
               onDeleteClick
                 ? (id: string) => {

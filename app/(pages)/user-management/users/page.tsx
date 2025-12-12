@@ -1,4 +1,3 @@
-import UsersList from '@/pages-dir/user-management/users/users-list/UsersList'
+import UsersList from '@/components/pages/user-management/users/index'
 
 export default UsersList
-
