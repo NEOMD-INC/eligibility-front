@@ -104,7 +104,12 @@ const Header = () => {
                 >
                   Carrier Addresses
                 </Link>
-                <a className="block px-3 py-2 hover:bg-gray-100 cursor-pointer">Carrier Setup</a>
+                <Link
+                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  href="/settings/carrier-setup"
+                >
+                  Carrier Setup
+                </Link>
                 <a className="block px-3 py-2 hover:bg-gray-100 cursor-pointer">Availity Payer</a>
               </div>
             )}
