@@ -4,8 +4,8 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import Link from 'next/link'
-// Theme colors - Tailwind classes like bg-blue-600, text-gray-800, etc. use theme colors via CSS variables
 import { themeColors } from '@/theme'
+import { authService } from '@/services/auth.service'
 
 export default function ForgotPasswordPage() {
   const [btnLoading, setBtnLoading] = useState(false)
@@ -24,12 +24,19 @@ export default function ForgotPasswordPage() {
     }),
 
     onSubmit: async values => {
-      setBtnLoading(true)
-      setIsError(false)
+      try {
+        setBtnLoading(true)
+        setIsError(false)
 
-      console.log('Reset request:', values)
-
-      setTimeout(() => setBtnLoading(false), 1200)
+        await authService.forgotPassword({
+          email: values.email,
+        })
+      } catch (error: any) {
+        setIsError(true)
+        setErrorMsg(error.response?.data?.message || 'Something went wrong')
+      } finally {
+        setBtnLoading(false)
+      }
     },
   })
 

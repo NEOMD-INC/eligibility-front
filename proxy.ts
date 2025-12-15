@@ -1,22 +1,39 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
 export function proxy(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
+  const token = request.cookies.get('access_token')?.value
+  const pathname = request.nextUrl.pathname
 
-  // Allow the login page
-  // if (request.nextUrl.pathname === "/login") {
-  //   return NextResponse.next();
-  // }
+  const protectedPaths = ['/patient-dashboard', '/settings', '/user-management', '/user-profile']
 
-  // // Redirect if missing token
-  // if (!token) {
-  //   return NextResponse.redirect(new URL("/login", request.url));
-  // }
+  if (!token && protectedPaths.some(p => pathname.startsWith(p))) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 
-  return NextResponse.next();
+  if (pathname === '/') {
+    if (token) {
+      return NextResponse.redirect(new URL('/patient-dashboard', request.url))
+    } else {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  if (token && pathname.startsWith('/login') && pathname.startsWith('/register')) {
+    return NextResponse.redirect(new URL('/patient-dashboard', request.url))
+  }
+
+  // For all other requests, just continue
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/"],
-};
+  matcher: [
+    '/',
+    '/patient-dashboard/:path*',
+    '/settings/:path*',
+    '/user-management/:path*',
+    '/user-profile/:path*',
+    '/login',
+  ], // Run middleware on '/'
+}

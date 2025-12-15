@@ -7,24 +7,24 @@ import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import { themeColors } from '@/theme'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/services/auth.service'
+import { useSearchParams } from 'next/navigation'
 
-export default function RegisterPage() {
+export default function ResetPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [btnLoading, setBtnLoading] = useState(false)
   const [isError, setIsError] = useState(false)
-  const [errorMsg, setErrorMsg] = useState('Create your account to access the Elegibility system.')
+  const [errorMsg, setErrorMsg] = useState('Reset Your Password to access the Elegibility system.')
+  const token = searchParams.get('token')
+  const email = searchParams.get('email')
 
   const formik = useFormik({
     initialValues: {
-      fullName: '',
-      email: '',
       password: '',
       confirmPassword: '',
     },
 
     validationSchema: Yup.object({
-      fullName: Yup.string().required('Required'),
-      email: Yup.string().email('Invalid email').required('Required'),
       password: Yup.string().min(6, 'Minimum 6 characters').required('Required'),
       confirmPassword: Yup.string()
         .oneOf([Yup.ref('password')], 'Passwords must match')
@@ -37,13 +37,13 @@ export default function RegisterPage() {
 
       try {
         const payload = {
-          name: values.fullName,
-          email: values.email,
+          token,
+          email,
           password: values.password,
           password_confirmation: values.confirmPassword,
         }
 
-        await authService.register(payload)
+        await authService.resetPassword(payload)
 
         router.push('/login')
       } catch (err: any) {
@@ -69,48 +69,6 @@ export default function RegisterPage() {
         }`}
       >
         <span>{errorMsg}</span>
-      </div>
-
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-800 mb-1">Full Name</label>
-        <input
-          type="text"
-          name="fullName"
-          placeholder="Your full name"
-          autoComplete="off"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.fullName}
-          className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-            formik.touched.fullName && formik.errors.fullName
-              ? 'border-red-500 focus:ring-red-400'
-              : 'border-gray-300 focus:ring-blue-400'
-          }`}
-        />
-        {formik.touched.fullName && formik.errors.fullName && (
-          <p className="text-red-600 text-sm mt-1">{formik.errors.fullName}</p>
-        )}
-      </div>
-
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-800 mb-1">Email</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          autoComplete="off"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.email}
-          className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-            formik.touched.email && formik.errors.email
-              ? 'border-red-500 focus:ring-red-400'
-              : 'border-gray-300 focus:ring-blue-400'
-          }`}
-        />
-        {formik.touched.email && formik.errors.email && (
-          <p className="text-red-600 text-sm mt-1">{formik.errors.email}</p>
-        )}
       </div>
 
       <div className="mb-6">
@@ -163,7 +121,7 @@ export default function RegisterPage() {
 
       <SubmitButton
         type="submit"
-        title="Register"
+        title="Reset Password"
         class_name="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition"
         btnLoading={btnLoading}
         callback_event=""

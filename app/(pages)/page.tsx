@@ -1,3 +1,2 @@
-export default function DashbaordPages () {
-    return(<div>hello dashbaord here</div>)
-}
+import PatientDashboard from '@/app/(pages)/patient-dashboard/page'
+export default <PatientDashboard />

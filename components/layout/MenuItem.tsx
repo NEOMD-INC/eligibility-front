@@ -1,35 +1,26 @@
 'use client'
 
 import Link from 'next/link'
-import axios from 'axios'
+import { deleteCookie } from '@/lib/cookies/cookies'
+import { authService } from '@/services/auth.service'
+import { useRouter } from 'next/navigation'
+import { useDispatch } from 'react-redux'
+import { clearUser } from '@/redux/slices/current-user/userSlice'
 
 const MenuItems = () => {
+  const router = useRouter()
+  const dispatch = useDispatch()
   const logoutbtn = async e => {
     e.preventDefault()
 
-    if (typeof window === 'undefined') {
-      return
-    }
-
     try {
-      const token = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('token') : null
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/logout`, config)
-    } catch (error) {
-      console.error('Error:', error)
+      await authService.logout()
+      deleteCookie('access_token')
+      dispatch(clearUser())
+      router.push('/login')
+    } catch (err: any) {
+      console.error('Logout failed:', err)
     }
-
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.clear()
-    }
-    if (typeof localStorage !== 'undefined') {
-      localStorage.clear()
-    }
-    window.location.reload()
   }
 
   return (

@@ -3,6 +3,8 @@ import { useEffect, useState, useRef } from 'react'
 import { MenuItems } from './MenuItem'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
 
 const Header = () => {
   const [eligibilityOpen, setEligibilityOpen] = useState(false)
@@ -13,6 +15,7 @@ const Header = () => {
   const settingsRef = useRef(null)
   const userMgmtRef = useRef(null)
   const profileRef = useRef(null)
+  const user = useSelector((state: RootState) => state?.user?.user)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -62,7 +65,12 @@ const Header = () => {
         >
           <a style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>NeoMD</a>
 
-          <a style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}>Patient Dashboard</a>
+          <Link
+            style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
+            href="/patient-dashboard"
+          >
+            Patient Dashboard
+          </Link>
 
           <div ref={eligibilityRef} className="relative">
             <button
@@ -74,10 +82,24 @@ const Header = () => {
 
             {eligibilityOpen && (
               <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
-                <a className="block px-3 py-2 hover:bg-gray-100 cursor-pointer">Indivitual</a>
-                <a className="block px-3 py-2 hover:bg-gray-100 cursor-pointer">Bulk</a>
-                <a className="block px-3 py-2 hover:bg-gray-100 cursor-pointer">History</a>
-                <a className="block px-3 py-2 hover:bg-gray-100 cursor-pointer">Settings</a>
+                <Link
+                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  href="/eligibility/indivitual"
+                >
+                  Indivitual
+                </Link>
+                <Link className="block px-3 py-2 hover:bg-gray-100 cursor-pointer" href="#">
+                  Bulk
+                </Link>
+                <Link className="block px-3 py-2 hover:bg-gray-100 cursor-pointer" href="#">
+                  History
+                </Link>
+                <Link
+                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  href="/eligibility/settings"
+                >
+                  Settings
+                </Link>
               </div>
             )}
           </div>
@@ -110,7 +132,12 @@ const Header = () => {
                 >
                   Carrier Setup
                 </Link>
-                <a className="block px-3 py-2 hover:bg-gray-100 cursor-pointer">Availity Payer</a>
+                <Link
+                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  href="/settings/availity-payer"
+                >
+                  Availity Payer
+                </Link>
               </div>
             )}
           </div>
@@ -153,7 +180,7 @@ const Header = () => {
         <div className="relative mt-3" ref={profileRef}>
           <div onClick={() => setIsProductOpen(!isProductOpen)} className="cursor-pointer">
             <div className="w-40 h-10 flex justify-end overflow-hidden">
-              <div>Super Admin ▾</div>
+              <div>{user?.name ? `${user.name} ▾` : 'Super Admin ▾'}</div>
             </div>
           </div>
 

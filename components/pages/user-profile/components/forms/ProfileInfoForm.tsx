@@ -1,39 +1,82 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useDispatch, useSelector } from 'react-redux'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import { updateUserProfile, clearProfileError } from '@/redux/slices/user-profile/reducer'
+import { setUser } from '@/redux/slices/current-user/userSlice'
+import { AppDispatch, RootState } from '@/redux/store'
 // Theme colors - Tailwind classes like bg-blue-600, text-gray-800, etc. use theme colors via CSS variables
 import { themeColors } from '@/theme'
 
 export default function ProfileInfoForm() {
-  const [btnLoading, setBtnLoading] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const { user } = useSelector((state: RootState) => state.user)
+  const { updateProfileLoading, updateProfileError } = useSelector(
+    (state: RootState) => state.userProfile
+  )
+  const [showSuccess, setShowSuccess] = useState(false)
 
   const formik = useFormik({
     initialValues: {
-      name: '',
-      email: '',
+      name: user?.name || '',
+      email: user?.email || '',
     },
-
+    enableReinitialize: true,
     validationSchema: Yup.object({
       name: Yup.string().required('Required'),
       email: Yup.string().email('Invalid email address').required('Required'),
     }),
 
     onSubmit: async values => {
-      console.log(values)
+      dispatch(clearProfileError())
+      setShowSuccess(false)
+      const result = await dispatch(updateUserProfile({ name: values.name, email: values.email }))
+      if (updateUserProfile.fulfilled.match(result)) {
+        // Update user data in current-user slice if response contains updated user data
+        if (result.payload?.data) {
+          dispatch(setUser({ ...user, ...result.payload.data }))
+        } else {
+          // Otherwise update with the values we just submitted
+          dispatch(setUser({ ...user, name: values.name, email: values.email }))
+        }
+        setShowSuccess(true)
+        setTimeout(() => setShowSuccess(false), 3000)
+      }
     },
   })
+
+  // Clear error when component unmounts or form is reset
+  useEffect(() => {
+    return () => {
+      dispatch(clearProfileError())
+    }
+  }, [dispatch])
 
   return (
     <div>
       <form className="w-full" onSubmit={formik.handleSubmit}>
+        {/* Error message */}
+        {updateProfileError && (
+          <div className="mb-4 p-4 rounded-lg bg-red-100 text-red-700">
+            <span>{updateProfileError}</span>
+          </div>
+        )}
+
+        {/* Success message */}
+        {showSuccess && !updateProfileError && (
+          <div className="mb-4 p-4 rounded-lg bg-green-100 text-green-700">
+            <span>Profile updated successfully!</span>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name field */}
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-1">Name</label>
             <input
-              type="name"
+              type="text"
               name="name"
               placeholder="Name"
               autoComplete="off"
@@ -85,7 +128,7 @@ export default function ProfileInfoForm() {
             class_name="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition"
             title="Save"
             callback_event=""
-            btnLoading={btnLoading}
+            btnLoading={updateProfileLoading}
           />
         </div>
       </form>

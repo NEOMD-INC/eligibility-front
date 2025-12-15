@@ -1,6 +1,6 @@
 // Theme colors - Tailwind classes use theme colors via CSS variables
-import { themeColors } from '@/theme';
-import LoginPage from '@/pages-dir/auth/login/index';
+import { themeColors } from '@/theme'
+import LoginPage from '@/components/pages/auth/login/index'
 
 export default function Login() {
   return (
@@ -14,5 +14,5 @@ export default function Login() {
         <LoginPage />
       </div>
     </div>
-  );
+  )
 }

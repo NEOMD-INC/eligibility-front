@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-// import { useAppDispatch } from '../../redux/hooks/hooks'
-// import { addUser, setProfileId, setLoading, setError, clearError } from '@/redux/slices/userSlice'
-import { TokenManager } from '../../../utils/token'
-// Theme colors - Tailwind classes like bg-blue-600, text-gray-800, etc. use theme colors via CSS variables
 import { themeColors } from '@/theme'
+import { authService } from '@/services/auth.service'
+import { setCookie } from '@/lib/cookies/cookies'
+import { useDispatch } from 'react-redux'
+import { setUser } from '@/redux/slices/current-user/userSlice'
 
 interface LoginValues {
   email: string
@@ -19,7 +19,7 @@ interface LoginValues {
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  //   const dispatch = useAppDispatch()
+  const dispatch = useDispatch()
 
   const [btnLoading, setBtnLoading] = useState(false)
   const [isError, setIsError] = useState(false)
@@ -27,14 +27,7 @@ export default function LoginPage() {
     'Please login! if you have credential or contact NeoMD Billing team'
   )
 
-  const redirect = searchParams.get('redirect') || '/dashboard'
-
-  // Clear errors when component unmounts
-  //   useEffect(() => {
-  //     return () => {
-  //       dispatch(clearError())
-  //     }
-  //   }, [dispatch])
+  const redirect = searchParams.get('redirect') || '/'
 
   const formik = useFormik({
     initialValues: {
@@ -48,55 +41,33 @@ export default function LoginPage() {
     }),
 
     onSubmit: async values => {
-      console.log(values)
       setBtnLoading(true)
       setIsError(false)
-      //   dispatch(setLoading(true))
-      //   dispatch(clearError())
 
-      //   try {
-      //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
-      //       method: 'POST',
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //       },
-      //       body: JSON.stringify(values),
-      //     })
+      try {
+        const res = await authService.login({
+          email: values.email,
+          password: values.password,
+        })
 
-      //     const data = await response.json()
+        const { access_token } = res.data.data.token
+        const { user } = res.data.data
 
-      //     if (!response.ok) {
-      //       throw new Error(data.message || 'Login failed')
-      //     }
+        setCookie('access_token', access_token, 60 * 15)
+        dispatch(setUser(user))
 
-      //     const userData = data.data
-      //     const accessToken = userData.bearer_token.accessToken
-
-      //     // Store token
-      //     TokenManager.setToken(accessToken)
-
-      //     // Update Redux state
-      //     console.log(userData, "userData")
-      //     dispatch(addUser(userData))
-      //     dispatch(setProfileId(userData.id))
-
-      //     // Redirect to dashboard
-      //     router.replace(redirect)
-      //   } catch (err: any) {
-      //     setBtnLoading(false)
-      //     dispatch(setLoading(false))
-
-      //     const errorMessage = err.message || 'An error occurred during login.'
-      // setErrorMsg(errorMessage)
-      //     dispatch(setError(errorMessage))
-      //     setIsError(true)
-      //   }
+        router.push(redirect)
+      } catch (err: any) {
+        setIsError(true)
+        setErrorMsg(err?.response?.data?.message || 'Invalid credentials')
+      } finally {
+        setBtnLoading(false)
+      }
     },
   })
 
   return (
     <form className="w-full" onSubmit={formik.handleSubmit} id="kt_login_signin_form">
-      {/* ALERT BOX */}
       <div
         className={`mb-6 p-4 rounded-lg ${
           isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
