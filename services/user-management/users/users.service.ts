@@ -1,19 +1,41 @@
 import api from '@/lib/api/axios'
 
 export const userService = {
-  getCurrentUserDetail() {
-    return api.get('/user-detail')
+  getAllUsers: (
+    page: number,
+    filters?: {
+      search?: string
+      role?: string
+    }
+  ) => {
+    const params = new URLSearchParams({
+      page: String(page),
+    })
+
+    if (filters?.search) {
+      params.append('search', filters.search)
+    }
+
+    if (filters?.role) {
+      params.append('role', filters.role)
+    }
+
+    return api.get(`/users?${params.toString()}`)
   },
 
-  updateProfile(data: { name?: string; email?: string }) {
-    return api.put('/update-profile', data)
+  getUserById: (userId: string) => {
+    return api.get(`/users/${userId}`)
   },
 
-  updatePassword(data: {
-    current_password: string
-    password: string
-    password_confirmation: string
-  }) {
-    return api.post('/update-password', data)
+  createUser: (userData: {}) => {
+    return api.post('/users/store', userData)
+  },
+
+  updateUser: (userId: string, userData: {}) => {
+    return api.put(`/users/${userId}/update`, userData)
+  },
+
+  deleteUser: (userId: string) => {
+    return api.delete(`/users/${userId}/delete`)
   },
 }

@@ -1,67 +1,45 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import UsersListColumns from './components/columns'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
 import { Plus, Search, FunnelPlus } from 'lucide-react'
-
-const mockUsers = [
-  {
-    id: '1',
-    uuid: 'uuid-1',
-    first_name: 'John',
-    last_name: 'Doe',
-    full_name: 'John Doe',
-    email: 'john.doe@example.com',
-    username: 'johndoe',
-    role: 'Admin',
-    roles: ['Admin'],
-    gender: 'male',
-    profile_image_path: null,
-    created_at: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    uuid: 'uuid-2',
-    first_name: 'Jane',
-    last_name: 'Smith',
-    full_name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    username: 'janesmith',
-    role: 'User',
-    roles: ['User'],
-    gender: 'female',
-    profile_image_path: null,
-    created_at: '2024-02-20T14:20:00Z',
-  },
-  {
-    id: '3',
-    uuid: 'uuid-3',
-    first_name: 'Bob',
-    last_name: 'Johnson',
-    full_name: 'Bob Johnson',
-    email: 'bob.johnson@example.com',
-    username: 'bobjohnson',
-    role: 'Manager',
-    roles: ['Manager'],
-    gender: 'male',
-    profile_image_path: null,
-    created_at: '2024-03-10T09:15:00Z',
-  },
-]
+import {
+  fetchAllUsers,
+  deleteUser,
+  setCurrentPage,
+  clearUsersError,
+} from '@/redux/slices/user-management/users/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 export default function UsersList() {
-  const [loading, setLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
+  const dispatch = useDispatch<AppDispatch>()
+  const { users, loading, totalItems, currentPage, deleteLoading, error } = useSelector(
+    (state: RootState) => state.users
+  )
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [searchText, setSearchText] = useState('')
-  const [searchField, setSearchField] = useState('first_name')
+  const [roleFilter, setRoleFilter] = useState('allrole')
+  const [appliedSearch, setAppliedSearch] = useState('')
+  const [appliedRole, setAppliedRole] = useState('allrole')
   const filterRef = useRef<HTMLDivElement>(null)
   const itemsPerPage = 10
 
-  // Close filter dropdown when clicking outside
+  // Fetch users on component mount and when applied filters/page change
+  useEffect(() => {
+    const filters: { search?: string; role?: string } = {}
+    if (appliedSearch.trim()) {
+      filters.search = appliedSearch.trim()
+    }
+    if (appliedRole && appliedRole !== 'allrole') {
+      filters.role = appliedRole
+    }
+    dispatch(fetchAllUsers({ page: currentPage, filters }))
+  }, [dispatch, currentPage, appliedSearch, appliedRole])
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
@@ -78,40 +56,50 @@ export default function UsersList() {
     }
   }, [isFilterOpen])
 
-  const handleDeleteClick = (id: string, userName: string) => {
+  const handleDeleteClick = async (id: string, userName: string) => {
     if (confirm(`Are you sure you want to delete user "${userName}"?`)) {
-      console.log('Delete user:', id, userName)
+      dispatch(clearUsersError())
+      const result = await dispatch(deleteUser(id))
+      if (deleteUser.fulfilled.match(result)) {
+        const filters: { search?: string; role?: string } = {}
+        if (appliedSearch.trim()) {
+          filters.search = appliedSearch.trim()
+        }
+        if (appliedRole && appliedRole !== 'allrole') {
+          filters.role = appliedRole
+        }
+        dispatch(fetchAllUsers({ page: currentPage, filters }))
+      }
     }
   }
 
-  // Filter handlers
   const handleQuickSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value)
   }
 
   const handleSearchFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSearchField(e.target.value)
+    setRoleFilter(e.target.value)
   }
 
   const handleSubmit = () => {
-    // TODO: Implement search/filter logic
-    console.log('Search:', searchText, 'Field:', searchField)
+    setAppliedSearch(searchText)
+    setAppliedRole(roleFilter)
+    dispatch(setCurrentPage(1))
     setIsFilterOpen(false)
   }
 
   const resetSearchField = () => {
     setSearchText('')
-    setSearchField('first_name')
+    setRoleFilter('allrole')
+    setAppliedSearch('')
+    setAppliedRole('allrole')
+    dispatch(setCurrentPage(1))
   }
 
   const columns = UsersListColumns({ onDeleteClick: handleDeleteClick })
-  const totalItems = mockUsers.length
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedData = mockUsers.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    dispatch(setCurrentPage(page))
   }
 
   return (
@@ -194,11 +182,13 @@ export default function UsersList() {
                           <select
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold bg-white"
                             onChange={handleSearchFieldChange}
-                            value={searchField}
+                            value={roleFilter}
                           >
                             <option value="allrole">All Role</option>
-                            <option value="allrole">User</option>
-                            <option value="allrole">Employee</option>
+                            <option value="super_admin">Super Admin</option>
+                            <option value="employee">Employee</option>
+                            <option value="manager">Manager</option>
+                            <option value="team_lead">Team Lead</option>
                           </select>
                         </div>
                       </div>
@@ -231,9 +221,9 @@ export default function UsersList() {
         {/* DataTable */}
         <DataTable
           columns={columns}
-          data={paginatedData}
-          loading={loading}
-          totalItems={totalItems}
+          data={Array.isArray(users) ? users : []}
+          loading={loading || deleteLoading}
+          totalItems={totalItems || 0}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
           onPageChange={handlePageChange}
@@ -245,6 +235,11 @@ export default function UsersList() {
           }
           className="shadow-none rounded-none"
         />
+        {error && (
+          <div className="px-6 py-4 bg-red-50 border-t border-red-200">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -9,24 +9,26 @@ interface RolesListColumnsProps {
 export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProps = {}) {
   const rolesColumns = [
     {
-      key: 'roleName',
+      key: 'name',
       label: 'Role Name',
       width: '20%',
       align: 'left' as const,
-      render: (value: any, user: any) => {
-        const userImage = user.profile_image_path || user.image || user.profile_image
-        const userName =
-          user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User'
+      render: (value: any, role: any) => {
+        const roleName = role.name || role.role_name || 'N/A'
+        const roleId = role.id || role.uuid
 
         return (
-          <Link href={`#`} className="block">
+          <Link 
+            href={`/user-management/roles/role-detail/${roleId}`} 
+            className="block"
+          >
             <div className="flex items-center">
               <div className="flex flex-col justify-start min-w-0">
                 <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
-                  {userName || 'N/A'}
+                  {roleName}
                 </div>
-                {user.username && (
-                  <span className="text-gray-500 text-sm truncate">{user.username}</span>
+                {role.guard_name && (
+                  <span className="text-gray-500 text-sm truncate">{role.guard_name}</span>
                 )}
               </div>
             </div>
@@ -57,11 +59,17 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       align: 'center' as const,
       render: (value: any, role: any) => {
         const permissions = role.permissions || role.permission_names || []
+        // Handle both array of strings and array of objects
+        const permissionList = Array.isArray(permissions) 
+          ? permissions.map((perm: any) => 
+              typeof perm === 'string' ? perm : (perm.name || perm.permission_name || perm))
+          : []
+        
         return (
           <div className="flex justify-center">
             <div className="inline-flex items-center flex-wrap justify-center gap-1">
-              {permissions.length > 0 ? (
-                permissions.slice(0, 2).map((perm: string, index: number) => (
+              {permissionList.length > 0 ? (
+                permissionList.slice(0, 2).map((perm: string, index: number) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
@@ -72,8 +80,8 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
               ) : (
                 <span className="text-gray-500 text-sm">No permissions</span>
               )}
-              {permissions.length > 2 && (
-                <span className="text-gray-500 text-xs">+{permissions.length - 2} more</span>
+              {permissionList.length > 2 && (
+                <span className="text-gray-500 text-xs">+{permissionList.length - 2} more</span>
               )}
             </div>
           </div>

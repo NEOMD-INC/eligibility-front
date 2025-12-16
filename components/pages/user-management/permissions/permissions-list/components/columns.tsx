@@ -31,7 +31,7 @@ export default function PermissionsListColumns({
       width: '15%',
       align: 'center' as const,
       render: (value: any, permission: any) => {
-        const role = permission.role || permission.roles?.[0] || 'N/A'
+        const role = permission.roles_count || 'N/A'
         return (
           <div className="flex justify-center">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">

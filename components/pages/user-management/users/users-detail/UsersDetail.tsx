@@ -1,63 +1,159 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useRouter, useParams } from 'next/navigation'
 import { UserProfileImage } from '@/components/ui/image/Image'
-import { useRouter } from 'next/navigation'
+import {
+  fetchUserById,
+  clearCurrentUser,
+  clearUsersError,
+} from '@/redux/slices/user-management/users/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 export default function UsersDetail() {
   const router = useRouter()
+  const params = useParams()
+  const userId = params?.id as string
+  const dispatch = useDispatch<AppDispatch>()
+  const { currentUser, fetchUserLoading, error } = useSelector((state: RootState) => state.users)
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(clearUsersError())
+      dispatch(fetchUserById(userId))
+    }
+    return () => {
+      dispatch(clearCurrentUser())
+    }
+  }, [dispatch, userId])
+
+  // Format date helper
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  }
 
   const USER_DETAILS = [
     {
       title: 'Full Name',
-      value: 'Super Admin',
+      value: currentUser?.name || 'N/A',
     },
     {
       title: 'Email Address',
-      value: 'superAdmin@gmail.com',
+      value: currentUser?.email || 'N/A',
     },
     {
       title: 'Member Since',
-      value: '13 jan 2023',
+      value: formatDate(currentUser?.created_at),
     },
     {
       title: 'Last Updated',
-      value: '3 months ago',
+      value: currentUser?.updated_at ? formatDate(currentUser.updated_at) : 'N/A',
     },
   ]
-  const ROLE_DETAILS = [
-    {
-      title: 'superAdmin',
-    },
-    {
-      title: 'Admin',
-    },
-  ]
-  const PERMISSIONS_GROUPED = [
-    {
-      title: 'view',
-      permissions: ['view role', 'view users'],
-    },
-    {
-      title: 'create',
-      permissions: ['create role'],
-    },
-    {
-      title: 'edit',
-      permissions: ['edit role', 'edit users', 'edit permissions'],
-    },
-    {
-      title: 'delete',
-      permissions: ['delete role', 'delete users', 'delete permissions'],
-    },
-    {
-      title: 'import',
-      permissions: ['import role'],
-    },
-    {
-      title: 'retry',
-      permissions: ['retry submission'],
-    },
-  ]
+
+  // Extract roles from user data - handle both string and object formats
+  const ROLE_DETAILS = currentUser?.roles
+    ? currentUser.roles.map((role: any) => ({
+        title: typeof role === 'string' ? role : role?.name || 'N/A',
+      }))
+    : currentUser?.role
+      ? [
+          {
+            title:
+              typeof currentUser.role === 'string'
+                ? currentUser.role
+                : currentUser.role?.name || 'N/A',
+          },
+        ]
+      : []
+
+  // Group permissions by prefix (the part before the underscore)
+  const groupPermissionsByPrefix = (permissions: any[]) => {
+    if (!permissions || !Array.isArray(permissions) || permissions.length === 0) {
+      return []
+    }
+
+    const grouped: { [key: string]: string[] } = {}
+
+    permissions.forEach((permission: any) => {
+      // Get the permission name (handle both string and object with name property)
+      const permissionName =
+        typeof permission === 'string' ? permission : permission?.name || ''
+
+      if (permissionName) {
+        // Extract the prefix (part before the first underscore)
+        const prefix = permissionName.split('_')[0] || permissionName
+
+        if (!grouped[prefix]) {
+          grouped[prefix] = []
+        }
+
+        // Add the full permission name to the group
+        grouped[prefix].push(permissionName)
+      }
+    })
+
+    // Convert to array format with title and permissions
+    return Object.keys(grouped)
+      .sort()
+      .map(prefix => ({
+        name: prefix,
+        permissions: grouped[prefix],
+      }))
+  }
+
+  // Get permissions from all roles and group them
+  const allPermissions =
+    currentUser?.roles?.flatMap((role: any) => role?.permissions || []) || []
+  const PERMISSIONS_GROUPED = groupPermissionsByPrefix(allPermissions)
+
+  if (fetchUserLoading) {
+    return (
+      <div className="flex items-center justify-center p-6">
+        <div className="text-center">
+          <p className="text-gray-600">Loading user details...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-6">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => router.push('/user-management/users')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="flex items-center justify-center p-6">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">User not found</p>
+          <button
+            onClick={() => router.push('/user-management/users')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
@@ -68,13 +164,14 @@ export default function UsersDetail() {
           {/* Left: Profile Info */}
           <div className="flex items-center gap-6">
             <div className="w-20 h-20 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0">
-              <UserProfileImage profileImagePath={null} width={80} />
+              <UserProfileImage profileImagePath={currentUser?.profile_image_path} width={80} />
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">superadmin</h2>
-              <p className="text-blue-100">superadmin@gmail.com</p>
-              <p className="text-sm mt-1 bg-blue-800 inline-block px-3 py-1 rounded-full">you</p>
+              <h2 className="text-2xl font-semibold">
+                {currentUser?.username || currentUser?.full_name || 'User'}
+              </h2>
+              <p className="text-blue-100">{currentUser?.email || 'N/A'}</p>
             </div>
           </div>
         </div>
@@ -106,29 +203,38 @@ export default function UsersDetail() {
           ))}
         </div>
 
-        <h1 className="text-2xl font-bold mb-4 pb-3 mt-5">Permissions</h1>
+        {PERMISSIONS_GROUPED.length > 0 && (
+          <>
+            <h1 className="text-2xl font-bold mb-4 pb-3 mt-5">Permissions</h1>
 
-        <div className="border-b pb-6">
-          {PERMISSIONS_GROUPED.map((group, groupIndex) => (
-            <div key={groupIndex} className="mb-2">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3 capitalize">{group.title}</h3>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {group.permissions.map((permission, permIndex) => (
-                  <span
-                    key={permIndex}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-700"
-                  >
-                    {permission}
-                  </span>
-                ))}
-              </div>
+            <div className="border-b pb-6">
+              {PERMISSIONS_GROUPED.map((group: any, groupIndex: number) => (
+                <div key={groupIndex} className="mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 capitalize">
+                    {group.name}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {group.permissions?.map((permission: string, permIndex: number) => (
+                      <span
+                        key={permIndex}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-700"
+                      >
+                        {permission}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
 
         <div className="flex justify-end gap-2 mt-5">
           <div>
-            <button className="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg shadow">
+            <button
+              onClick={() => router.push(`/user-management/users/edit/${userId}`)}
+              className="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg shadow"
+            >
               Edit User
             </button>
           </div>

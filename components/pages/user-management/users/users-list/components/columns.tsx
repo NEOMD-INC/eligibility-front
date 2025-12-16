@@ -15,8 +15,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       align: 'left' as const,
       render: (value: any, user: any) => {
         const userImage = user.profile_image_path || user.image || user.profile_image
-        const userName =
-          user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User'
+        const userName = user.name || 'User'
 
         return (
           <Link href={`#`} className="block">
@@ -56,11 +55,23 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       width: '15%',
       align: 'center' as const,
       render: (value: any, user: any) => {
-        const role = user.role || user.roles?.[0] || 'N/A'
+        // Handle different role structures: string, object with name property, or array of objects/strings
+        let roleDisplay = 'N/A'
+
+        if (user.role) {
+          // If role is a string, use it directly
+          roleDisplay = typeof user.role === 'string' ? user.role : user.role.name || 'N/A'
+        } else if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+          // If roles is an array, get the first one
+          const firstRole = user.roles[0]
+          // Check if it's an object with a name property or a string
+          roleDisplay = typeof firstRole === 'string' ? firstRole : firstRole?.name || 'N/A'
+        }
+
         return (
           <div className="flex justify-center">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-              {role}
+              {roleDisplay}
             </span>
           </div>
         )

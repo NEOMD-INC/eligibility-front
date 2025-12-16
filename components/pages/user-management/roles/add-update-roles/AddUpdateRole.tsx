@@ -3,7 +3,17 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useDispatch, useSelector } from 'react-redux'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import {
+  createRole,
+  updateRole,
+  fetchRoleById,
+  clearRolesError,
+  clearCurrentRole,
+} from '@/redux/slices/user-management/roles/actions'
+import { fetchAllPermissions } from '@/redux/slices/user-management/permissions/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 interface AddRoleValues {
   roleName: string
@@ -15,42 +25,60 @@ interface EditRoleValues {
   permissions: string[]
 }
 
-const PERMISSIONS_GROUPED = [
-  {
-    title: 'view',
-    permissions: ['view role', 'view users'],
-  },
-  {
-    title: 'create',
-    permissions: ['create role'],
-  },
-  {
-    title: 'edit',
-    permissions: ['edit role', 'edit users', 'edit permissions'],
-  },
-  {
-    title: 'delete',
-    permissions: ['delete role', 'delete users', 'delete permissions'],
-  },
-  {
-    title: 'import',
-    permissions: ['import role'],
-  },
-  {
-    title: 'retry',
-    permissions: ['retry submission'],
-  },
-]
-
 export default function AddUpdateRole() {
   const router = useRouter()
   const params = useParams()
   const roleId = params?.id as string | undefined
   const isEditMode = !!roleId
+  const dispatch = useDispatch<AppDispatch>()
+  const { currentRole, createLoading, updateLoading, fetchRoleLoading, error } = useSelector(
+    (state: RootState) => state.roles
+  )
+  const { permissions: allPermissions, loading: permissionsLoading } = useSelector(
+    (state: RootState) => state.permissions
+  )
 
-  const [btnLoading, setBtnLoading] = useState(false)
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+
+  // Group permissions by prefix (e.g., "view_", "create_", etc.)
+  // Store permission objects with id and name
+  const PERMISSIONS_GROUPED = (() => {
+    if (!allPermissions || allPermissions.length === 0) {
+      return []
+    }
+
+    // Normalize permissions to objects with id and name
+    const normalizedPermissions = allPermissions
+      .map((perm: any) => {
+        if (perm && typeof perm === 'object') {
+          return {
+            id: perm.id || perm.uuid || String(perm.id),
+            name: perm.name || perm.permission_name || perm.permission || String(perm),
+          }
+        }
+        // If it's a string, we can't get the ID, so skip it
+        return null
+      })
+      .filter((perm: any) => perm && perm.id && perm.name)
+
+    // Group by prefix
+    return normalizedPermissions.reduce((acc: any[], perm: any) => {
+      if (!perm || !perm.name) return acc
+
+      const prefix = perm.name.split('_')[0] || 'other'
+      const existingGroup = acc.find(g => g.title === prefix)
+      if (existingGroup) {
+        existingGroup.permissions.push(perm)
+      } else {
+        acc.push({
+          title: prefix,
+          permissions: [perm],
+        })
+      }
+      return acc
+    }, [])
+  })()
 
   // Add Role Validation Schema
   const addRoleValidationSchema = Yup.object({
@@ -76,18 +104,27 @@ export default function AddUpdateRole() {
     },
     validationSchema: addRoleValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
+      dispatch(clearRolesError())
       setIsError(false)
+      setErrorMsg('')
+      
       try {
-        console.log('Add Role Values:', values)
-        // TODO: Add API call to create role
-        // await createRole(values)
-        setTimeout(() => {
-          setBtnLoading(false)
+        const roleData = {
+          name: values.roleName,
+          permissions: values.permissions,
+        }
+        
+        const result = await dispatch(createRole(roleData))
+        
+        if (createRole.fulfilled.match(result)) {
           router.push('/user-management/roles')
-        }, 1000)
+        } else {
+          setIsError(true)
+          setErrorMsg(
+            (result.payload as string) || 'An error occurred while creating the role.'
+          )
+        }
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
         setErrorMsg(err.message || 'An error occurred while creating the role.')
       }
@@ -102,72 +139,145 @@ export default function AddUpdateRole() {
     },
     validationSchema: editRoleValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
+      if (!roleId) return
+      
+      dispatch(clearRolesError())
       setIsError(false)
+      setErrorMsg('')
+      
       try {
-        console.log('Edit Role Values:', values)
-        // TODO: Add API call to update role
-        // await updateRole(roleId, values)
-        setTimeout(() => {
-          setBtnLoading(false)
+        const roleData = {
+          name: values.roleName,
+          permissions: values.permissions,
+        }
+        
+        const result = await dispatch(updateRole({ roleId, roleData }))
+        
+        if (updateRole.fulfilled.match(result)) {
           router.push('/user-management/roles')
-        }, 1000)
+        } else {
+          setIsError(true)
+          setErrorMsg(
+            (result.payload as string) || 'An error occurred while updating the role.'
+          )
+        }
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
         setErrorMsg(err.message || 'An error occurred while updating the role.')
       }
     },
   })
 
-  // Load role data in edit mode
+  // Fetch role data in edit mode
   useEffect(() => {
     if (isEditMode && roleId) {
-      const loadRoleData = async () => {
-        try {
-          editRoleFormik.setValues({
-            roleName: 'admin',
-            permissions: ['view role', 'view users', 'edit role', 'edit users'],
-          })
-        } catch (error) {
-          console.error('Error loading role data:', error)
-        }
-      }
-      loadRoleData()
+      dispatch(clearRolesError())
+      dispatch(clearCurrentRole())
+      dispatch(fetchRoleById(roleId))
     }
-  }, [isEditMode, roleId])
 
-  const handleAddPermissionChange = (permission: string, isChecked: boolean) => {
+    return () => {
+      if (isEditMode) {
+        dispatch(clearCurrentRole())
+      }
+    }
+  }, [dispatch, isEditMode, roleId])
+
+  // Populate form with role data when it's loaded
+  useEffect(() => {
+    if (isEditMode && currentRole && allPermissions.length > 0) {
+      // Extract role name
+      const roleName = currentRole.name || ''
+      
+      // Extract permissions - map permission names to IDs
+      const permissions = currentRole.permissions || []
+      const permissionIds: string[] = []
+      
+      permissions.forEach((perm: any) => {
+        // Get permission name
+        const permName = typeof perm === 'string' 
+          ? perm 
+          : (perm?.name || perm?.permission_name || perm?.permission || String(perm))
+        
+        if (permName) {
+          // Find the permission in allPermissions by name and get its ID
+          const foundPerm = allPermissions.find((p: any) => {
+            const pName = p.name || p.permission_name || p.permission
+            return pName === permName
+          })
+          
+          if (foundPerm && foundPerm.id) {
+            permissionIds.push(foundPerm.id || foundPerm.uuid)
+          }
+        }
+      })
+
+      editRoleFormik.setValues({
+        roleName,
+        permissions: permissionIds,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentRole, isEditMode, allPermissions])
+
+  // Fetch permissions on component mount
+  useEffect(() => {
+    // Fetch all permissions (use a large page size to get all permissions)
+    dispatch(fetchAllPermissions({ page: 1 }))
+  }, [dispatch])
+
+  // Update error message from Redux state
+  useEffect(() => {
+    if (error) {
+      setIsError(true)
+      setErrorMsg(error)
+    }
+  }, [error])
+
+  const handleAddPermissionChange = (permissionId: string, isChecked: boolean) => {
     const currentPermissions = [...addRoleFormik.values.permissions]
 
     if (isChecked) {
-      if (!currentPermissions.includes(permission)) {
-        addRoleFormik.setFieldValue('permissions', [...currentPermissions, permission])
+      if (!currentPermissions.includes(permissionId)) {
+        addRoleFormik.setFieldValue('permissions', [...currentPermissions, permissionId])
       }
     } else {
       addRoleFormik.setFieldValue(
         'permissions',
-        currentPermissions.filter(p => p !== permission)
+        currentPermissions.filter(p => p !== permissionId)
       )
     }
   }
 
-  const handleEditPermissionChange = (permission: string, isChecked: boolean) => {
+  const handleEditPermissionChange = (permissionId: string, isChecked: boolean) => {
     const currentPermissions = [...editRoleFormik.values.permissions]
 
     if (isChecked) {
-      if (!currentPermissions.includes(permission)) {
-        editRoleFormik.setFieldValue('permissions', [...currentPermissions, permission])
+      if (!currentPermissions.includes(permissionId)) {
+        editRoleFormik.setFieldValue('permissions', [...currentPermissions, permissionId])
       }
     } else {
       editRoleFormik.setFieldValue(
         'permissions',
-        currentPermissions.filter(p => p !== permission)
+        currentPermissions.filter(p => p !== permissionId)
       )
     }
   }
 
   if (isEditMode) {
+    // Show loading state while fetching role data
+    if (fetchRoleLoading) {
+      return (
+        <div className="flex flex-col justify-center bg-gray-100 p-6">
+          <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
+            <div className="text-center py-8">
+              <p className="text-gray-500">Loading role data...</p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="flex flex-col justify-center bg-gray-100 p-6">
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
@@ -207,8 +317,17 @@ export default function AddUpdateRole() {
 
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-800 mb-3">Permissions</label>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {PERMISSIONS_GROUPED.map((group, groupIndex) => {
+              {permissionsLoading ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-500">Loading permissions...</p>
+                </div>
+              ) : PERMISSIONS_GROUPED.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-500">No permissions available</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {PERMISSIONS_GROUPED.map((group, groupIndex) => {
                   const permissionCount = group.permissions.length
                   const gridClass =
                     permissionCount <= 3
@@ -231,8 +350,10 @@ export default function AddUpdateRole() {
                             : 'grid grid-cols-2 gap-2'
                         }
                       >
-                        {group.permissions.map((permission, permIndex) => {
-                          const isChecked = editRoleFormik.values.permissions.includes(permission)
+                        {group.permissions.map((permission: any, permIndex: number) => {
+                          const permissionId = permission.id || permission.uuid
+                          const permissionName = permission.name
+                          const isChecked = editRoleFormik.values.permissions.includes(permissionId)
                           return (
                             <div key={permIndex} className="flex items-center">
                               <input
@@ -240,7 +361,7 @@ export default function AddUpdateRole() {
                                 id={`edit-permission-${groupIndex}-${permIndex}`}
                                 checked={isChecked}
                                 onChange={e =>
-                                  handleEditPermissionChange(permission, e.target.checked)
+                                  handleEditPermissionChange(permissionId, e.target.checked)
                                 }
                                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                               />
@@ -248,7 +369,7 @@ export default function AddUpdateRole() {
                                 htmlFor={`edit-permission-${groupIndex}-${permIndex}`}
                                 className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
                               >
-                                {permission}
+                                {permissionName}
                               </label>
                             </div>
                           )
@@ -257,7 +378,8 @@ export default function AddUpdateRole() {
                     </div>
                   )
                 })}
-              </div>
+                </div>
+              )}
               {editRoleFormik.touched.permissions && editRoleFormik.errors.permissions && (
                 <p className="text-red-600 text-sm mt-1">{editRoleFormik.errors.permissions}</p>
               )}
@@ -275,7 +397,7 @@ export default function AddUpdateRole() {
                 type="submit"
                 title="Update Role"
                 class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                btnLoading={btnLoading}
+                btnLoading={updateLoading || fetchRoleLoading}
                 callback_event=""
               />
             </div>
@@ -324,8 +446,17 @@ export default function AddUpdateRole() {
 
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-800 mb-3">Permissions</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {PERMISSIONS_GROUPED.map((group, groupIndex) => {
+            {permissionsLoading ? (
+              <div className="text-center py-4">
+                <p className="text-gray-500">Loading permissions...</p>
+              </div>
+            ) : PERMISSIONS_GROUPED.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-gray-500">No permissions available</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {PERMISSIONS_GROUPED.map((group, groupIndex) => {
                 const permissionCount = group.permissions.length
                 const gridClass =
                   permissionCount <= 3
@@ -346,8 +477,10 @@ export default function AddUpdateRole() {
                         permissionCount <= 3 ? 'grid grid-cols-1 gap-2' : 'grid grid-cols-2 gap-2'
                       }
                     >
-                      {group.permissions.map((permission, permIndex) => {
-                        const isChecked = addRoleFormik.values.permissions.includes(permission)
+                      {group.permissions.map((permission: any, permIndex: number) => {
+                        const permissionId = permission.id || permission.uuid
+                        const permissionName = permission.name
+                        const isChecked = addRoleFormik.values.permissions.includes(permissionId)
                         return (
                           <div key={permIndex} className="flex items-center">
                             <input
@@ -355,7 +488,7 @@ export default function AddUpdateRole() {
                               id={`add-permission-${groupIndex}-${permIndex}`}
                               checked={isChecked}
                               onChange={e =>
-                                handleAddPermissionChange(permission, e.target.checked)
+                                handleAddPermissionChange(permissionId, e.target.checked)
                               }
                               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                             />
@@ -363,16 +496,17 @@ export default function AddUpdateRole() {
                               htmlFor={`add-permission-${groupIndex}-${permIndex}`}
                               className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
                             >
-                              {permission}
+                              {permissionName}
                             </label>
                           </div>
                         )
                       })}
                     </div>
-                  </div>
-                )
-              })}
-            </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
             {addRoleFormik.touched.permissions && addRoleFormik.errors.permissions && (
               <p className="text-red-600 text-sm mt-1">{addRoleFormik.errors.permissions}</p>
             )}
@@ -390,7 +524,7 @@ export default function AddUpdateRole() {
               type="submit"
               title="Add Role"
               class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={btnLoading}
+              btnLoading={createLoading}
               callback_event=""
             />
           </div>

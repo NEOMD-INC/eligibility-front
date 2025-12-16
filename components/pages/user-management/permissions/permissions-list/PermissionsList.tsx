@@ -1,63 +1,44 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import PermissionsListColumns from './components/columns'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
 import { Plus, Search, FunnelPlus } from 'lucide-react'
-
-const mockPermissions = [
-  {
-    id: '1',
-    uuid: 'uuid-1',
-    name: 'View Users',
-    slug: 'view-users',
-    description: 'Permission to view users list',
-    created_at: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    uuid: 'uuid-2',
-    name: 'Edit Users',
-    slug: 'edit-users',
-    description: 'Permission to edit user information',
-    created_at: '2024-02-20T14:20:00Z',
-  },
-  {
-    id: '3',
-    uuid: 'uuid-3',
-    name: 'Delete Users',
-    slug: 'delete-users',
-    description: 'Permission to delete users',
-    created_at: '2024-03-10T09:15:00Z',
-  },
-  {
-    id: '4',
-    uuid: 'uuid-4',
-    name: 'Manage Roles',
-    slug: 'manage-roles',
-    description: 'Permission to manage roles',
-    created_at: '2024-03-15T11:00:00Z',
-  },
-  {
-    id: '5',
-    uuid: 'uuid-5',
-    name: 'Manage Permissions',
-    slug: 'manage-permissions',
-    description: 'Permission to manage permissions',
-    created_at: '2024-03-20T13:30:00Z',
-  },
-]
+import {
+  fetchAllPermissions,
+  deletePermission,
+  setCurrentPage,
+  clearPermissionsError,
+} from '@/redux/slices/user-management/permissions/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 export default function PermissionsList() {
-  const [loading, setLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
+  const dispatch = useDispatch<AppDispatch>()
+  const { permissions, loading, totalItems, currentPage, deleteLoading, error } = useSelector(
+    (state: RootState) => state.permissions
+  )
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [searchText, setSearchText] = useState('')
-  const [searchField, setSearchField] = useState('name')
+  const [roleFilter, setRoleFilter] = useState('allrole')
+  const [appliedSearch, setAppliedSearch] = useState('')
+  const [appliedRole, setAppliedRole] = useState('allrole')
   const filterRef = useRef<HTMLDivElement>(null)
   const itemsPerPage = 10
+
+  // Fetch permissions on component mount and when applied filters/page change
+  useEffect(() => {
+    const filters: { search?: string; role?: string } = {}
+    if (appliedSearch.trim()) {
+      filters.search = appliedSearch.trim()
+    }
+    if (appliedRole && appliedRole !== 'allrole') {
+      filters.role = appliedRole
+    }
+    dispatch(fetchAllPermissions({ page: currentPage, filters }))
+  }, [dispatch, currentPage, appliedSearch, appliedRole])
 
   // Close filter dropdown when clicking outside
   useEffect(() => {
@@ -76,9 +57,20 @@ export default function PermissionsList() {
     }
   }, [isFilterOpen])
 
-  const handleDeleteClick = (id: string, permissionName: string) => {
+  const handleDeleteClick = async (id: string, permissionName: string) => {
     if (confirm(`Are you sure you want to delete permission "${permissionName}"?`)) {
-      console.log('Delete permission:', id, permissionName)
+      dispatch(clearPermissionsError())
+      const result = await dispatch(deletePermission(id))
+      if (deletePermission.fulfilled.match(result)) {
+        const filters: { search?: string; role?: string } = {}
+        if (appliedSearch.trim()) {
+          filters.search = appliedSearch.trim()
+        }
+        if (appliedRole && appliedRole !== 'allrole') {
+          filters.role = appliedRole
+        }
+        dispatch(fetchAllPermissions({ page: currentPage, filters }))
+      }
     }
   }
 
@@ -88,28 +80,28 @@ export default function PermissionsList() {
   }
 
   const handleSearchFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSearchField(e.target.value)
+    setRoleFilter(e.target.value)
   }
 
   const handleSubmit = () => {
-    // TODO: Implement search/filter logic
-    console.log('Search:', searchText, 'Field:', searchField)
+    setAppliedSearch(searchText)
+    setAppliedRole(roleFilter)
+    dispatch(setCurrentPage(1))
     setIsFilterOpen(false)
   }
 
   const resetSearchField = () => {
     setSearchText('')
-    setSearchField('name')
+    setRoleFilter('allrole')
+    setAppliedSearch('')
+    setAppliedRole('allrole')
+    dispatch(setCurrentPage(1))
   }
 
   const columns = PermissionsListColumns({ onDeleteClick: handleDeleteClick })
-  const totalItems = mockPermissions.length
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedData = mockPermissions.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    dispatch(setCurrentPage(page))
   }
 
   return (
@@ -171,9 +163,9 @@ export default function PermissionsList() {
 
         <DataTable
           columns={columns}
-          data={paginatedData}
-          loading={loading}
-          totalItems={totalItems}
+          data={Array.isArray(permissions) ? permissions : []}
+          loading={loading || deleteLoading}
+          totalItems={totalItems || 0}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
           onPageChange={handlePageChange}
@@ -185,6 +177,11 @@ export default function PermissionsList() {
           }
           className="shadow-none rounded-none"
         />
+        {error && (
+          <div className="px-6 py-4 bg-red-50 border-t border-red-200">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
       </div>
     </div>
   )

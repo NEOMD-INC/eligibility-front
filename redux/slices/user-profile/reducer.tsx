@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { userService } from '@/services/user-management/users/users.service'
+import { userProfileService } from '@/services/user-profile/userprofile.service'
 
 interface UserProfileState {
   updateProfileLoading: boolean
@@ -20,7 +20,7 @@ export const updateUserProfile = createAsyncThunk(
   'userProfile/updateProfile',
   async (data: { name?: string; email?: string }, { rejectWithValue }) => {
     try {
-      const response = await userService.updateProfile(data)
+      const response = await userProfileService.updateProfile(data)
       return response.data
     } catch (error: any) {
       return rejectWithValue(error?.response?.data?.message || 'Failed to update profile')
@@ -40,7 +40,7 @@ export const updateUserPassword = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await userService.updatePassword(data)
+      const response = await userProfileService.updatePassword(data)
       return response.data
     } catch (error: any) {
       return rejectWithValue(error?.response?.data?.message || 'Failed to update password')
@@ -94,4 +94,3 @@ const userProfileSlice = createSlice({
 
 export const { clearProfileError, clearPasswordError } = userProfileSlice.actions
 export default userProfileSlice.reducer
-

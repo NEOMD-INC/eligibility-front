@@ -1,9 +1,3 @@
-import React from "react";
+import Dashboard from '@/components/pages/patient-dashboard/index'
 
-export default function PatientDashboard () {
-    return(
-        <div>
-            hey there
-        </div>
-    )
-}
+export default Dashboard

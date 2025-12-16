@@ -3,7 +3,16 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useDispatch, useSelector } from 'react-redux'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import {
+  createPermission,
+  updatePermission,
+  fetchPermissionById,
+  clearPermissionsError,
+  clearCurrentPermission,
+} from '@/redux/slices/user-management/permissions/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 interface AddPermissionValues {
   permissionName: string
@@ -18,8 +27,10 @@ export default function AddUpdatePermission() {
   const params = useParams()
   const permissionId = params?.id as string | undefined
   const isEditMode = !!permissionId
+  const dispatch = useDispatch<AppDispatch>()
+  const { currentPermission, createLoading, updateLoading, fetchPermissionLoading, error } =
+    useSelector((state: RootState) => state.permissions)
 
-  const [btnLoading, setBtnLoading] = useState(false)
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -40,18 +51,26 @@ export default function AddUpdatePermission() {
     },
     validationSchema: addPermissionValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
+      dispatch(clearPermissionsError())
       setIsError(false)
+      setErrorMsg('')
+
       try {
-        console.log('Add Permission Values:', values)
-        // TODO: Add API call to create permission
-        // await createPermission(values)
-        setTimeout(() => {
-          setBtnLoading(false)
+        const permissionData = {
+          name: values.permissionName,
+        }
+
+        const result = await dispatch(createPermission(permissionData))
+
+        if (createPermission.fulfilled.match(result)) {
           router.push('/user-management/permissions')
-        }, 1000)
+        } else {
+          setIsError(true)
+          setErrorMsg(
+            (result.payload as string) || 'An error occurred while creating the permission.'
+          )
+        }
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
         setErrorMsg(err.message || 'An error occurred while creating the permission.')
       }
@@ -65,45 +84,83 @@ export default function AddUpdatePermission() {
     },
     validationSchema: editPermissionValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
+      if (!permissionId) return
+
+      dispatch(clearPermissionsError())
       setIsError(false)
+      setErrorMsg('')
+
       try {
-        console.log('Edit Permission Values:', values)
-        // TODO: Add API call to update permission
-        // await updatePermission(permissionId, values)
-        setTimeout(() => {
-          setBtnLoading(false)
+        const permissionData = {
+          name: values.permissionName,
+        }
+
+        const result = await dispatch(updatePermission({ permissionId, permissionData }))
+
+        if (updatePermission.fulfilled.match(result)) {
           router.push('/user-management/permissions')
-        }, 1000)
+        } else {
+          setIsError(true)
+          setErrorMsg(
+            (result.payload as string) || 'An error occurred while updating the permission.'
+          )
+        }
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
         setErrorMsg(err.message || 'An error occurred while updating the permission.')
       }
     },
   })
 
-  // Load permission data in edit mode
+  // Fetch permission data in edit mode
   useEffect(() => {
     if (isEditMode && permissionId) {
-      const loadPermissionData = async () => {
-        try {
-          // TODO: Fetch permission data from API
-          // const permissionData = await fetchPermission(permissionId)
-          // For now, using mock data
-          editPermissionFormik.setValues({
-            permissionName: 'View Users',
-          })
-        } catch (error) {
-          console.error('Error loading permission data:', error)
-        }
-      }
-      loadPermissionData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      dispatch(clearPermissionsError())
+      dispatch(clearCurrentPermission())
+      dispatch(fetchPermissionById(permissionId))
     }
-  }, [isEditMode, permissionId])
+
+    return () => {
+      if (isEditMode) {
+        dispatch(clearCurrentPermission())
+      }
+    }
+  }, [dispatch, isEditMode, permissionId])
+
+  // Populate form with permission data when it's loaded
+  useEffect(() => {
+    if (isEditMode && currentPermission) {
+      const permissionName = currentPermission.name || ''
+
+      editPermissionFormik.setValues({
+        permissionName,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPermission, isEditMode])
+
+  // Update error message from Redux state
+  useEffect(() => {
+    if (error) {
+      setIsError(true)
+      setErrorMsg(error)
+    }
+  }, [error])
 
   if (isEditMode) {
+    // Show loading state while fetching permission data
+    if (fetchPermissionLoading) {
+      return (
+        <div className="flex flex-col justify-center bg-gray-100 p-6">
+          <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
+            <div className="text-center py-8">
+              <p className="text-gray-500">Loading permission data...</p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="flex flex-col justify-center bg-gray-100 p-6">
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
@@ -159,7 +216,7 @@ export default function AddUpdatePermission() {
                 type="submit"
                 title="Update Permission"
                 class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                btnLoading={btnLoading}
+                btnLoading={updateLoading || fetchPermissionLoading}
                 callback_event=""
               />
             </div>
@@ -225,7 +282,7 @@ export default function AddUpdatePermission() {
               type="submit"
               title="Add Permission"
               class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={btnLoading}
+              btnLoading={createLoading}
               callback_event=""
             />
           </div>

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { userService } from '@/services/user-management/users/users.service'
+import { userProfileService } from '@/services/user-profile/userprofile.service'
 
 interface UserState {
   user: Record<string, any> | null
@@ -18,7 +18,7 @@ export const fetchCurrentUser = createAsyncThunk(
   'user/fetchCurrentUser',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await userService.getCurrentUserDetail()
+      const response = await userProfileService.getCurrentUserDetail()
       return response.data
     } catch (error: any) {
       return rejectWithValue(error?.response?.data?.message || 'Failed to fetch user details')

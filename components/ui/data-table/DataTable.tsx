@@ -176,7 +176,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 </td>
               </tr>
             ) : (
-              displayData.map((row, index) =>
+              displayData?.map((row, index) =>
                 renderRow ? (
                   renderRow(row, index)
                 ) : (
