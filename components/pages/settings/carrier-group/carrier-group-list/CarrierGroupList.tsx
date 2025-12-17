@@ -1,102 +1,148 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import CarrierGroupListColumns from './components/columns'
+import Filters, { FilterField } from '@/components/ui/filters/Filters'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
-import { Plus, Search } from 'lucide-react'
-
-const mockCarrierGroups = [
-  {
-    id: '1',
-    uuid: 'uuid-1',
-    description: 'Insurance Group A',
-    code: 'IGA001',
-    fillingIndicator: 'Full Coverage',
-    status: 'Active',
-    isActive: true,
-    createdAt: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    uuid: 'uuid-2',
-    description: 'Insurance Group B',
-    code: 'IGB002',
-    fillingIndicator: 'Partial Coverage',
-    status: 'Active',
-    isActive: true,
-    createdAt: '2024-02-20T14:20:00Z',
-  },
-  {
-    id: '3',
-    uuid: 'uuid-3',
-    description: 'Insurance Group C',
-    code: 'IGC003',
-    fillingIndicator: 'Limited Coverage',
-    status: 'Inactive',
-    isActive: false,
-    createdAt: '2024-03-10T09:15:00Z',
-  },
-]
+import { Plus } from 'lucide-react'
+import {
+  fetchAllCarrierGroups,
+  deleteCarrierGroup,
+  setCurrentPage,
+  clearCarrierGroupsError,
+} from '@/redux/slices/settings/carrier-groups/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 export default function CarrierGroupList() {
-  const [loading, setLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
+  const dispatch = useDispatch<AppDispatch>()
+  const { carrierGroups, loading, error, totalItems, currentPage, itemsPerPage, deleteLoading } =
+    useSelector((state: RootState) => state.carrierGroups)
+
   const [searchDescription, setSearchDescription] = useState('')
   const [searchCode, setSearchCode] = useState('')
   const [searchFillingIndicator, setSearchFillingIndicator] = useState('')
   const [searchStatus, setSearchStatus] = useState('all')
-  const itemsPerPage = 10
+
+  const buildFilters = () => {
+    const filters: {
+      description?: string
+      code?: string
+      filling_indicator?: string
+      status?: string
+    } = {}
+
+    if (searchDescription) {
+      filters.description = searchDescription
+    }
+    if (searchCode) {
+      filters.code = searchCode
+    }
+    if (searchFillingIndicator) {
+      filters.filling_indicator = searchFillingIndicator
+    }
+    if (searchStatus && searchStatus !== 'all') {
+      filters.status = searchStatus
+    }
+
+    return filters
+  }
+
+  useEffect(() => {
+    dispatch(clearCarrierGroupsError())
+    const filters = buildFilters()
+    dispatch(fetchAllCarrierGroups({ page: currentPage, filters }))
+  }, [dispatch, currentPage])
 
   const handleDeleteClick = (id: string, carrierGroupName: string) => {
     if (confirm(`Are you sure you want to delete carrier group "${carrierGroupName}"?`)) {
-      console.log('Delete carrier group:', id, carrierGroupName)
+      dispatch(deleteCarrierGroup(id)).then(() => {
+        const filters = buildFilters()
+        dispatch(fetchAllCarrierGroups({ page: currentPage, filters }))
+      })
     }
   }
 
-  // Filter handlers
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setSearchDescription(e.target.value)
   }
 
-  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setSearchCode(e.target.value)
   }
 
-  const handleFillingIndicatorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFillingIndicatorChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setSearchFillingIndicator(e.target.value)
   }
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setSearchStatus(e.target.value)
   }
 
   const handleSubmit = () => {
-    // TODO: Implement search/filter logic
-    console.log('Search:', {
-      description: searchDescription,
-      code: searchCode,
-      fillingIndicator: searchFillingIndicator,
-      status: searchStatus,
-    })
+    dispatch(clearCarrierGroupsError())
+    dispatch(setCurrentPage(1))
+    const filters = buildFilters()
+    dispatch(fetchAllCarrierGroups({ page: 1, filters }))
   }
 
-  const resetFilters = () => {
+  const handleReset = () => {
     setSearchDescription('')
     setSearchCode('')
     setSearchFillingIndicator('')
     setSearchStatus('all')
+    dispatch(clearCarrierGroupsError())
+    dispatch(setCurrentPage(1))
+    dispatch(fetchAllCarrierGroups({ page: 1, filters: {} }))
   }
 
+  const filterFields: FilterField[] = [
+    {
+      name: 'description',
+      label: 'Search by Description',
+      type: 'text',
+      placeholder: 'Enter description...',
+      value: searchDescription,
+      onChange: handleDescriptionChange,
+    },
+    {
+      name: 'code',
+      label: 'Search by Code',
+      type: 'text',
+      placeholder: 'Enter code...',
+      value: searchCode,
+      onChange: handleCodeChange,
+    },
+    {
+      name: 'fillingIndicator',
+      label: 'Search by Filling Indicator',
+      type: 'text',
+      placeholder: 'Enter filling indicator...',
+      value: searchFillingIndicator,
+      onChange: handleFillingIndicatorChange,
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      value: searchStatus,
+      onChange: handleStatusChange,
+      options: [
+        { value: 'all', label: 'All Status' },
+        { value: '1', label: 'Active' },
+        { value: '0', label: 'Inactive' },
+      ],
+    },
+  ]
+
   const columns = CarrierGroupListColumns({ onDeleteClick: handleDeleteClick })
-  const totalItems = mockCarrierGroups.length
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedData = mockCarrierGroups.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    dispatch(setCurrentPage(page))
   }
 
   return (
@@ -127,91 +173,23 @@ export default function CarrierGroupList() {
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search by Description */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Search by Description:
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                placeholder="Enter description..."
-                onChange={handleDescriptionChange}
-                value={searchDescription}
-              />
-            </div>
+        <Filters
+          fields={filterFields}
+          onReset={handleReset}
+          onSubmit={handleSubmit}
+          columns={4}
+        />
 
-            {/* Search by Code */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Search by Code:
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                placeholder="Enter code..."
-                onChange={handleCodeChange}
-                value={searchCode}
-              />
-            </div>
-
-            {/* Search by Filling Indicator */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Search by Filling Indicator:
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                placeholder="Enter filling indicator..."
-                onChange={handleFillingIndicatorChange}
-                value={searchFillingIndicator}
-              />
-            </div>
-
-            {/* Status */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Status:</label>
-              <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold bg-white"
-                onChange={handleStatusChange}
-                value={searchStatus}
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
+        {error && (
+          <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
+            <p className="text-sm font-medium">{error}</p>
           </div>
+        )}
 
-          <div className="flex justify-end gap-2 mt-4">
-            <button
-              onClick={resetFilters}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
-            >
-              Reset
-            </button>
-            <button
-              type="button"
-              onClick={e => {
-                e.preventDefault()
-                handleSubmit()
-              }}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
-            >
-              <Search size={14} />
-              Search
-            </button>
-          </div>
-        </div>
-
-        {/* DataTable */}
         <DataTable
           columns={columns}
-          data={paginatedData}
-          loading={loading}
+          data={carrierGroups}
+          loading={loading || deleteLoading}
           totalItems={totalItems}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
@@ -228,4 +206,3 @@ export default function CarrierGroupList() {
     </div>
   )
 }
-

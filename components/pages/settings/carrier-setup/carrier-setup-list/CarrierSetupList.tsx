@@ -1,79 +1,50 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import CarrierSetupListColumns from './components/columns'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
-
-const mockCarrierSetups = [
-  {
-    id: '1',
-    uuid: 'uuid-1',
-    groupCode: 'GRP001',
-    groupDescription: 'Health Insurance Group A',
-    carrierCode: 'CAR001',
-    carrierDescription: 'ABC Insurance Company',
-    state: 'NY',
-    batchPlayerId: 'BP001',
-    isClia: 'Yes',
-    cob: 'Primary',
-    correctedClaim: 'Yes',
-    enrollmentRequired: 'Required',
-    createdAt: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    uuid: 'uuid-2',
-    groupCode: 'GRP002',
-    groupDescription: 'Health Insurance Group B',
-    carrierCode: 'CAR002',
-    carrierDescription: 'XYZ Insurance Corp',
-    state: 'CA',
-    batchPlayerId: 'BP002',
-    isClia: 'No',
-    cob: 'Secondary',
-    correctedClaim: 'No',
-    enrollmentRequired: 'Not Required',
-    createdAt: '2024-02-20T14:20:00Z',
-  },
-  {
-    id: '3',
-    uuid: 'uuid-3',
-    groupCode: 'GRP003',
-    groupDescription: 'Dental Insurance Group',
-    carrierCode: 'CAR003',
-    carrierDescription: 'DEF Insurance Services',
-    state: 'IL',
-    batchPlayerId: 'BP003',
-    isClia: 'Yes',
-    cob: 'Primary',
-    correctedClaim: 'Yes',
-    enrollmentRequired: 'Required',
-    createdAt: '2024-03-10T09:15:00Z',
-  },
-]
+import {
+  fetchAllCarrierSetups,
+  deleteCarrierSetup,
+  setCurrentPage,
+  clearCarrierSetupsError,
+} from '@/redux/slices/settings/carrier-setups/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 export default function CarrierSetupList() {
-  const [loading, setLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
+  const dispatch = useDispatch<AppDispatch>()
+  const {
+    carrierSetups,
+    loading,
+    error,
+    totalItems,
+    currentPage,
+    itemsPerPage,
+    deleteLoading,
+  } = useSelector((state: RootState) => state.carrierSetups)
+
+  // Fetch carrier setups on mount and when page changes
+  useEffect(() => {
+    dispatch(clearCarrierSetupsError())
+    dispatch(fetchAllCarrierSetups(currentPage))
+  }, [dispatch, currentPage])
 
   const handleDeleteClick = (id: string, carrierSetupName: string) => {
     if (confirm(`Are you sure you want to delete carrier setup "${carrierSetupName}"?`)) {
-      console.log('Delete carrier setup:', id, carrierSetupName)
+      dispatch(deleteCarrierSetup(id)).then(() => {
+        dispatch(fetchAllCarrierSetups(currentPage))
+      })
     }
   }
 
   const columns = CarrierSetupListColumns({ onDeleteClick: handleDeleteClick })
-  const totalItems = mockCarrierSetups.length
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedData = mockCarrierSetups.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    dispatch(setCurrentPage(page))
   }
 
   return (
@@ -104,11 +75,18 @@ export default function CarrierSetupList() {
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
+        {/* Error Message */}
+        {error && (
+          <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
+            <p className="text-sm font-medium">{error}</p>
+          </div>
+        )}
+
         {/* DataTable */}
         <DataTable
           columns={columns}
-          data={paginatedData}
-          loading={loading}
+          data={carrierSetups}
+          loading={loading || deleteLoading}
           totalItems={totalItems}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}

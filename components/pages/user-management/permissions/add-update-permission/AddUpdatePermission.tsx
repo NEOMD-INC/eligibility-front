@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { useDispatch, useSelector } from 'react-redux'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import {
   createPermission,
@@ -13,14 +14,7 @@ import {
   clearCurrentPermission,
 } from '@/redux/slices/user-management/permissions/actions'
 import { AppDispatch, RootState } from '@/redux/store'
-
-interface AddPermissionValues {
-  permissionName: string
-}
-
-interface EditPermissionValues {
-  permissionName: string
-}
+import type { PermissionFormValues } from '@/types'
 
 export default function AddUpdatePermission() {
   const router = useRouter()
@@ -45,7 +39,7 @@ export default function AddUpdatePermission() {
   })
 
   // Add Permission Formik
-  const addPermissionFormik = useFormik<AddPermissionValues>({
+  const addPermissionFormik = useFormik<PermissionFormValues>({
     initialValues: {
       permissionName: '',
     },
@@ -78,7 +72,7 @@ export default function AddUpdatePermission() {
   })
 
   // Edit Permission Formik
-  const editPermissionFormik = useFormik<EditPermissionValues>({
+  const editPermissionFormik = useFormik<PermissionFormValues>({
     initialValues: {
       permissionName: '',
     },
@@ -150,15 +144,7 @@ export default function AddUpdatePermission() {
   if (isEditMode) {
     // Show loading state while fetching permission data
     if (fetchPermissionLoading) {
-      return (
-        <div className="flex flex-col justify-center bg-gray-100 p-6">
-          <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-            <div className="text-center py-8">
-              <p className="text-gray-500">Loading permission data...</p>
-            </div>
-          </div>
-        </div>
-      )
+      return <ComponentLoader component="permission" message="Loading permission data..." />
     }
 
     return (

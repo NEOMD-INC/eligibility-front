@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { useDispatch, useSelector } from 'react-redux'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import {
   createUser,
@@ -14,21 +15,7 @@ import {
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { rolesService } from '@/services/user-management/roles/roles.service'
-
-interface AddUserValues {
-  fullName: string
-  email: string
-  password: string
-  confirmPassword: string
-  role: string
-}
-
-interface EditUserValues {
-  fullName: string
-  email: string
-  newPassword: string
-  confirmNewPassword: string
-}
+import type { AddUserFormValues, EditUserFormValues } from '@/types'
 
 export default function AddUpdateUser() {
   const router = useRouter()
@@ -167,7 +154,7 @@ export default function AddUpdateUser() {
   })
 
   // Add User Formik
-  const addUserFormik = useFormik<AddUserValues>({
+  const addUserFormik = useFormik<AddUserFormValues>({
     initialValues: {
       fullName: '',
       email: '',
@@ -212,7 +199,7 @@ export default function AddUpdateUser() {
 
   // Edit User Formik
   // NOTE: We use enableReinitialize for name/email but explicitly keep passwords empty
-  const editUserFormik = useFormik<EditUserValues>({
+  const editUserFormik = useFormik<EditUserFormValues>({
     initialValues: {
       fullName: currentUser?.name || currentUser?.full_name || '',
       email: currentUser?.email || '',
@@ -254,18 +241,11 @@ export default function AddUpdateUser() {
     },
   })
 
-  if (isEditMode || rolesLoading) {
+  if (isEditMode) {
     if (fetchUserLoading || !currentUser) {
-      return (
-        <div className="flex flex-col justify-center bg-gray-100 p-6">
-          <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-            <div className="text-center py-8">
-              <p className="text-gray-600">Loading user data...</p>
-            </div>
-          </div>
-        </div>
-      )
+      return <ComponentLoader component="user" message="Loading user data..." />
     }
+
     return (
       <div className="flex flex-col justify-center bg-gray-100 p-6">
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
@@ -531,7 +511,7 @@ export default function AddUpdateUser() {
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-800 mb-3">Role</label>
             {rolesLoading ? (
-              <div className="text-gray-500 text-sm">Loading roles...</div>
+              <ComponentLoader message="Loading roles..." size="sm" variant="inline" />
             ) : availableRoles.length === 0 ? (
               <div className="text-red-500 text-sm">No roles available</div>
             ) : (

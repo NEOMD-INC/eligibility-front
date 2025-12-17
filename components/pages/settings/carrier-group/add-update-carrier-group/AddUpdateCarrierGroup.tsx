@@ -1,23 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-
-interface AddCarrierGroupValues {
-  description: string
-  code: string
-  fillingIndicator: string
-  isActive: boolean
-}
-
-interface EditCarrierGroupValues {
-  description: string
-  code: string
-  fillingIndicator: string
-  isActive: boolean
-}
+import {
+  fetchCarrierGroupById,
+  createCarrierGroup,
+  updateCarrierGroup,
+  clearCurrentCarrierGroup,
+  clearCarrierGroupsError,
+} from '@/redux/slices/settings/carrier-groups/actions'
+import { AppDispatch, RootState } from '@/redux/store'
+import type { CarrierGroupFormValues } from '@/types'
 
 export default function AddUpdateCarrierGroup() {
   const router = useRouter()
@@ -25,7 +22,15 @@ export default function AddUpdateCarrierGroup() {
   const carrierGroupId = params?.id as string | undefined
   const isEditMode = !!carrierGroupId
 
-  const [btnLoading, setBtnLoading] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const {
+    currentCarrierGroup,
+    createLoading,
+    updateLoading,
+    fetchCarrierGroupLoading,
+    error,
+  } = useSelector((state: RootState) => state.carrierGroups)
+
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -46,7 +51,7 @@ export default function AddUpdateCarrierGroup() {
   })
 
   // Add Carrier Group Formik
-  const addCarrierGroupFormik = useFormik<AddCarrierGroupValues>({
+  const addCarrierGroupFormik = useFormik<CarrierGroupFormValues>({
     initialValues: {
       description: '',
       code: '',
@@ -55,26 +60,21 @@ export default function AddUpdateCarrierGroup() {
     },
     validationSchema: addCarrierGroupValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearCarrierGroupsError())
       try {
-        console.log('Add Carrier Group Values:', values)
-        // TODO: Add API call to create carrier group
-        // await createCarrierGroup(values)
-        setTimeout(() => {
-          setBtnLoading(false)
-          router.push('/settings/carrier-group')
-        }, 1000)
+        await dispatch(createCarrierGroup(values)).unwrap()
+        router.push('/settings/carrier-group')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while creating the carrier group.')
+        setErrorMsg(err || 'An error occurred while creating the carrier group.')
       }
     },
   })
 
   // Edit Carrier Group Formik
-  const editCarrierGroupFormik = useFormik<EditCarrierGroupValues>({
+  const editCarrierGroupFormik = useFormik<CarrierGroupFormValues>({
     initialValues: {
       description: '',
       code: '',
@@ -83,20 +83,18 @@ export default function AddUpdateCarrierGroup() {
     },
     validationSchema: editCarrierGroupValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
+      if (!carrierGroupId) return
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearCarrierGroupsError())
       try {
-        console.log('Edit Carrier Group Values:', values)
-        // TODO: Add API call to update carrier group
-        // await updateCarrierGroup(carrierGroupId, values)
-        setTimeout(() => {
-          setBtnLoading(false)
-          router.push('/settings/carrier-group')
-        }, 1000)
+        await dispatch(
+          updateCarrierGroup({ carrierGroupId, carrierGroupData: values })
+        ).unwrap()
+        router.push('/settings/carrier-group')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while updating the carrier group.')
+        setErrorMsg(err || 'An error occurred while updating the carrier group.')
       }
     },
   })
@@ -104,25 +102,60 @@ export default function AddUpdateCarrierGroup() {
   // Load carrier group data in edit mode
   useEffect(() => {
     if (isEditMode && carrierGroupId) {
-      const loadCarrierGroupData = async () => {
-        try {
-          // TODO: Fetch carrier group data from API
-          // const carrierGroupData = await fetchCarrierGroup(carrierGroupId)
-          // For now, using mock data
-          editCarrierGroupFormik.setValues({
-            description: 'Insurance Group A',
-            code: 'IGA001',
-            fillingIndicator: 'Full Coverage',
-            isActive: true,
-          })
-        } catch (error) {
-          console.error('Error loading carrier group data:', error)
-        }
-      }
-      loadCarrierGroupData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      dispatch(clearCarrierGroupsError())
+      dispatch(fetchCarrierGroupById(carrierGroupId))
     }
-  }, [isEditMode, carrierGroupId])
+    return () => {
+      dispatch(clearCurrentCarrierGroup())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, isEditMode, carrierGroupId])
+
+  // Update form values when carrier group data is loaded
+  useEffect(() => {
+    if (isEditMode && currentCarrierGroup) {
+      // Determine isActive value from various possible status formats
+      let isActiveValue = false
+      if (typeof currentCarrierGroup.status === 'boolean') {
+        isActiveValue = currentCarrierGroup.status
+      } else if (currentCarrierGroup.isActive !== undefined) {
+        isActiveValue = currentCarrierGroup.isActive
+      } else if (currentCarrierGroup.is_active !== undefined) {
+        isActiveValue = currentCarrierGroup.is_active
+      } else if (typeof currentCarrierGroup.status === 'string') {
+        isActiveValue =
+          currentCarrierGroup.status.toLowerCase() === 'active' ||
+          currentCarrierGroup.status === 'true'
+      }
+
+      editCarrierGroupFormik.setValues({
+        description:
+          currentCarrierGroup.carrier_group_description ||
+          currentCarrierGroup.description ||
+          '',
+        code:
+          currentCarrierGroup.carrier_group_code || currentCarrierGroup.code || '',
+        fillingIndicator:
+          currentCarrierGroup.filling_indicator ||
+          currentCarrierGroup.fillingIndicator ||
+          '',
+        isActive: isActiveValue,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCarrierGroup, isEditMode])
+
+  // Update error message from Redux
+  useEffect(() => {
+    if (error) {
+      setIsError(true)
+      setErrorMsg(error)
+    }
+  }, [error])
+
+  if (isEditMode && fetchCarrierGroupLoading) {
+    return <ComponentLoader component="Carrier Group" message="Loading Carrier Group data..." />
+  }
 
   if (isEditMode) {
     return (
@@ -247,7 +280,7 @@ export default function AddUpdateCarrierGroup() {
                 type="submit"
                 title="Update Carrier Group"
                 class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                btnLoading={btnLoading}
+                btnLoading={updateLoading || fetchCarrierGroupLoading}
                 callback_event=""
               />
             </div>
@@ -380,7 +413,7 @@ export default function AddUpdateCarrierGroup() {
               type="submit"
               title="Add Carrier Group"
               class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={btnLoading}
+              btnLoading={createLoading}
               callback_event=""
             />
           </div>

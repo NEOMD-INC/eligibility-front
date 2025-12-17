@@ -1,79 +1,51 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import CarrierAddressListColumns from './components/columns'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
-
-const mockCarrierAddresses = [
-  {
-    id: '1',
-    uuid: 'uuid-1',
-    carrierCode: 'CAR001',
-    actualName: 'ABC Insurance Company',
-    addressId: 'ADD001',
-    addressLine1: '123 Main Street',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10001',
-    phoneType: 'Office',
-    phoneNumber: '555-1234',
-    insuranceDepartment: 'Health Insurance',
-    createdAt: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    uuid: 'uuid-2',
-    carrierCode: 'CAR002',
-    actualName: 'XYZ Insurance Corp',
-    addressId: 'ADD002',
-    addressLine1: '456 Oak Avenue',
-    city: 'Los Angeles',
-    state: 'CA',
-    zipCode: '90001',
-    phoneType: 'Mobile',
-    phoneNumber: '555-5678',
-    insuranceDepartment: 'Life Insurance',
-    createdAt: '2024-02-20T14:20:00Z',
-  },
-  {
-    id: '3',
-    uuid: 'uuid-3',
-    carrierCode: 'CAR003',
-    actualName: 'DEF Insurance Services',
-    addressId: 'ADD003',
-    addressLine1: '789 Pine Road',
-    city: 'Chicago',
-    state: 'IL',
-    zipCode: '60601',
-    phoneType: 'Office',
-    phoneNumber: '555-9012',
-    insuranceDepartment: 'Auto Insurance',
-    createdAt: '2024-03-10T09:15:00Z',
-  },
-]
+import {
+  fetchAllCarrierAddresses,
+  deleteCarrierAddress,
+  setCurrentPage,
+  clearCarrierAddressesError,
+} from '@/redux/slices/settings/carrier-addresses/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 export default function CarrierAddressList() {
-  const [loading, setLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
+  const dispatch = useDispatch<AppDispatch>()
+  const {
+    carrierAddresses,
+    loading,
+    error,
+    totalItems,
+    currentPage,
+    itemsPerPage,
+    deleteLoading,
+  } = useSelector((state: RootState) => state.carrierAddresses)
+
+  // Fetch carrier addresses on mount and when page changes
+  useEffect(() => {
+    dispatch(clearCarrierAddressesError())
+    dispatch(fetchAllCarrierAddresses(currentPage))
+  }, [dispatch, currentPage])
 
   const handleDeleteClick = (id: string, carrierAddressName: string) => {
     if (confirm(`Are you sure you want to delete carrier address "${carrierAddressName}"?`)) {
-      console.log('Delete carrier address:', id, carrierAddressName)
+      dispatch(deleteCarrierAddress(id)).then(() => {
+        // Refetch the list after deletion
+        dispatch(fetchAllCarrierAddresses(currentPage))
+      })
     }
   }
 
   const columns = CarrierAddressListColumns({ onDeleteClick: handleDeleteClick })
-  const totalItems = mockCarrierAddresses.length
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedData = mockCarrierAddresses.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    dispatch(setCurrentPage(page))
   }
 
   return (
@@ -104,11 +76,18 @@ export default function CarrierAddressList() {
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
+        {/* Error Message */}
+        {error && (
+          <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
+            <p className="text-sm font-medium">{error}</p>
+          </div>
+        )}
+
         {/* DataTable */}
         <DataTable
           columns={columns}
-          data={paginatedData}
-          loading={loading}
+          data={carrierAddresses}
+          loading={loading || deleteLoading}
           totalItems={totalItems}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}

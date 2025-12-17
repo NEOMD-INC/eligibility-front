@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { useDispatch, useSelector } from 'react-redux'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import {
   createRole,
@@ -14,16 +15,7 @@ import {
 } from '@/redux/slices/user-management/roles/actions'
 import { fetchAllPermissions } from '@/redux/slices/user-management/permissions/actions'
 import { AppDispatch, RootState } from '@/redux/store'
-
-interface AddRoleValues {
-  roleName: string
-  permissions: string[]
-}
-
-interface EditRoleValues {
-  roleName: string
-  permissions: string[]
-}
+import type { RoleFormValues } from '@/types'
 
 export default function AddUpdateRole() {
   const router = useRouter()
@@ -97,7 +89,7 @@ export default function AddUpdateRole() {
   })
 
   // Add Role Formik
-  const addRoleFormik = useFormik<AddRoleValues>({
+  const addRoleFormik = useFormik<RoleFormValues>({
     initialValues: {
       roleName: '',
       permissions: [],
@@ -132,7 +124,7 @@ export default function AddUpdateRole() {
   })
 
   // Edit Role Formik
-  const editRoleFormik = useFormik<EditRoleValues>({
+  const editRoleFormik = useFormik<RoleFormValues>({
     initialValues: {
       roleName: '',
       permissions: [],
@@ -267,15 +259,7 @@ export default function AddUpdateRole() {
   if (isEditMode) {
     // Show loading state while fetching role data
     if (fetchRoleLoading) {
-      return (
-        <div className="flex flex-col justify-center bg-gray-100 p-6">
-          <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-            <div className="text-center py-8">
-              <p className="text-gray-500">Loading role data...</p>
-            </div>
-          </div>
-        </div>
-      )
+      return <ComponentLoader component="role" message="Loading role data..." />
     }
 
     return (
@@ -319,7 +303,7 @@ export default function AddUpdateRole() {
               <label className="block text-sm font-semibold text-gray-800 mb-3">Permissions</label>
               {permissionsLoading ? (
                 <div className="text-center py-4">
-                  <p className="text-gray-500">Loading permissions...</p>
+                  <ComponentLoader message="Loading permissions..." size="sm" variant="inline" />
                 </div>
               ) : PERMISSIONS_GROUPED.length === 0 ? (
                 <div className="text-center py-4">
@@ -446,11 +430,11 @@ export default function AddUpdateRole() {
 
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-800 mb-3">Permissions</label>
-            {permissionsLoading ? (
-              <div className="text-center py-4">
-                <p className="text-gray-500">Loading permissions...</p>
-              </div>
-            ) : PERMISSIONS_GROUPED.length === 0 ? (
+              {permissionsLoading ? (
+                <div className="text-center py-4">
+                  <ComponentLoader message="Loading permissions..." size="sm" variant="inline" />
+                </div>
+              ) : PERMISSIONS_GROUPED.length === 0 ? (
               <div className="text-center py-4">
                 <p className="text-gray-500">No permissions available</p>
               </div>

@@ -1,35 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { userService } from '@/services/user-management/users/users.service'
-
-interface User {
-  id: string
-  uuid: string
-  first_name: string
-  last_name: string
-  full_name: string
-  email: string
-  username: string
-  role?: string
-  roles?: string[]
-  gender?: string
-  profile_image_path?: string | null
-  created_at: string
-}
-
-interface UsersState {
-  users: User[]
-  currentUser: User | null
-  loading: boolean
-  error: string | null
-  totalItems: number
-  currentPage: number
-  itemsPerPage: number
-  // Individual operation states
-  createLoading: boolean
-  updateLoading: boolean
-  deleteLoading: boolean
-  fetchUserLoading: boolean
-}
+import type { User, UsersState } from '@/types'
 
 const initialState: UsersState = {
   users: [],
@@ -165,16 +136,36 @@ const usersSlice = createSlice({
         
         if (payload?.data && Array.isArray(payload.data)) {
           // Structure: { data: [...], total: 100, ... } or { data: [...], meta: { total: 100 } }
+          const dataArray = payload.data
           state.users = payload.data
-          state.totalItems =
-            payload.total || payload.meta?.total || payload.data.length
+          const apiTotal = payload.total || payload.meta?.total
+          if (apiTotal !== undefined && apiTotal !== null) {
+            state.totalItems = apiTotal
+          } else if (dataArray.length > 0) {
+            if (dataArray.length === state.itemsPerPage) {
+              if (state.totalItems === 0) {
+                state.totalItems = state.currentPage * state.itemsPerPage
+              }
+            } else {
+              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+            }
+          }
         } else if (payload?.data?.data && Array.isArray(payload.data.data)) {
           // Nested structure: { data: { data: [...], total: 100 } }
+          const dataArray = payload.data.data
           state.users = payload.data.data
-          state.totalItems =
-            payload.data.total ||
-            payload.data.meta?.total ||
-            payload.data.data.length
+          const apiTotal = payload.data.total || payload.data.meta?.total
+          if (apiTotal !== undefined && apiTotal !== null) {
+            state.totalItems = apiTotal
+          } else if (dataArray.length > 0) {
+            if (dataArray.length === state.itemsPerPage) {
+              if (state.totalItems === 0) {
+                state.totalItems = state.currentPage * state.itemsPerPage
+              }
+            } else {
+              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+            }
+          }
         } else if (Array.isArray(payload)) {
           // Direct array: [...]
           state.users = payload

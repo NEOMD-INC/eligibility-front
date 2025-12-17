@@ -78,14 +78,8 @@ export default function IndividualEligibilityForm() {
     relationshipCode: Yup.string().required('Relationship code is required'),
     serviceDate: Yup.date()
       .required('Service date is required')
-      .min(
-        new Date(serviceDateRestrictions.min),
-        'Service date must be within the allowed range'
-      )
-      .max(
-        new Date(serviceDateRestrictions.max),
-        'Service date must be within the allowed range'
-      ),
+      .min(new Date(serviceDateRestrictions.min), 'Service date must be within the allowed range')
+      .max(new Date(serviceDateRestrictions.max), 'Service date must be within the allowed range'),
     serviceType: Yup.string().required('Service type is required'),
     placeOfService: Yup.string().required('Place of service is required'),
   })
@@ -507,4 +501,3 @@ export default function IndividualEligibilityForm() {
     </div>
   )
 }
-

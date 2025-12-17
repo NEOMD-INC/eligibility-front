@@ -1,35 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-
-interface AddCarrierSetupValues {
-  carrierGroupCode: string
-  carrierGroupDescription: string
-  carrierCode: string
-  carrierDescription: string
-  state: string
-  batchPlayerId: string
-  isClia: string
-  cob: string
-  correctedClaim: string
-  enrollmentRequired: string
-}
-
-interface EditCarrierSetupValues {
-  carrierGroupCode: string
-  carrierGroupDescription: string
-  carrierCode: string
-  carrierDescription: string
-  state: string
-  batchPlayerId: string
-  isClia: string
-  cob: string
-  correctedClaim: string
-  enrollmentRequired: string
-}
+import {
+  fetchCarrierSetupById,
+  createCarrierSetup,
+  updateCarrierSetup,
+  clearCurrentCarrierSetup,
+  clearCarrierSetupsError,
+} from '@/redux/slices/settings/carrier-setups/actions'
+import { AppDispatch, RootState } from '@/redux/store'
+import type { CarrierSetupFormValues } from '@/types'
 
 export default function AddUpdateCarrierSetup() {
   const router = useRouter()
@@ -37,7 +22,10 @@ export default function AddUpdateCarrierSetup() {
   const carrierSetupId = params?.id as string | undefined
   const isEditMode = !!carrierSetupId
 
-  const [btnLoading, setBtnLoading] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const { currentCarrierSetup, createLoading, updateLoading, fetchCarrierSetupLoading, error } =
+    useSelector((state: RootState) => state.carrierSetups)
+
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -49,7 +37,7 @@ export default function AddUpdateCarrierSetup() {
     carrierDescription: Yup.string().required('Carrier description is required'),
     state: Yup.string().required('State is required'),
     batchPlayerId: Yup.string().required('Batch player ID is required'),
-    isClia: Yup.string().required('Is CLIA is required'),
+    isClia: Yup.boolean().required('Is CLIA is required'),
     cob: Yup.string().required('COB is required'),
     correctedClaim: Yup.string().required('Corrected claim is required'),
     enrollmentRequired: Yup.string().required('Enrollment required is required'),
@@ -63,14 +51,14 @@ export default function AddUpdateCarrierSetup() {
     carrierDescription: Yup.string().required('Carrier description is required'),
     state: Yup.string().required('State is required'),
     batchPlayerId: Yup.string().required('Batch player ID is required'),
-    isClia: Yup.string().required('Is CLIA is required'),
+    isClia: Yup.boolean().required('Is CLIA is required'),
     cob: Yup.string().required('COB is required'),
     correctedClaim: Yup.string().required('Corrected claim is required'),
     enrollmentRequired: Yup.string().required('Enrollment required is required'),
   })
 
   // Add Carrier Setup Formik
-  const addCarrierSetupFormik = useFormik<AddCarrierSetupValues>({
+  const addCarrierSetupFormik = useFormik<CarrierSetupFormValues>({
     initialValues: {
       carrierGroupCode: '',
       carrierGroupDescription: '',
@@ -78,33 +66,28 @@ export default function AddUpdateCarrierSetup() {
       carrierDescription: '',
       state: '',
       batchPlayerId: '',
-      isClia: '',
+      isClia: false,
       cob: '',
       correctedClaim: '',
       enrollmentRequired: '',
     },
     validationSchema: addCarrierSetupValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearCarrierSetupsError())
       try {
-        console.log('Add Carrier Setup Values:', values)
-        // TODO: Add API call to create carrier setup
-        // await createCarrierSetup(values)
-        setTimeout(() => {
-          setBtnLoading(false)
-          router.push('/settings/carrier-setup')
-        }, 1000)
+        await dispatch(createCarrierSetup(values)).unwrap()
+        router.push('/settings/carrier-setup')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while creating the carrier setup.')
+        setErrorMsg(err || 'An error occurred while creating the carrier setup.')
       }
     },
   })
 
   // Edit Carrier Setup Formik
-  const editCarrierSetupFormik = useFormik<EditCarrierSetupValues>({
+  const editCarrierSetupFormik = useFormik<CarrierSetupFormValues>({
     initialValues: {
       carrierGroupCode: '',
       carrierGroupDescription: '',
@@ -112,27 +95,23 @@ export default function AddUpdateCarrierSetup() {
       carrierDescription: '',
       state: '',
       batchPlayerId: '',
-      isClia: '',
+      isClia: false,
       cob: '',
       correctedClaim: '',
       enrollmentRequired: '',
     },
     validationSchema: editCarrierSetupValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
+      if (!carrierSetupId) return
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearCarrierSetupsError())
       try {
-        console.log('Edit Carrier Setup Values:', values)
-        // TODO: Add API call to update carrier setup
-        // await updateCarrierSetup(carrierSetupId, values)
-        setTimeout(() => {
-          setBtnLoading(false)
-          router.push('/settings/carrier-setup')
-        }, 1000)
+        await dispatch(updateCarrierSetup({ carrierSetupId, carrierSetupData: values })).unwrap()
+        router.push('/settings/carrier-setup')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while updating the carrier setup.')
+        setErrorMsg(err || 'An error occurred while updating the carrier setup.')
       }
     },
   })
@@ -140,38 +119,57 @@ export default function AddUpdateCarrierSetup() {
   // Load carrier setup data in edit mode
   useEffect(() => {
     if (isEditMode && carrierSetupId) {
-      const loadCarrierSetupData = async () => {
-        try {
-          // TODO: Fetch carrier setup data from API
-          // const carrierSetupData = await fetchCarrierSetup(carrierSetupId)
-          // For now, using mock data
-          editCarrierSetupFormik.setValues({
-            carrierGroupCode: 'GRP001',
-            carrierGroupDescription: 'Health Insurance Group A',
-            carrierCode: 'CAR001',
-            carrierDescription: 'ABC Insurance Company',
-            state: 'NY',
-            batchPlayerId: 'BP001',
-            isClia: 'Yes',
-            cob: 'Primary',
-            correctedClaim: 'Yes',
-            enrollmentRequired: 'Required',
-          })
-        } catch (error) {
-          console.error('Error loading carrier setup data:', error)
-        }
-      }
-      loadCarrierSetupData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      dispatch(clearCarrierSetupsError())
+      dispatch(fetchCarrierSetupById(carrierSetupId))
     }
-  }, [isEditMode, carrierSetupId])
+    return () => {
+      dispatch(clearCurrentCarrierSetup())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, isEditMode, carrierSetupId])
+
+  // Update form values when carrier setup data is loaded
+  useEffect(() => {
+    if (isEditMode && currentCarrierSetup) {
+      editCarrierSetupFormik.setValues({
+        carrierGroupCode: currentCarrierSetup.carrier_group_code || '',
+        carrierGroupDescription: currentCarrierSetup.carrier_group_description || '',
+        carrierCode: currentCarrierSetup.carrier_code || '',
+        carrierDescription: currentCarrierSetup.carrier_description || '',
+        state: currentCarrierSetup.state || '',
+        batchPlayerId: currentCarrierSetup.batch_payer_id || '',
+        isClia:
+          typeof currentCarrierSetup.is_clia === 'boolean'
+            ? currentCarrierSetup.is_clia
+            : currentCarrierSetup.is_clia === 1 ||
+                currentCarrierSetup.is_clia === '1' ||
+                currentCarrierSetup.is_clia === true
+              ? true
+              : false,
+        cob: currentCarrierSetup.cob || '',
+        correctedClaim: currentCarrierSetup.corrected_claim || '',
+        enrollmentRequired: currentCarrierSetup.enrollment_required || '',
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCarrierSetup, isEditMode])
+
+  // Update error message from Redux
+  useEffect(() => {
+    if (error) {
+      setIsError(true)
+      setErrorMsg(error)
+    }
+  }, [error])
+
+  if (isEditMode && fetchCarrierSetupLoading) {
+    return <ComponentLoader component="Carrier Setup" message="Loading Carrier Setup data..." />
+  }
 
   const renderFormFields = (formik: any) => (
     <>
       <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-800 mb-1">
-          Carrier Group Code
-        </label>
+        <label className="block text-sm font-semibold text-gray-800 mb-1">Carrier Group Code</label>
         <input
           type="text"
           name="carrierGroupCode"
@@ -210,9 +208,7 @@ export default function AddUpdateCarrierSetup() {
           }`}
         />
         {formik.touched.carrierGroupDescription && formik.errors.carrierGroupDescription && (
-          <p className="text-red-600 text-sm mt-1">
-            {formik.errors.carrierGroupDescription}
-          </p>
+          <p className="text-red-600 text-sm mt-1">{formik.errors.carrierGroupDescription}</p>
         )}
       </div>
 
@@ -306,9 +302,12 @@ export default function AddUpdateCarrierSetup() {
         <label className="block text-sm font-semibold text-gray-800 mb-1">Is CLIA</label>
         <select
           name="isClia"
-          onChange={formik.handleChange}
+          onChange={e => {
+            const value = e.target.value
+            formik.setFieldValue('isClia', value === '' ? undefined : value === 'true')
+          }}
           onBlur={formik.handleBlur}
-          value={formik.values.isClia}
+          value={formik.values.isClia === undefined ? '' : String(formik.values.isClia)}
           className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
             formik.touched.isClia && formik.errors.isClia
               ? 'border-red-500 focus:ring-red-400'
@@ -316,8 +315,8 @@ export default function AddUpdateCarrierSetup() {
           }`}
         >
           <option value="">Select</option>
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
         </select>
         {formik.touched.isClia && formik.errors.isClia && (
           <p className="text-red-600 text-sm mt-1">{formik.errors.isClia}</p>
@@ -423,7 +422,7 @@ export default function AddUpdateCarrierSetup() {
                 type="submit"
                 title="Update Carrier Setup"
                 class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                btnLoading={btnLoading}
+                btnLoading={updateLoading || fetchCarrierSetupLoading}
                 callback_event=""
               />
             </div>
@@ -464,7 +463,7 @@ export default function AddUpdateCarrierSetup() {
               type="submit"
               title="Add Carrier Setup"
               class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={btnLoading}
+              btnLoading={createLoading}
               callback_event=""
             />
           </div>
@@ -473,4 +472,3 @@ export default function AddUpdateCarrierSetup() {
     </div>
   )
 }
-

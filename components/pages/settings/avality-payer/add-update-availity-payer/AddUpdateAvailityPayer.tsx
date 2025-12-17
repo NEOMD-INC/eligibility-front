@@ -1,41 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-
-interface AddAvailityPayerValues {
-  payerId: string
-  payerName: string
-  payerCode: string
-  contactName: string
-  addressLine1: string
-  addressLine2: string
-  city: string
-  state: string
-  zipCode: string
-  phone: string
-  email: string
-  isActive: boolean
-  notes: string
-}
-
-interface EditAvailityPayerValues {
-  payerId: string
-  payerName: string
-  payerCode: string
-  contactName: string
-  addressLine1: string
-  addressLine2: string
-  city: string
-  state: string
-  zipCode: string
-  phone: string
-  email: string
-  isActive: boolean
-  notes: string
-}
+import {
+  fetchAvailityPayerById,
+  createAvailityPayer,
+  updateAvailityPayer,
+  clearCurrentAvailityPayer,
+  clearAvailityPayersError,
+} from '@/redux/slices/settings/availity-payers/actions'
+import { AppDispatch, RootState } from '@/redux/store'
+import type { AvailityPayerFormValues } from '@/types'
 
 export default function AddUpdateAvailityPayer() {
   const router = useRouter()
@@ -43,7 +22,10 @@ export default function AddUpdateAvailityPayer() {
   const payerId = params?.id as string | undefined
   const isEditMode = !!payerId
 
-  const [btnLoading, setBtnLoading] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const { currentAvailityPayer, createLoading, updateLoading, fetchAvailityPayerLoading, error } =
+    useSelector((state: RootState) => state.availityPayers)
+
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -82,7 +64,7 @@ export default function AddUpdateAvailityPayer() {
   })
 
   // Add Payer Formik
-  const addPayerFormik = useFormik<AddAvailityPayerValues>({
+  const addPayerFormik = useFormik<AvailityPayerFormValues>({
     initialValues: {
       payerId: '',
       payerName: '',
@@ -100,26 +82,21 @@ export default function AddUpdateAvailityPayer() {
     },
     validationSchema: addPayerValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearAvailityPayersError())
       try {
-        console.log('Add Payer Values:', values)
-        // TODO: Add API call to create payer
-        // await createPayer(values)
-        setTimeout(() => {
-          setBtnLoading(false)
-          router.push('/settings/availity-payer')
-        }, 1000)
+        await dispatch(createAvailityPayer(values)).unwrap()
+        router.push('/settings/availity-payer')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while creating the payer.')
+        setErrorMsg(err || 'An error occurred while creating the payer.')
       }
     },
   })
 
   // Edit Payer Formik
-  const editPayerFormik = useFormik<EditAvailityPayerValues>({
+  const editPayerFormik = useFormik<AvailityPayerFormValues>({
     initialValues: {
       payerId: '',
       payerName: '',
@@ -137,20 +114,16 @@ export default function AddUpdateAvailityPayer() {
     },
     validationSchema: editPayerValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
+      if (!payerId) return
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearAvailityPayersError())
       try {
-        console.log('Edit Payer Values:', values)
-        // TODO: Add API call to update payer
-        // await updatePayer(payerId, values)
-        setTimeout(() => {
-          setBtnLoading(false)
-          router.push('/settings/availity-payer')
-        }, 1000)
+        await dispatch(updateAvailityPayer({ payerId, payerData: values })).unwrap()
+        router.push('/settings/availity-payer')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while updating the payer.')
+        setErrorMsg(err || 'An error occurred while updating the payer.')
       }
     },
   })
@@ -158,34 +131,55 @@ export default function AddUpdateAvailityPayer() {
   // Load payer data in edit mode
   useEffect(() => {
     if (isEditMode && payerId) {
-      const loadPayerData = async () => {
-        try {
-          // TODO: Fetch payer data from API
-          // const payerData = await fetchPayer(payerId)
-          // For now, using mock data
-          editPayerFormik.setValues({
-            payerId: 'PAY001',
-            payerName: 'Blue Cross Blue Shield',
-            payerCode: 'BCBS001',
-            contactName: 'John Doe',
-            addressLine1: '123 Main Street',
-            addressLine2: 'Suite 100',
-            city: 'New York',
-            state: 'NY',
-            zipCode: '10001',
-            phone: '555-1234',
-            email: 'contact@bcbs.com',
-            isActive: true,
-            notes: 'Primary insurance provider',
-          })
-        } catch (error) {
-          console.error('Error loading payer data:', error)
-        }
-      }
-      loadPayerData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      dispatch(clearAvailityPayersError())
+      dispatch(fetchAvailityPayerById(payerId))
     }
-  }, [isEditMode, payerId])
+    return () => {
+      dispatch(clearCurrentAvailityPayer())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, isEditMode, payerId])
+
+  // Update form values when payer data is loaded
+  useEffect(() => {
+    if (isEditMode && currentAvailityPayer) {
+      editPayerFormik.setValues({
+        payerId: currentAvailityPayer.payer_id || '',
+        payerName: currentAvailityPayer.payer_name || '',
+        payerCode: currentAvailityPayer.payer_code || '',
+        contactName: currentAvailityPayer.contact_name || '',
+        addressLine1: currentAvailityPayer.address_line_1 || '',
+        addressLine2: currentAvailityPayer.address_line_2 || '',
+        city: currentAvailityPayer.city || '',
+        state: currentAvailityPayer.state || '',
+        zipCode: currentAvailityPayer.zip || '',
+        phone: currentAvailityPayer.phone || '',
+        email: currentAvailityPayer.email || '',
+        isActive:
+          typeof currentAvailityPayer.is_active === 'boolean'
+            ? currentAvailityPayer.is_active
+            : currentAvailityPayer.is_active === 1 ||
+                currentAvailityPayer.is_active === '1' ||
+                currentAvailityPayer.is_active === true
+              ? true
+              : false,
+        notes: currentAvailityPayer.notes || '',
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentAvailityPayer, isEditMode])
+
+  // Update error message from Redux
+  useEffect(() => {
+    if (error) {
+      setIsError(true)
+      setErrorMsg(error)
+    }
+  }, [error])
+
+  if (isEditMode && fetchAvailityPayerLoading) {
+    return <ComponentLoader component="Availity Payer" message="Loading Availity Payer data..." />
+  }
 
   const renderFormFields = (formik: any, prefix: string) => (
     <>
@@ -494,7 +488,7 @@ export default function AddUpdateAvailityPayer() {
                 type="submit"
                 title="Update Payer"
                 class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                btnLoading={btnLoading}
+                btnLoading={updateLoading || fetchAvailityPayerLoading}
                 callback_event=""
               />
             </div>
@@ -535,7 +529,7 @@ export default function AddUpdateAvailityPayer() {
               type="submit"
               title="Add Payer"
               class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={btnLoading}
+              btnLoading={createLoading}
               callback_event=""
             />
           </div>
@@ -544,4 +538,3 @@ export default function AddUpdateAvailityPayer() {
     </div>
   )
 }
-

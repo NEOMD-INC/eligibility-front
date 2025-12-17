@@ -54,12 +54,29 @@ export default function AvailityPayerListColumns({
     {
       key: 'status',
       label: 'Status',
-      width: '10%',
-      align: 'left' as const,
+      width: '15%',
+      align: 'center' as const,
       render: (value: any, payer: any) => {
-        const status = payer.status || payer.isActive ? 'Active' : 'Inactive'
-        const statusColor = status === 'Active' ? 'text-green-600' : 'text-red-600'
-        return <div className={`font-semibold ${statusColor}`}>{status}</div>
+        // Handle status as boolean or string
+        const statusValue =
+          typeof payer.status === 'boolean'
+            ? payer.status
+            : payer.status === 'active' ||
+              payer.status === 'Active' ||
+              payer.isActive ||
+              payer.is_active
+        const status = statusValue ? 'Active' : 'Inactive'
+        const statusClass =
+          status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        return (
+          <div className="flex justify-center">
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}
+            >
+              {status}
+            </span>
+          </div>
+        )
       },
     },
     {

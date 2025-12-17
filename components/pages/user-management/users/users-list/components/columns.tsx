@@ -55,16 +55,12 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       width: '15%',
       align: 'center' as const,
       render: (value: any, user: any) => {
-        // Handle different role structures: string, object with name property, or array of objects/strings
         let roleDisplay = 'N/A'
 
         if (user.role) {
-          // If role is a string, use it directly
           roleDisplay = typeof user.role === 'string' ? user.role : user.role.name || 'N/A'
         } else if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
-          // If roles is an array, get the first one
           const firstRole = user.roles[0]
-          // Check if it's an object with a name property or a string
           roleDisplay = typeof firstRole === 'string' ? firstRole : firstRole?.name || 'N/A'
         }
 

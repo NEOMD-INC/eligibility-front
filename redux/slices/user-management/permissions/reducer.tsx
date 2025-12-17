@@ -145,13 +145,36 @@ const permissionsSlice = createSlice({
 
         if (payload?.data && Array.isArray(payload.data)) {
           // Structure: { data: [...], total: 100, ... } or { data: [...], meta: { total: 100 } }
+          const dataArray = payload.data
           state.permissions = payload.data
-          state.totalItems = payload.total || payload.meta?.total || payload.data.length
+          const apiTotal = payload.total || payload.meta?.total
+          if (apiTotal !== undefined && apiTotal !== null) {
+            state.totalItems = apiTotal
+          } else if (dataArray.length > 0) {
+            if (dataArray.length === state.itemsPerPage) {
+              if (state.totalItems === 0) {
+                state.totalItems = state.currentPage * state.itemsPerPage
+              }
+            } else {
+              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+            }
+          }
         } else if (payload?.data?.data && Array.isArray(payload.data.data)) {
           // Nested structure: { data: { data: [...], total: 100 } }
+          const dataArray = payload.data.data
           state.permissions = payload.data.data
-          state.totalItems =
-            payload.data.total || payload.data.meta?.total || payload.data.data.length
+          const apiTotal = payload.data.total || payload.data.meta?.total
+          if (apiTotal !== undefined && apiTotal !== null) {
+            state.totalItems = apiTotal
+          } else if (dataArray.length > 0) {
+            if (dataArray.length === state.itemsPerPage) {
+              if (state.totalItems === 0) {
+                state.totalItems = state.currentPage * state.itemsPerPage
+              }
+            } else {
+              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+            }
+          }
         } else if (Array.isArray(payload)) {
           // Direct array: [...]
           state.permissions = payload

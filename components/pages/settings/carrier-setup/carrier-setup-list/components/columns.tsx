@@ -17,7 +17,7 @@ export default function CarrierSetupListColumns({
       render: (value: any, carrierSetup: any) => (
         <Link href={`/settings/carrier-setup/${carrierSetup.id || carrierSetup.uuid}`}>
           <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
-            {carrierSetup.groupCode || carrierSetup.group_code || 'N/A'}
+            {carrierSetup.carrier_group_code || 'N/A'}
           </div>
         </Link>
       ),
@@ -29,7 +29,7 @@ export default function CarrierSetupListColumns({
       align: 'left' as const,
       render: (value: any, carrierSetup: any) => (
         <div className="text-gray-900 truncate">
-          {carrierSetup.groupDescription || carrierSetup.group_description || 'N/A'}
+          {carrierSetup.carrier_group_description || 'N/A'}
         </div>
       ),
     },
@@ -96,4 +96,3 @@ export default function CarrierSetupListColumns({
 
   return carrierSetupColumns
 }
-

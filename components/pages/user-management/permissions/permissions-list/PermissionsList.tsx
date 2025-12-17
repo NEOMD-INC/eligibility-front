@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import PermissionsListColumns from './components/columns'
+import Filters, { FilterField } from '@/components/ui/filters/Filters'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
-import { Plus, Search, FunnelPlus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import {
   fetchAllPermissions,
   deletePermission,
@@ -20,83 +21,58 @@ export default function PermissionsList() {
   const { permissions, loading, totalItems, currentPage, deleteLoading, error } = useSelector(
     (state: RootState) => state.permissions
   )
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [searchText, setSearchText] = useState('')
-  const [roleFilter, setRoleFilter] = useState('allrole')
   const [appliedSearch, setAppliedSearch] = useState('')
-  const [appliedRole, setAppliedRole] = useState('allrole')
-  const filterRef = useRef<HTMLDivElement>(null)
   const itemsPerPage = 10
 
   // Fetch permissions on component mount and when applied filters/page change
   useEffect(() => {
-    const filters: { search?: string; role?: string } = {}
+    const filters: { search?: string } = {}
     if (appliedSearch.trim()) {
       filters.search = appliedSearch.trim()
     }
-    if (appliedRole && appliedRole !== 'allrole') {
-      filters.role = appliedRole
-    }
     dispatch(fetchAllPermissions({ page: currentPage, filters }))
-  }, [dispatch, currentPage, appliedSearch, appliedRole])
-
-  // Close filter dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
-        setIsFilterOpen(false)
-      }
-    }
-
-    if (isFilterOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isFilterOpen])
+  }, [dispatch, currentPage, appliedSearch])
 
   const handleDeleteClick = async (id: string, permissionName: string) => {
     if (confirm(`Are you sure you want to delete permission "${permissionName}"?`)) {
       dispatch(clearPermissionsError())
       const result = await dispatch(deletePermission(id))
       if (deletePermission.fulfilled.match(result)) {
-        const filters: { search?: string; role?: string } = {}
+        const filters: { search?: string } = {}
         if (appliedSearch.trim()) {
           filters.search = appliedSearch.trim()
-        }
-        if (appliedRole && appliedRole !== 'allrole') {
-          filters.role = appliedRole
         }
         dispatch(fetchAllPermissions({ page: currentPage, filters }))
       }
     }
   }
 
-  // Filter handlers
-  const handleQuickSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value)
-  }
-
-  const handleSearchFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setRoleFilter(e.target.value)
   }
 
   const handleSubmit = () => {
     setAppliedSearch(searchText)
-    setAppliedRole(roleFilter)
     dispatch(setCurrentPage(1))
-    setIsFilterOpen(false)
   }
 
-  const resetSearchField = () => {
+  const handleReset = () => {
     setSearchText('')
-    setRoleFilter('allrole')
     setAppliedSearch('')
-    setAppliedRole('allrole')
     dispatch(setCurrentPage(1))
   }
+
+  const filterFields: FilterField[] = [
+    {
+      name: 'search',
+      label: 'Search',
+      type: 'text',
+      placeholder: 'Quick permission search...',
+      value: searchText,
+      onChange: handleSearchChange,
+    },
+  ]
 
   const columns = PermissionsListColumns({ onDeleteClick: handleDeleteClick })
 
@@ -132,34 +108,7 @@ export default function PermissionsList() {
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-          <div className="flex justify-end items-center gap-4">
-            {/* Quick Search */}
-            <div className="flex items-center relative">
-              <div className="absolute left-3 text-gray-400">
-                <Search size={16} />
-              </div>
-              <input
-                type="text"
-                className="w-80 pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                placeholder="Quick permission search..."
-                onChange={handleQuickSearchChange}
-                value={searchText}
-              />
-              <button
-                type="button"
-                onClick={e => {
-                  e.preventDefault()
-                  handleSubmit()
-                }}
-                className="ml-3 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 whitespace-nowrap"
-              >
-                <Search size={14} />
-                Search
-              </button>
-            </div>
-          </div>
-        </div>
+        <Filters fields={filterFields} onReset={handleReset} onSubmit={handleSubmit} columns={1} />
 
         <DataTable
           columns={columns}

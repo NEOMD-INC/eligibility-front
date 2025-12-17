@@ -17,7 +17,9 @@ export default function CarrierGroupListColumns({
       render: (value: any, carrierGroup: any) => (
         <Link href={`/settings/carrier-group/${carrierGroup.id || carrierGroup.uuid}`}>
           <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
-            {carrierGroup.description || 'N/A'}
+            {carrierGroup.carrier_group_description ||
+              carrierGroup.description ||
+              'N/A'}
           </div>
         </Link>
       ),
@@ -28,7 +30,9 @@ export default function CarrierGroupListColumns({
       width: '20%',
       align: 'left' as const,
       render: (value: any, carrierGroup: any) => (
-        <div className="text-gray-900 truncate">{carrierGroup.code || 'N/A'}</div>
+        <div className="text-gray-900 truncate">
+          {carrierGroup.carrier_group_code || carrierGroup.code || 'N/A'}
+        </div>
       ),
     },
     {
@@ -48,7 +52,15 @@ export default function CarrierGroupListColumns({
       width: '15%',
       align: 'center' as const,
       render: (value: any, carrierGroup: any) => {
-        const status = carrierGroup.status || carrierGroup.isActive ? 'Active' : 'Inactive'
+        // Handle status as boolean or string
+        const statusValue =
+          typeof carrierGroup.status === 'boolean'
+            ? carrierGroup.status
+            : carrierGroup.status === 'active' ||
+                carrierGroup.status === 'Active' ||
+                carrierGroup.isActive ||
+                carrierGroup.is_active
+        const status = statusValue ? 'Active' : 'Inactive'
         const statusClass =
           status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
         return (
@@ -78,7 +90,11 @@ export default function CarrierGroupListColumns({
               onDeleteClick
                 ? (id: string) => {
                     const carrierGroupName: string =
-                      carrierGroup.description || carrierGroup.code || 'carrier group'
+                      carrierGroup.carrier_group_description ||
+                      carrierGroup.description ||
+                      carrierGroup.carrier_group_code ||
+                      carrierGroup.code ||
+                      'carrier group'
                     onDeleteClick(id, carrierGroupName)
                   }
                 : undefined

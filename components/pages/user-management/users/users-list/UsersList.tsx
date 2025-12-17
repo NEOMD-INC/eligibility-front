@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import UsersListColumns from './components/columns'
+import Filters, { FilterField } from '@/components/ui/filters/Filters'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
-import { Plus, Search, FunnelPlus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import {
   fetchAllUsers,
   deleteUser,
@@ -20,15 +21,12 @@ export default function UsersList() {
   const { users, loading, totalItems, currentPage, deleteLoading, error } = useSelector(
     (state: RootState) => state.users
   )
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [searchText, setSearchText] = useState('')
   const [roleFilter, setRoleFilter] = useState('allrole')
   const [appliedSearch, setAppliedSearch] = useState('')
   const [appliedRole, setAppliedRole] = useState('allrole')
-  const filterRef = useRef<HTMLDivElement>(null)
   const itemsPerPage = 10
 
-  // Fetch users on component mount and when applied filters/page change
   useEffect(() => {
     const filters: { search?: string; role?: string } = {}
     if (appliedSearch.trim()) {
@@ -39,22 +37,6 @@ export default function UsersList() {
     }
     dispatch(fetchAllUsers({ page: currentPage, filters }))
   }, [dispatch, currentPage, appliedSearch, appliedRole])
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
-        setIsFilterOpen(false)
-      }
-    }
-
-    if (isFilterOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isFilterOpen])
 
   const handleDeleteClick = async (id: string, userName: string) => {
     if (confirm(`Are you sure you want to delete user "${userName}"?`)) {
@@ -73,11 +55,11 @@ export default function UsersList() {
     }
   }
 
-  const handleQuickSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value)
   }
 
-  const handleSearchFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRoleFilter(e.target.value)
   }
 
@@ -85,16 +67,40 @@ export default function UsersList() {
     setAppliedSearch(searchText)
     setAppliedRole(roleFilter)
     dispatch(setCurrentPage(1))
-    setIsFilterOpen(false)
   }
 
-  const resetSearchField = () => {
+  const handleReset = () => {
     setSearchText('')
     setRoleFilter('allrole')
     setAppliedSearch('')
     setAppliedRole('allrole')
     dispatch(setCurrentPage(1))
   }
+
+  const filterFields: FilterField[] = [
+    {
+      name: 'search',
+      label: 'Search',
+      type: 'text',
+      placeholder: 'Quick user search...',
+      value: searchText,
+      onChange: handleSearchChange as () => void,
+    },
+    {
+      name: 'role',
+      label: 'Search by Role',
+      type: 'select',
+      value: roleFilter,
+      onChange: handleRoleChange as () => void,
+      options: [
+        { value: 'allrole', label: 'All Role' },
+        { value: 'super_admin', label: 'Super Admin' },
+        { value: 'employee', label: 'Employee' },
+        { value: 'manager', label: 'Manager' },
+        { value: 'team_lead', label: 'Team Lead' },
+      ],
+    },
+  ]
 
   const columns = UsersListColumns({ onDeleteClick: handleDeleteClick })
 
@@ -130,95 +136,8 @@ export default function UsersList() {
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-          <div className="flex justify-end items-center gap-4">
-            {/* Quick Search */}
-            <div className="flex items-center relative">
-              <div className="absolute left-3 text-gray-400">
-                <Search size={16} />
-              </div>
-              <input
-                type="text"
-                className="w-80 pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                placeholder="Quick user search..."
-                onChange={handleQuickSearchChange}
-                value={searchText}
-              />
-              <button
-                type="button"
-                onClick={e => {
-                  e.preventDefault()
-                  handleSubmit()
-                }}
-                className="ml-3 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 whitespace-nowrap"
-              >
-                <Search size={14} />
-                Search
-              </button>
-            </div>
+        <Filters fields={filterFields} onReset={handleReset} onSubmit={handleSubmit} columns={2} />
 
-            {/* Filter Dropdown */}
-            <div className="flex items-center">
-              <div className="relative" ref={filterRef}>
-                <button
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  className="px-4 py-2 bg-white text-gray-700 text-sm font-semibold rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 flex items-center gap-2 border border-gray-300"
-                >
-                  <FunnelPlus size={14} />
-                  Filter
-                </button>
-
-                {isFilterOpen && (
-                  <div className="absolute right-0 z-50 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200">
-                    <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                      <div className="text-lg font-bold text-gray-900">Filter Options</div>
-                    </div>
-                    <div className="px-6 py-4">
-                      <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Search by Role:
-                        </label>
-                        <div className="flex flex-col gap-3">
-                          <select
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold bg-white"
-                            onChange={handleSearchFieldChange}
-                            value={roleFilter}
-                          >
-                            <option value="allrole">All Role</option>
-                            <option value="super_admin">Super Admin</option>
-                            <option value="employee">Employee</option>
-                            <option value="manager">Manager</option>
-                            <option value="team_lead">Team Lead</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
-                        <button
-                          onClick={resetSearchField}
-                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                        >
-                          Reset
-                        </button>
-                        <button
-                          type="button"
-                          onClick={e => {
-                            e.preventDefault()
-                            handleSubmit()
-                          }}
-                          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          Search
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* DataTable */}
         <DataTable
           columns={columns}
           data={Array.isArray(users) ? users : []}

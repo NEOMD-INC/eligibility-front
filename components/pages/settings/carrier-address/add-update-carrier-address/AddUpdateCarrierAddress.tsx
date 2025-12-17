@@ -1,35 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-
-interface AddCarrierAddressValues {
-  carrierCode: string
-  actualName: string
-  addressId: string
-  addressLine1: string
-  city: string
-  state: string
-  zipCode: string
-  phoneType: string
-  phoneNumber: string
-  insuranceDepartment: string
-}
-
-interface EditCarrierAddressValues {
-  carrierCode: string
-  actualName: string
-  addressId: string
-  addressLine1: string
-  city: string
-  state: string
-  zipCode: string
-  phoneType: string
-  phoneNumber: string
-  insuranceDepartment: string
-}
+import {
+  fetchCarrierAddressById,
+  createCarrierAddress,
+  updateCarrierAddress,
+  clearCurrentCarrierAddress,
+  clearCarrierAddressesError,
+} from '@/redux/slices/settings/carrier-addresses/actions'
+import { AppDispatch, RootState } from '@/redux/store'
+import type { CarrierAddressFormValues } from '@/types'
 
 export default function AddUpdateCarrierAddress() {
   const router = useRouter()
@@ -37,7 +22,10 @@ export default function AddUpdateCarrierAddress() {
   const carrierAddressId = params?.id as string | undefined
   const isEditMode = !!carrierAddressId
 
-  const [btnLoading, setBtnLoading] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const { currentCarrierAddress, createLoading, updateLoading, fetchCarrierAddressLoading, error } =
+    useSelector((state: RootState) => state.carrierAddresses)
+
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -70,7 +58,7 @@ export default function AddUpdateCarrierAddress() {
   })
 
   // Add Carrier Address Formik
-  const addCarrierAddressFormik = useFormik<AddCarrierAddressValues>({
+  const addCarrierAddressFormik = useFormik<CarrierAddressFormValues>({
     initialValues: {
       carrierCode: '',
       actualName: '',
@@ -85,26 +73,21 @@ export default function AddUpdateCarrierAddress() {
     },
     validationSchema: addCarrierAddressValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearCarrierAddressesError())
       try {
-        console.log('Add Carrier Address Values:', values)
-        // TODO: Add API call to create carrier address
-        // await createCarrierAddress(values)
-        setTimeout(() => {
-          setBtnLoading(false)
-          router.push('/settings/carrier-address')
-        }, 1000)
+        await dispatch(createCarrierAddress(values)).unwrap()
+        router.push('/settings/carrier-address')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while creating the carrier address.')
+        setErrorMsg(err || 'An error occurred while creating the carrier address.')
       }
     },
   })
 
   // Edit Carrier Address Formik
-  const editCarrierAddressFormik = useFormik<EditCarrierAddressValues>({
+  const editCarrierAddressFormik = useFormik<CarrierAddressFormValues>({
     initialValues: {
       carrierCode: '',
       actualName: '',
@@ -119,20 +102,18 @@ export default function AddUpdateCarrierAddress() {
     },
     validationSchema: editCarrierAddressValidationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
+      if (!carrierAddressId) return
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearCarrierAddressesError())
       try {
-        console.log('Edit Carrier Address Values:', values)
-        // TODO: Add API call to update carrier address
-        // await updateCarrierAddress(carrierAddressId, values)
-        setTimeout(() => {
-          setBtnLoading(false)
-          router.push('/settings/carrier-address')
-        }, 1000)
+        await dispatch(
+          updateCarrierAddress({ carrierAddressId, carrierAddressData: values })
+        ).unwrap()
+        router.push('/settings/carrier-address')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while updating the carrier address.')
+        setErrorMsg(err || 'An error occurred while updating the carrier address.')
       }
     },
   })
@@ -140,31 +121,41 @@ export default function AddUpdateCarrierAddress() {
   // Load carrier address data in edit mode
   useEffect(() => {
     if (isEditMode && carrierAddressId) {
-      const loadCarrierAddressData = async () => {
-        try {
-          // TODO: Fetch carrier address data from API
-          // const carrierAddressData = await fetchCarrierAddress(carrierAddressId)
-          // For now, using mock data
-          editCarrierAddressFormik.setValues({
-            carrierCode: 'CAR001',
-            actualName: 'ABC Insurance Company',
-            addressId: 'ADD001',
-            addressLine1: '123 Main Street',
-            city: 'New York',
-            state: 'NY',
-            zipCode: '10001',
-            phoneType: 'Office',
-            phoneNumber: '555-1234',
-            insuranceDepartment: 'Health Insurance',
-          })
-        } catch (error) {
-          console.error('Error loading carrier address data:', error)
-        }
-      }
-      loadCarrierAddressData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      dispatch(clearCarrierAddressesError())
+      dispatch(fetchCarrierAddressById(carrierAddressId))
     }
-  }, [isEditMode, carrierAddressId])
+    return () => {
+      dispatch(clearCurrentCarrierAddress())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, isEditMode, carrierAddressId])
+
+  // Update form values when carrier address data is loaded
+  useEffect(() => {
+    if (isEditMode && currentCarrierAddress) {
+      editCarrierAddressFormik.setValues({
+        carrierCode: currentCarrierAddress.carrier_code || '',
+        actualName: currentCarrierAddress.actual_name || '',
+        addressId: currentCarrierAddress.address_id || '',
+        addressLine1: currentCarrierAddress.address1 || '',
+        city: currentCarrierAddress.city || '',
+        state: currentCarrierAddress.state || '',
+        zipCode: currentCarrierAddress.zip_code || '',
+        phoneType: currentCarrierAddress.insurance_phone_type1 || '',
+        phoneNumber: currentCarrierAddress.insurance_phone_number1 || '',
+        insuranceDepartment: currentCarrierAddress.insurance_department || '',
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCarrierAddress, isEditMode])
+
+  // Update error message from Redux
+  useEffect(() => {
+    if (error) {
+      setIsError(true)
+      setErrorMsg(error)
+    }
+  }, [error])
 
   const renderFormFields = (formik: any, prefix: string) => (
     <>
@@ -382,6 +373,10 @@ export default function AddUpdateCarrierAddress() {
     </>
   )
 
+  if (isEditMode && fetchCarrierAddressLoading) {
+    return <ComponentLoader component="Carrier Address" message="Loading Carrier Address data..." />
+  }
+
   if (isEditMode) {
     return (
       <div className="flex flex-col justify-center bg-gray-100 p-6">
@@ -413,7 +408,7 @@ export default function AddUpdateCarrierAddress() {
                 type="submit"
                 title="Update Carrier Address"
                 class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                btnLoading={btnLoading}
+                btnLoading={updateLoading || fetchCarrierAddressLoading}
                 callback_event=""
               />
             </div>
@@ -454,7 +449,7 @@ export default function AddUpdateCarrierAddress() {
               type="submit"
               title="Add Carrier Address"
               class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={btnLoading}
+              btnLoading={createLoading}
               callback_event=""
             />
           </div>
@@ -463,4 +458,3 @@ export default function AddUpdateCarrierAddress() {
     </div>
   )
 }
-

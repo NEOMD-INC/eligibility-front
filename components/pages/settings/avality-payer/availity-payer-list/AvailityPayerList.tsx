@@ -1,64 +1,42 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import AvailityPayerListColumns from './components/columns'
 import { themeColors } from '@/theme'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
-
-const mockAvailityPayers = [
-  {
-    id: '1',
-    uuid: 'uuid-1',
-    payerId: 'PAY001',
-    payerName: 'Blue Cross Blue Shield',
-    payerCode: 'BCBS001',
-    city: 'New York',
-    state: 'NY',
-    status: 'Active',
-  },
-  {
-    id: '2',
-    uuid: 'uuid-2',
-    payerId: 'PAY002',
-    payerName: 'UnitedHealthcare',
-    payerCode: 'UHC001',
-    city: 'Los Angeles',
-    state: 'CA',
-    status: 'Active',
-  },
-  {
-    id: '3',
-    uuid: 'uuid-3',
-    payerId: 'PAY003',
-    payerName: 'Aetna Insurance',
-    payerCode: 'AET001',
-    city: 'Chicago',
-    state: 'IL',
-    status: 'Inactive',
-  },
-]
+import {
+  fetchAllAvailityPayers,
+  deleteAvailityPayer,
+  setCurrentPage,
+  clearAvailityPayersError,
+} from '@/redux/slices/settings/availity-payers/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 
 export default function AvailityPayerList() {
-  const [loading, setLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
+  const dispatch = useDispatch<AppDispatch>()
+  const { availityPayers, loading, error, totalItems, currentPage, itemsPerPage, deleteLoading } =
+    useSelector((state: RootState) => state.availityPayers)
+
+  useEffect(() => {
+    dispatch(clearAvailityPayersError())
+    dispatch(fetchAllAvailityPayers(currentPage))
+  }, [dispatch, currentPage])
 
   const handleDeleteClick = (id: string, payerName: string) => {
     if (confirm(`Are you sure you want to delete payer "${payerName}"?`)) {
-      console.log('Delete payer:', id, payerName)
+      dispatch(deleteAvailityPayer(id)).then(() => {
+        dispatch(fetchAllAvailityPayers(currentPage))
+      })
     }
   }
 
   const columns = AvailityPayerListColumns({ onDeleteClick: handleDeleteClick })
-  const totalItems = mockAvailityPayers.length
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedData = mockAvailityPayers.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    dispatch(setCurrentPage(page))
   }
 
   return (
@@ -89,11 +67,16 @@ export default function AvailityPayerList() {
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
-        {/* DataTable */}
+        {error && (
+          <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
+            <p className="text-sm font-medium">{error}</p>
+          </div>
+        )}
+
         <DataTable
           columns={columns}
-          data={paginatedData}
-          loading={loading}
+          data={availityPayers}
+          loading={loading || deleteLoading}
           totalItems={totalItems}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
@@ -110,4 +93,3 @@ export default function AvailityPayerList() {
     </div>
   )
 }
-

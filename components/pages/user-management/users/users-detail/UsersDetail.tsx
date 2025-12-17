@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter, useParams } from 'next/navigation'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import { UserProfileImage } from '@/components/ui/image/Image'
 import {
   fetchUserById,
@@ -9,6 +10,7 @@ import {
   clearUsersError,
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { getRoleDetails, getUserDetails, groupPermissionsByPrefix } from './helper/helper'
 
 export default function UsersDetail() {
   const router = useRouter()
@@ -27,100 +29,15 @@ export default function UsersDetail() {
     }
   }, [dispatch, userId])
 
-  // Format date helper
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A'
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  }
+  const USER_DETAILS = getUserDetails(currentUser)
 
-  const USER_DETAILS = [
-    {
-      title: 'Full Name',
-      value: currentUser?.name || 'N/A',
-    },
-    {
-      title: 'Email Address',
-      value: currentUser?.email || 'N/A',
-    },
-    {
-      title: 'Member Since',
-      value: formatDate(currentUser?.created_at),
-    },
-    {
-      title: 'Last Updated',
-      value: currentUser?.updated_at ? formatDate(currentUser.updated_at) : 'N/A',
-    },
-  ]
+  const ROLE_DETAILS = getRoleDetails(currentUser?.roles)
 
-  // Extract roles from user data - handle both string and object formats
-  const ROLE_DETAILS = currentUser?.roles
-    ? currentUser.roles.map((role: any) => ({
-        title: typeof role === 'string' ? role : role?.name || 'N/A',
-      }))
-    : currentUser?.role
-      ? [
-          {
-            title:
-              typeof currentUser.role === 'string'
-                ? currentUser.role
-                : currentUser.role?.name || 'N/A',
-          },
-        ]
-      : []
-
-  // Group permissions by prefix (the part before the underscore)
-  const groupPermissionsByPrefix = (permissions: any[]) => {
-    if (!permissions || !Array.isArray(permissions) || permissions.length === 0) {
-      return []
-    }
-
-    const grouped: { [key: string]: string[] } = {}
-
-    permissions.forEach((permission: any) => {
-      // Get the permission name (handle both string and object with name property)
-      const permissionName =
-        typeof permission === 'string' ? permission : permission?.name || ''
-
-      if (permissionName) {
-        // Extract the prefix (part before the first underscore)
-        const prefix = permissionName.split('_')[0] || permissionName
-
-        if (!grouped[prefix]) {
-          grouped[prefix] = []
-        }
-
-        // Add the full permission name to the group
-        grouped[prefix].push(permissionName)
-      }
-    })
-
-    // Convert to array format with title and permissions
-    return Object.keys(grouped)
-      .sort()
-      .map(prefix => ({
-        name: prefix,
-        permissions: grouped[prefix],
-      }))
-  }
-
-  // Get permissions from all roles and group them
-  const allPermissions =
-    currentUser?.roles?.flatMap((role: any) => role?.permissions || []) || []
+  const allPermissions = currentUser?.roles?.flatMap((role: any) => role?.permissions || []) || []
   const PERMISSIONS_GROUPED = groupPermissionsByPrefix(allPermissions)
 
   if (fetchUserLoading) {
-    return (
-      <div className="flex items-center justify-center p-6">
-        <div className="text-center">
-          <p className="text-gray-600">Loading user details...</p>
-        </div>
-      </div>
-    )
+    return <ComponentLoader component="user details" />
   }
 
   if (error) {
@@ -157,11 +74,8 @@ export default function UsersDetail() {
 
   return (
     <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
-      {/* Top Profile Card */}
       <div className="w-full bg-blue-600 text-white rounded-xl shadow-md p-6">
-        {/* Row: Profile Info (left) + Go Back Button (right) */}
         <div className="flex items-center justify-between">
-          {/* Left: Profile Info */}
           <div className="flex items-center gap-6">
             <div className="w-20 h-20 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0">
               <UserProfileImage profileImagePath={currentUser?.profile_image_path} width={80} />
@@ -177,7 +91,6 @@ export default function UsersDetail() {
         </div>
       </div>
 
-      {/* Main Detail Card */}
       <div className="w-full bg-white shadow-lg rounded-xl p-8 ">
         <h1 className="text-2xl font-bold mb-4 pb-3">User Details</h1>
 
@@ -193,7 +106,7 @@ export default function UsersDetail() {
         <h1 className="text-2xl font-bold mb-4 pb-3 mt-5">Roles</h1>
 
         <div className=" border-b">
-          {ROLE_DETAILS.map((obj, index) => (
+          {ROLE_DETAILS.map((obj: { title: string }, index: number) => (
             <span
               key={index}
               className="inline-flex items-center px-3 py-1 mb-5 rounded-full text-xs font-semibold bg-green-100 text-green-700 mr-2"

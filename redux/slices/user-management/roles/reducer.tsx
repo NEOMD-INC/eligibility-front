@@ -1,42 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { rolesService } from '@/services/user-management/roles/roles.service'
-
-interface Role {
-  id: string
-  uuid?: string
-  name: string
-  system_name?: string
-  description?: string
-  permissions?: string[]
-  users_count?: number
-  users?: Array<{
-    id: string
-    uuid?: string
-    name?: string
-    full_name?: string
-    first_name?: string
-    last_name?: string
-    email: string
-    username?: string
-  }>
-  created_at?: string
-  updated_at?: string
-}
-
-interface RolesState {
-  roles: Role[]
-  currentRole: Role | null
-  loading: boolean
-  error: string | null
-  totalItems: number
-  currentPage: number
-  itemsPerPage: number
-  // Individual operation states
-  createLoading: boolean
-  updateLoading: boolean
-  deleteLoading: boolean
-  fetchRoleLoading: boolean
-}
+import type { Role, RolesState } from '@/types'
 
 const initialState: RolesState = {
   roles: [],
@@ -172,16 +136,36 @@ const rolesSlice = createSlice({
         
         if (payload?.data && Array.isArray(payload.data)) {
           // Structure: { data: [...], total: 100, ... } or { data: [...], meta: { total: 100 } }
+          const dataArray = payload.data
           state.roles = payload.data
-          state.totalItems =
-            payload.total || payload.meta?.total || payload.data.length
+          const apiTotal = payload.total || payload.meta?.total
+          if (apiTotal !== undefined && apiTotal !== null) {
+            state.totalItems = apiTotal
+          } else if (dataArray.length > 0) {
+            if (dataArray.length === state.itemsPerPage) {
+              if (state.totalItems === 0) {
+                state.totalItems = state.currentPage * state.itemsPerPage
+              }
+            } else {
+              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+            }
+          }
         } else if (payload?.data?.data && Array.isArray(payload.data.data)) {
           // Nested structure: { data: { data: [...], total: 100 } }
+          const dataArray = payload.data.data
           state.roles = payload.data.data
-          state.totalItems =
-            payload.data.total ||
-            payload.data.meta?.total ||
-            payload.data.data.length
+          const apiTotal = payload.data.total || payload.data.meta?.total
+          if (apiTotal !== undefined && apiTotal !== null) {
+            state.totalItems = apiTotal
+          } else if (dataArray.length > 0) {
+            if (dataArray.length === state.itemsPerPage) {
+              if (state.totalItems === 0) {
+                state.totalItems = state.currentPage * state.itemsPerPage
+              }
+            } else {
+              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+            }
+          }
         } else if (Array.isArray(payload)) {
           // Direct array: [...]
           state.roles = payload

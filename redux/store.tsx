@@ -5,6 +5,11 @@ import userProfileReducer from './slices/user-profile/reducer'
 import usersReducer from './slices/user-management/users/reducer'
 import rolesReducer from './slices/user-management/roles/reducer'
 import permissionsReducer from './slices/user-management/permissions/reducer'
+import carrierGroupsReducer from './slices/settings/carrier-groups/reducer'
+import carrierAddressesReducer from './slices/settings/carrier-addresses/reducer'
+import carrierSetupsReducer from './slices/settings/carrier-setups/reducer'
+import availityPayersReducer from './slices/settings/availity-payers/reducer'
+import eligibilitySettingsReducer from './slices/eligibility/settings/reducer'
 import storage from 'redux-persist/lib/storage'
 import { persistStore, persistReducer } from 'redux-persist'
 
@@ -21,6 +26,11 @@ const rootReducer = combineReducers({
   users: usersReducer,
   roles: rolesReducer,
   permissions: permissionsReducer,
+  carrierGroups: carrierGroupsReducer,
+  carrierAddresses: carrierAddressesReducer,
+  carrierSetups: carrierSetupsReducer,
+  availityPayers: availityPayersReducer,
+  eligibilitySettings: eligibilitySettingsReducer,
 })
 
 export const store = configureStore({

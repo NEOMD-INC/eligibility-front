@@ -1,46 +1,50 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-
-interface ISASettingsValues {
-  authorizationInformationQualifier: string
-  authorizationInformation: string
-  securityInformationQualifier: string
-  securityInformation: string
-  senderQualifier: string
-  senderId: string
-  receiverQualifier: string
-  receiverId: string
-  repetitionSeparator: string
-  controlVersion: string
-  acknowledgmentRequested: string
-  usageIndicator: string
-  componentElementSeparator: string
-}
+import {
+  fetchEligibilitySettings,
+  updateEligibilitySettings,
+  clearEligibilitySettingsError,
+} from '@/redux/slices/eligibility/settings/actions'
+import { AppDispatch, RootState } from '@/redux/store'
+import type { ISASettingsFormValues } from '@/types'
 
 export default function ISASettingsForm() {
-  const [btnLoading, setBtnLoading] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const { settings, loading, updateLoading, error } = useSelector(
+    (state: RootState) => state.eligibilitySettings
+  )
+
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
   // Validation Schema
   const validationSchema = Yup.object({
+    idQualifier: Yup.string().required('ID Qualifier is required'),
     authorizationInformationQualifier: Yup.string().required(
       'Authorization information qualifier is required'
     ),
     authorizationInformation: Yup.string()
       .required('Authorization information is required')
-      .max(15, 'Authorization information must be exactly 15 characters')
-      .min(15, 'Authorization information must be exactly 15 characters'),
+      .test(
+        'exact-length',
+        'Authorization information must be exactly 15 characters',
+        value => value && value.length <= 15
+      ),
     securityInformationQualifier: Yup.string().required(
       'Security information qualifier is required'
     ),
     securityInformation: Yup.string()
       .required('Security information is required')
-      .max(15, 'Security information must be exactly 15 characters')
-      .min(15, 'Security information must be exactly 15 characters'),
+      .test(
+        'exact-length',
+        'Security information must be exactly 15 characters',
+        value => value && value.length <= 15
+      ),
     senderQualifier: Yup.string().required('Sender qualifier is required'),
     senderId: Yup.string()
       .required('Sender ID is required')
@@ -56,8 +60,9 @@ export default function ISASettingsForm() {
     componentElementSeparator: Yup.string().required('Component element separator is required'),
   })
 
-  const formik = useFormik<ISASettingsValues>({
+  const formik = useFormik<ISASettingsFormValues>({
     initialValues: {
+      idQualifier: '',
       authorizationInformationQualifier: '',
       authorizationInformation: '',
       securityInformationQualifier: '',
@@ -74,17 +79,25 @@ export default function ISASettingsForm() {
     },
     validationSchema,
     onSubmit: async values => {
-      setBtnLoading(true)
       setIsError(false)
+      setErrorMsg('')
+      dispatch(clearEligibilitySettingsError())
       try {
-        // Pad authorization information to 15 spaces if needed
-        const paddedAuthInfo = values.authorizationInformation.padEnd(15, ' ')
-        // Pad security information to 15 spaces if needed
-        const paddedSecurityInfo = values.securityInformation.padEnd(15, ' ')
-        // Pad sender ID to 15 chars if needed
-        const paddedSenderId = values.senderId.padEnd(15, ' ')
-        // Pad receiver ID to 15 chars if needed
-        const paddedReceiverId = values.receiverId.padEnd(15, ' ')
+        // Pad authorization information to exactly 15 spaces (not more)
+        const authInfo = values.authorizationInformation.slice(0, 15)
+        const paddedAuthInfo = authInfo.padEnd(15, ' ')
+        
+        // Pad security information to exactly 15 spaces (not more)
+        const securityInfo = values.securityInformation.slice(0, 15)
+        const paddedSecurityInfo = securityInfo.padEnd(15, ' ')
+        
+        // Pad sender ID to exactly 15 chars (not more)
+        const senderId = values.senderId.slice(0, 15)
+        const paddedSenderId = senderId.padEnd(15, ' ')
+        
+        // Pad receiver ID to exactly 15 chars (not more)
+        const receiverId = values.receiverId.slice(0, 15)
+        const paddedReceiverId = receiverId.padEnd(15, ' ')
 
         const formattedValues = {
           ...values,
@@ -94,49 +107,106 @@ export default function ISASettingsForm() {
           receiverId: paddedReceiverId,
         }
 
-        console.log('ISA Settings Values:', formattedValues)
-        // TODO: Add API call to save ISA settings
-        // await saveISASettings(formattedValues)
-        setTimeout(() => {
-          setBtnLoading(false)
-          // Handle success
-        }, 1000)
+        await dispatch(updateEligibilitySettings(formattedValues)).unwrap()
+        // Show success message or handle success
+        setIsError(false)
+        setErrorMsg('Settings saved successfully!')
       } catch (err: any) {
-        setBtnLoading(false)
         setIsError(true)
-        setErrorMsg(err.message || 'An error occurred while saving ISA settings.')
+        setErrorMsg(err || 'An error occurred while saving ISA settings.')
       }
     },
   })
 
-  // Handle authorization information input - ensure it's exactly 15 characters
+  // Handle authorization information input - limit to 15 characters (no padding during input)
   const handleAuthInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.slice(0, 15) // Limit to 15 chars
-    formik.setFieldValue('authorizationInformation', value.padEnd(15, ' '))
+    const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
+    formik.setFieldValue('authorizationInformation', value)
   }
 
-  // Handle security information input - ensure it's exactly 15 characters
+  // Handle security information input - limit to 15 characters (no padding during input)
   const handleSecurityInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.slice(0, 15) // Limit to 15 chars
-    formik.setFieldValue('securityInformation', value.padEnd(15, ' '))
+    const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
+    formik.setFieldValue('securityInformation', value)
   }
 
-  // Handle sender ID input - max 15 chars
+  // Handle sender ID input - limit to 15 chars (no padding during input)
   const handleSenderIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.slice(0, 15) // Limit to 15 chars
+    const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
     formik.setFieldValue('senderId', value)
   }
 
-  // Handle receiver ID input - max 15 chars
+  // Handle receiver ID input - limit to 15 chars (no padding during input)
   const handleReceiverIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.slice(0, 15) // Limit to 15 chars
+    const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
     formik.setFieldValue('receiverId', value)
+  }
+
+  // Fetch settings on mount
+  useEffect(() => {
+    dispatch(clearEligibilitySettingsError())
+    dispatch(fetchEligibilitySettings())
+  }, [dispatch])
+
+  // Update form values when settings are loaded
+  useEffect(() => {
+    if (settings) {
+      // Map API response (snake_case) to form fields (camelCase)
+      // Handle nested structure: settings.isa or settings.data.isa or direct settings
+      const settingsData = settings.data || settings
+      const isaData = settingsData.isa || settingsData
+      const subscriberData = settingsData.subscriber || {}
+      
+      formik.setValues({
+        idQualifier:
+          subscriberData.id_qualifier || subscriberData.idQualifier || '',
+        authorizationInformationQualifier:
+          isaData.authorization_information_qualifier ||
+          isaData.authorizationInformationQualifier ||
+          '',
+        authorizationInformation:
+          (isaData.authorization_information ||
+            isaData.authorizationInformation ||
+            '').slice(0, 15), // Limit to 15 chars, preserve spaces
+        securityInformationQualifier:
+          isaData.security_information_qualifier ||
+          isaData.securityInformationQualifier ||
+          '',
+        securityInformation:
+          (isaData.security_information || isaData.securityInformation || '').slice(0, 15), // Limit to 15 chars, preserve spaces
+        senderQualifier: isaData.sender_qualifier || isaData.senderQualifier || '',
+        senderId: (isaData.sender_id || isaData.senderId || '').slice(0, 15), // Limit to 15 chars, preserve spaces
+        receiverQualifier: isaData.receiver_qualifier || isaData.receiverQualifier || '',
+        receiverId: (isaData.receiver_id || isaData.receiverId || '').slice(0, 15), // Limit to 15 chars, preserve spaces
+        repetitionSeparator:
+          isaData.repetition_separator || isaData.repetitionSeparator || '',
+        controlVersion: isaData.control_version || isaData.controlVersion || '',
+        acknowledgmentRequested:
+          isaData.acknowledgment_requested || isaData.acknowledgmentRequested || '',
+        usageIndicator: isaData.usage_indicator || isaData.usageIndicator || '',
+        componentElementSeparator:
+          isaData.component_element_separator || isaData.componentElementSeparator || '',
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings])
+
+  // Update error message from Redux
+  useEffect(() => {
+    if (error) {
+      setIsError(true)
+      setErrorMsg(error)
+    }
+  }, [error])
+
+  if (loading) {
+    return <ComponentLoader component="ISA Settings" message="Loading ISA Settings..." />
   }
 
   return (
     <div className="flex flex-col justify-center bg-gray-100 p-6">
       <div className="w-full bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-6">ISA Settings (Interchange Control Header)</h1>
+        <h1 className="text-2xl font-bold mb-6">Eligibility Settings</h1>
 
         <form onSubmit={formik.handleSubmit}>
           {errorMsg && (
@@ -149,7 +219,40 @@ export default function ISASettingsForm() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Subscriber Settings Section */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Subscriber Settings</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {/* ID Qualifier */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  ID Qualifier
+                </label>
+                <input
+                  type="text"
+                  name="idQualifier"
+                  placeholder="ID Qualifier"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.idQualifier}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.idQualifier && formik.errors.idQualifier
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.idQualifier && formik.errors.idQualifier && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.idQualifier}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ISA Settings Section */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">ISA Settings (Interchange Control Header)</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Authorization Information Qualifier */}
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-1">
@@ -204,7 +307,7 @@ export default function ISASettingsForm() {
                 </p>
               )}
               <p className="text-xs text-gray-500 mt-1">
-                {formik.values.authorizationInformation.length}/15 characters (will be padded)
+                {formik.values.authorizationInformation.length}/15 characters (will be padded to 15 spaces)
               </p>
             </div>
 
@@ -248,7 +351,7 @@ export default function ISASettingsForm() {
                 autoComplete="off"
                 onChange={handleSecurityInfoChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.securityInformation.trim()}
+                value={formik.values.securityInformation}
                 maxLength={15}
                 className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
                   formik.touched.securityInformation && formik.errors.securityInformation
@@ -260,7 +363,7 @@ export default function ISASettingsForm() {
                 <p className="text-red-600 text-sm mt-1">{formik.errors.securityInformation}</p>
               )}
               <p className="text-xs text-gray-500 mt-1">
-                {formik.values.securityInformation.length}/15 characters (will be padded)
+                {formik.values.securityInformation.length}/15 characters (will be padded to 15 spaces)
               </p>
             </div>
 
@@ -312,7 +415,7 @@ export default function ISASettingsForm() {
                 <p className="text-red-600 text-sm mt-1">{formik.errors.senderId}</p>
               )}
               <p className="text-xs text-gray-500 mt-1">
-                {formik.values.senderId.length}/15 characters (will be padded)
+                {formik.values.senderId.length}/15 characters (will be padded to 15 spaces)
               </p>
             </div>
 
@@ -364,7 +467,7 @@ export default function ISASettingsForm() {
                 <p className="text-red-600 text-sm mt-1">{formik.errors.receiverId}</p>
               )}
               <p className="text-xs text-gray-500 mt-1">
-                {formik.values.receiverId.length}/15 characters (will be padded)
+                {formik.values.receiverId.length}/15 characters (will be padded to 15 spaces)
               </p>
             </div>
 
@@ -498,6 +601,7 @@ export default function ISASettingsForm() {
                   </p>
                 )}
             </div>
+            </div>
           </div>
 
           {/* Submit Button */}
@@ -511,9 +615,9 @@ export default function ISASettingsForm() {
             </button>
             <SubmitButton
               type="submit"
-              title="Save ISA Settings"
+              title="Save Settings"
               class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={btnLoading}
+              btnLoading={updateLoading || loading}
               callback_event=""
             />
           </div>
