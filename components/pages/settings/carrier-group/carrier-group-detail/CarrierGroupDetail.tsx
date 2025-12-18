@@ -10,6 +10,7 @@ import {
   clearCarrierGroupsError,
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { getCarrierGroupDetails } from './helper/helper'
 
 export default function CarrierGroupDetail() {
   const router = useRouter()
@@ -17,14 +18,10 @@ export default function CarrierGroupDetail() {
   const carrierGroupId = params?.id as string
 
   const dispatch = useDispatch<AppDispatch>()
-  const {
-    currentCarrierGroup,
-    fetchCarrierGroupLoading,
-    deleteLoading,
-    error,
-  } = useSelector((state: RootState) => state.carrierGroups)
+  const { currentCarrierGroup, fetchCarrierGroupLoading, deleteLoading, error } = useSelector(
+    (state: RootState) => state.carrierGroups
+  )
 
-  // Fetch carrier group data on mount
   useEffect(() => {
     if (carrierGroupId) {
       dispatch(clearCarrierGroupsError())
@@ -34,20 +31,6 @@ export default function CarrierGroupDetail() {
       dispatch(clearCurrentCarrierGroup())
     }
   }, [dispatch, carrierGroupId])
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A'
-    try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      })
-    } catch {
-      return dateString
-    }
-  }
 
   const handleDelete = async () => {
     if (!carrierGroupId) return
@@ -69,58 +52,7 @@ export default function CarrierGroupDetail() {
     }
   }
 
-  // Prepare detail data from API response
-  const getCarrierGroupDetails = () => {
-    if (!currentCarrierGroup) return []
-
-    const statusValue =
-      typeof currentCarrierGroup.status === 'boolean'
-        ? currentCarrierGroup.status
-        : currentCarrierGroup.status === 'active' ||
-            currentCarrierGroup.status === 'Active' ||
-            currentCarrierGroup.isActive ||
-            currentCarrierGroup.is_active
-
-    return [
-      {
-        title: 'Carrier Group Description',
-        value:
-          currentCarrierGroup.carrier_group_description ||
-          currentCarrierGroup.description ||
-          'N/A',
-      },
-      {
-        title: 'Carrier Group Code',
-        value:
-          currentCarrierGroup.carrier_group_code ||
-          currentCarrierGroup.code ||
-          'N/A',
-      },
-      {
-        title: 'Filling Indicator',
-        value:
-          currentCarrierGroup.filling_indicator ||
-          currentCarrierGroup.fillingIndicator ||
-          'N/A',
-      },
-      {
-        title: 'Status',
-        value: statusValue ? 'Active' : 'Inactive',
-      },
-      {
-        title: 'Created At',
-        value: formatDate(
-          currentCarrierGroup.created_at || currentCarrierGroup.createdAt
-        ),
-      },
-      {
-        title: 'Updated At',
-        value: formatDate(currentCarrierGroup.updated_at),
-      },
-    ]
-  }
-
-  const CARRIER_GROUP_DETAILS = getCarrierGroupDetails()
+  const CARRIER_GROUP_DETAILS = getCarrierGroupDetails(currentCarrierGroup)
 
   if (fetchCarrierGroupLoading) {
     return <ComponentLoader component="carrier group details" variant="card" />
@@ -146,7 +78,6 @@ export default function CarrierGroupDetail() {
 
   return (
     <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
-      {/* Main Detail Card */}
       <div className="w-full bg-white shadow-lg rounded-xl p-8">
         <h1 className="text-2xl font-bold mb-4 pb-3">Carrier Group Details</h1>
 
@@ -165,7 +96,6 @@ export default function CarrierGroupDetail() {
           ))}
         </div>
 
-        {/* Action Buttons */}
         <div className="flex justify-end gap-2 mt-3 pt-6">
           <button
             onClick={() => router.back()}

@@ -172,46 +172,55 @@ const carrierGroupsSlice = createSlice({
         let dataArray: any[] = []
 
         if (payload?.data && Array.isArray(payload.data)) {
-          // Structure: { data: [...], total: 100, ... } or { data: [...], meta: { total: 100 } }
+          // Structure: { data: [...], meta: { pagination: {...} } }
           dataArray = payload.data
           state.carrierGroups = payload.data
-          // Use API total if provided, otherwise calculate based on data
-          const apiTotal = payload.total || payload.meta?.total
-          if (apiTotal !== undefined && apiTotal !== null) {
-            state.totalItems = apiTotal
-          } else if (dataArray.length > 0) {
-            // If no total from API but we have data, estimate based on current page
-            // If we have a full page, assume there might be more (preserve existing or estimate)
-            if (dataArray.length === state.itemsPerPage) {
-              // Full page - might have more, use existing totalItems or estimate
-              if (state.totalItems === 0) {
-                // First load with no total - estimate minimum based on current page
-                state.totalItems = state.currentPage * state.itemsPerPage
+          
+          // Check meta.pagination for pagination info
+          if (payload.meta?.pagination) {
+            const pagination = payload.meta.pagination
+            state.totalItems = pagination.total || 0
+            state.currentPage = pagination.current_page || state.currentPage
+            state.itemsPerPage = pagination.per_page || state.itemsPerPage
+          } else {
+            // Fallback
+            const apiTotal = payload.total || payload.meta?.total
+            if (apiTotal !== undefined && apiTotal !== null) {
+              state.totalItems = apiTotal
+            } else if (dataArray.length > 0) {
+              if (dataArray.length === state.itemsPerPage) {
+                if (state.totalItems === 0) {
+                  state.totalItems = state.currentPage * state.itemsPerPage
+                }
+              } else {
+                state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
               }
-              // Otherwise preserve existing totalItems
-            } else {
-              // Partial page - this is the last page
-              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
             }
           }
         } else if (payload?.data?.data && Array.isArray(payload.data.data)) {
-          // Nested structure: { data: { data: [...], total: 100 } }
+          // Nested structure: { data: { data: [...] }, meta: { pagination: {...} } }
           dataArray = payload.data.data
           state.carrierGroups = payload.data.data
-          // Use API total if provided, otherwise calculate based on data
-          const apiTotal = payload.data.total || payload.data.meta?.total
-          if (apiTotal !== undefined && apiTotal !== null) {
-            state.totalItems = apiTotal
-          } else if (dataArray.length > 0) {
-            // If no total from API but we have data, estimate based on current page
-            if (dataArray.length === state.itemsPerPage) {
-              // Full page - might have more, use existing totalItems or estimate
-              if (state.totalItems === 0) {
-                state.totalItems = state.currentPage * state.itemsPerPage
+          
+          // Check meta.pagination for pagination info
+          if (payload.meta?.pagination) {
+            const pagination = payload.meta.pagination
+            state.totalItems = pagination.total || 0
+            state.currentPage = pagination.current_page || state.currentPage
+            state.itemsPerPage = pagination.per_page || state.itemsPerPage
+          } else {
+            // Fallback: try to get total from other locations
+            const apiTotal = payload.data.total || payload.data.meta?.total || payload.total
+            if (apiTotal !== undefined && apiTotal !== null) {
+              state.totalItems = apiTotal
+            } else if (dataArray.length > 0) {
+              if (dataArray.length === state.itemsPerPage) {
+                if (state.totalItems === 0) {
+                  state.totalItems = state.currentPage * state.itemsPerPage
+                }
+              } else {
+                state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
               }
-            } else {
-              // Partial page - this is the last page
-              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
             }
           }
         } else if (Array.isArray(payload)) {

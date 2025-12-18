@@ -134,36 +134,55 @@ const usersSlice = createSlice({
         // - [...] (direct array)
         const payload = action.payload
         
-        if (payload?.data && Array.isArray(payload.data)) {
-          // Structure: { data: [...], total: 100, ... } or { data: [...], meta: { total: 100 } }
-          const dataArray = payload.data
-          state.users = payload.data
-          const apiTotal = payload.total || payload.meta?.total
-          if (apiTotal !== undefined && apiTotal !== null) {
-            state.totalItems = apiTotal
-          } else if (dataArray.length > 0) {
-            if (dataArray.length === state.itemsPerPage) {
-              if (state.totalItems === 0) {
-                state.totalItems = state.currentPage * state.itemsPerPage
-              }
-            } else {
-              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
-            }
-          }
-        } else if (payload?.data?.data && Array.isArray(payload.data.data)) {
-          // Nested structure: { data: { data: [...], total: 100 } }
+        // Check for nested data structure: { data: { data: [...] }, meta: { pagination: {...} } }
+        if (payload?.data?.data && Array.isArray(payload.data.data)) {
           const dataArray = payload.data.data
           state.users = payload.data.data
-          const apiTotal = payload.data.total || payload.data.meta?.total
-          if (apiTotal !== undefined && apiTotal !== null) {
-            state.totalItems = apiTotal
-          } else if (dataArray.length > 0) {
-            if (dataArray.length === state.itemsPerPage) {
-              if (state.totalItems === 0) {
-                state.totalItems = state.currentPage * state.itemsPerPage
+          
+          // Check meta.pagination for pagination info
+          if (payload.meta?.pagination) {
+            const pagination = payload.meta.pagination
+            state.totalItems = pagination.total || 0
+            state.currentPage = pagination.current_page || state.currentPage
+            state.itemsPerPage = pagination.per_page || state.itemsPerPage
+          } else {
+            // Fallback: try to get total from other locations
+            const apiTotal = payload.data.total || payload.meta?.total || payload.total
+            if (apiTotal !== undefined && apiTotal !== null) {
+              state.totalItems = apiTotal
+            } else if (dataArray.length > 0) {
+              if (dataArray.length === state.itemsPerPage) {
+                if (state.totalItems === 0) {
+                  state.totalItems = state.currentPage * state.itemsPerPage
+                }
+              } else {
+                state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
               }
-            } else {
-              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+            }
+          }
+        } else if (payload?.data && Array.isArray(payload.data)) {
+          const dataArray = payload.data
+          state.users = payload.data
+          
+          // Check meta.pagination for pagination info
+          if (payload.meta?.pagination) {
+            const pagination = payload.meta.pagination
+            state.totalItems = pagination.total || 0
+            state.currentPage = pagination.current_page || state.currentPage
+            state.itemsPerPage = pagination.per_page || state.itemsPerPage
+          } else {
+            // Fallback
+            const apiTotal = payload.total || payload.meta?.total
+            if (apiTotal !== undefined && apiTotal !== null) {
+              state.totalItems = apiTotal
+            } else if (dataArray.length > 0) {
+              if (dataArray.length === state.itemsPerPage) {
+                if (state.totalItems === 0) {
+                  state.totalItems = state.currentPage * state.itemsPerPage
+                }
+              } else {
+                state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+              }
             }
           }
         } else if (Array.isArray(payload)) {

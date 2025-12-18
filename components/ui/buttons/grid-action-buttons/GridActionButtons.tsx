@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import Link from 'next/link'
-import { Eye, FilePenLine, Trash2 } from 'lucide-react'
+import { Eye, FilePenLine, Trash2, RotateCw } from 'lucide-react'
 
 const GridActionButtons = ({
   data,
@@ -9,6 +9,7 @@ const GridActionButtons = ({
   editBtnPath,
   showBtnPath,
   deleteResourceId,
+  retryResourceId,
 
   showIdDispatch,
   editIdDispatch,
@@ -19,6 +20,7 @@ const GridActionButtons = ({
   viewPermission,
   updatePermission,
   deletePermission,
+  retryPermission,
 
   isUser,
 }) => {
@@ -52,6 +54,23 @@ const GridActionButtons = ({
         id="event_trigger"
         className="flex flex-row flex-nowrap items-center justify-start min-w-max"
       >
+        {/* Retry */}
+        {retryPermission && (
+          <button
+            type="button"
+            style={{ cursor: 'pointer', backgroundColor: '#3b82f6' }}
+            onClick={() => {
+              if (typeof retryResourceId === 'function') {
+                retryResourceId(data[from])
+              }
+            }}
+            className="flex items-center justify-center w-8 h-8 rounded-md bg-blue-500 hover:bg-blue-600 text-white transition mr-2"
+            title="Retry"
+          >
+            <RotateCw size={18} />
+          </button>
+        )}
+
         {/* View */}
         {viewPermission && (
           <Link
@@ -59,6 +78,7 @@ const GridActionButtons = ({
             id={showBtnPath ? undefined : showDrawerId}
             onClick={!isUser ? handleShowClick : undefined}
             className="flex items-center justify-center w-8 h-8 rounded-md bg-sky-500 hover:bg-sky-600 text-white transition mr-2"
+            title="View"
           >
             <Eye size={18} />
           </Link>
@@ -71,6 +91,7 @@ const GridActionButtons = ({
             id={editBtnPath ? undefined : editDrawerId}
             onClick={handleEditClick}
             className="flex items-center justify-center w-8 h-8 rounded-md bg-green-500 hover:bg-green-600 text-white transition mr-2"
+            title="Edit"
           >
             <FilePenLine size={18} />
           </Link>
@@ -90,6 +111,7 @@ const GridActionButtons = ({
               }
             }}
             className="flex items-center justify-center w-8 h-8 rounded-md bg-red-500 hover:bg-red-600 text-white transition mr-3"
+            title="Delete"
           >
             <Trash2 size={18} />
           </button>

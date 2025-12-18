@@ -34,67 +34,44 @@ export default function AddUpdateCarrierGroup() {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Add Carrier Group Validation Schema
-  const addCarrierGroupValidationSchema = Yup.object({
+  // Unified validation schema
+  const validationSchema = Yup.object({
     description: Yup.string().required('Carrier group description is required'),
     code: Yup.string().required('Carrier group code is required'),
     fillingIndicator: Yup.string().required('Filling indicator is required'),
     isActive: Yup.boolean(),
   })
 
-  // Edit Carrier Group Validation Schema
-  const editCarrierGroupValidationSchema = Yup.object({
-    description: Yup.string().required('Carrier group description is required'),
-    code: Yup.string().required('Carrier group code is required'),
-    fillingIndicator: Yup.string().required('Filling indicator is required'),
-    isActive: Yup.boolean(),
-  })
-
-  // Add Carrier Group Formik
-  const addCarrierGroupFormik = useFormik<CarrierGroupFormValues>({
+  // Unified Formik instance
+  const formik = useFormik<CarrierGroupFormValues>({
     initialValues: {
       description: '',
       code: '',
       fillingIndicator: '',
       isActive: false,
     },
-    validationSchema: addCarrierGroupValidationSchema,
+    enableReinitialize: isEditMode,
+    validationSchema,
     onSubmit: async values => {
       setIsError(false)
       setErrorMsg('')
       dispatch(clearCarrierGroupsError())
       try {
-        await dispatch(createCarrierGroup(values)).unwrap()
+        if (isEditMode) {
+          if (!carrierGroupId) return
+          await dispatch(
+            updateCarrierGroup({ carrierGroupId, carrierGroupData: values })
+          ).unwrap()
+        } else {
+          await dispatch(createCarrierGroup(values)).unwrap()
+        }
         router.push('/settings/carrier-group')
       } catch (err: any) {
         setIsError(true)
-        setErrorMsg(err || 'An error occurred while creating the carrier group.')
-      }
-    },
-  })
-
-  // Edit Carrier Group Formik
-  const editCarrierGroupFormik = useFormik<CarrierGroupFormValues>({
-    initialValues: {
-      description: '',
-      code: '',
-      fillingIndicator: '',
-      isActive: false,
-    },
-    validationSchema: editCarrierGroupValidationSchema,
-    onSubmit: async values => {
-      if (!carrierGroupId) return
-      setIsError(false)
-      setErrorMsg('')
-      dispatch(clearCarrierGroupsError())
-      try {
-        await dispatch(
-          updateCarrierGroup({ carrierGroupId, carrierGroupData: values })
-        ).unwrap()
-        router.push('/settings/carrier-group')
-      } catch (err: any) {
-        setIsError(true)
-        setErrorMsg(err || 'An error occurred while updating the carrier group.')
+        setErrorMsg(
+          err ||
+            `An error occurred while ${isEditMode ? 'updating' : 'creating'} the carrier group.`
+        )
       }
     },
   })
@@ -128,7 +105,7 @@ export default function AddUpdateCarrierGroup() {
           currentCarrierGroup.status === 'true'
       }
 
-      editCarrierGroupFormik.setValues({
+      formik.setValues({
         description:
           currentCarrierGroup.carrier_group_description ||
           currentCarrierGroup.description ||
@@ -153,150 +130,49 @@ export default function AddUpdateCarrierGroup() {
     }
   }, [error])
 
-  if (isEditMode && fetchCarrierGroupLoading) {
-    return <ComponentLoader component="Carrier Group" message="Loading Carrier Group data..." />
-  }
+  // Render field helper
+  const renderField = (
+    name: 'description' | 'code' | 'fillingIndicator',
+    label: string,
+    placeholder?: string
+  ) => {
+    const value = formik.values[name]
+    const touched = formik.touched[name]
+    const error = formik.errors[name]
+    const hasError = touched && error
 
-  if (isEditMode) {
     return (
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
-        <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-          <h1 className="text-2xl font-bold mb-6">Edit Carrier Group</h1>
-
-          <form onSubmit={editCarrierGroupFormik.handleSubmit}>
-            {errorMsg && (
-              <div
-                className={`mb-6 p-4 rounded-lg ${
-                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                }`}
-              >
-                <span>{errorMsg}</span>
-              </div>
-            )}
-
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Carrier Group Description
-              </label>
-              <input
-                type="text"
-                name="description"
-                placeholder="Carrier Group Description"
-                autoComplete="off"
-                onChange={editCarrierGroupFormik.handleChange}
-                onBlur={editCarrierGroupFormik.handleBlur}
-                value={editCarrierGroupFormik.values.description}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  editCarrierGroupFormik.touched.description &&
-                  editCarrierGroupFormik.errors.description
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {editCarrierGroupFormik.touched.description &&
-                editCarrierGroupFormik.errors.description && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {editCarrierGroupFormik.errors.description}
-                  </p>
-                )}
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Carrier Group Code
-              </label>
-              <input
-                type="text"
-                name="code"
-                placeholder="Carrier Group Code"
-                autoComplete="off"
-                onChange={editCarrierGroupFormik.handleChange}
-                onBlur={editCarrierGroupFormik.handleBlur}
-                value={editCarrierGroupFormik.values.code}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  editCarrierGroupFormik.touched.code && editCarrierGroupFormik.errors.code
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {editCarrierGroupFormik.touched.code && editCarrierGroupFormik.errors.code && (
-                <p className="text-red-600 text-sm mt-1">{editCarrierGroupFormik.errors.code}</p>
-              )}
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Filling Indicator
-              </label>
-              <input
-                type="text"
-                name="fillingIndicator"
-                placeholder="Filling Indicator"
-                autoComplete="off"
-                onChange={editCarrierGroupFormik.handleChange}
-                onBlur={editCarrierGroupFormik.handleBlur}
-                value={editCarrierGroupFormik.values.fillingIndicator}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  editCarrierGroupFormik.touched.fillingIndicator &&
-                  editCarrierGroupFormik.errors.fillingIndicator
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {editCarrierGroupFormik.touched.fillingIndicator &&
-                editCarrierGroupFormik.errors.fillingIndicator && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {editCarrierGroupFormik.errors.fillingIndicator}
-                  </p>
-                )}
-            </div>
-
-            <div className="mb-6">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="edit-isActive"
-                  name="isActive"
-                  checked={editCarrierGroupFormik.values.isActive}
-                  onChange={editCarrierGroupFormik.handleChange}
-                  onBlur={editCarrierGroupFormik.handleBlur}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <label htmlFor="edit-isActive" className="ml-2 text-sm font-medium text-gray-700">
-                  Is Active
-                </label>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-8">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
-              >
-                Cancel
-              </button>
-              <SubmitButton
-                type="submit"
-                title="Update Carrier Group"
-                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                btnLoading={updateLoading || fetchCarrierGroupLoading}
-                callback_event=""
-              />
-            </div>
-          </form>
-        </div>
+      <div className="mb-6">
+        <label className="block text-sm font-semibold text-gray-800 mb-1">{label}</label>
+        <input
+          type="text"
+          name={name}
+          placeholder={placeholder || label}
+          autoComplete="off"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={String(value || '')}
+          className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+            hasError ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
+          }`}
+        />
+        {hasError && <p className="text-red-600 text-sm mt-1">{error}</p>}
       </div>
     )
   }
 
-  // Add Carrier Group Form
+  if (isEditMode && fetchCarrierGroupLoading) {
+    return <ComponentLoader component="Carrier Group" message="Loading Carrier Group data..." />
+  }
+
   return (
     <div className="flex flex-col justify-center bg-gray-100 p-6">
       <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-6">Add Carrier Group</h1>
+        <h1 className="text-2xl font-bold mb-6">
+          {isEditMode ? 'Edit Carrier Group' : 'Add Carrier Group'}
+        </h1>
 
-        <form onSubmit={addCarrierGroupFormik.handleSubmit}>
+        <form onSubmit={formik.handleSubmit}>
           {errorMsg && (
             <div
               className={`mb-6 p-4 rounded-lg ${
@@ -307,95 +183,22 @@ export default function AddUpdateCarrierGroup() {
             </div>
           )}
 
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-800 mb-1">
-              Carrier Group Description
-            </label>
-            <input
-              type="text"
-              name="description"
-              placeholder="Carrier Group Description"
-              autoComplete="off"
-              onChange={addCarrierGroupFormik.handleChange}
-              onBlur={addCarrierGroupFormik.handleBlur}
-              value={addCarrierGroupFormik.values.description}
-              className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                addCarrierGroupFormik.touched.description &&
-                addCarrierGroupFormik.errors.description
-                  ? 'border-red-500 focus:ring-red-400'
-                  : 'border-gray-300 focus:ring-blue-400'
-              }`}
-            />
-            {addCarrierGroupFormik.touched.description &&
-              addCarrierGroupFormik.errors.description && (
-                <p className="text-red-600 text-sm mt-1">
-                  {addCarrierGroupFormik.errors.description}
-                </p>
-              )}
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-800 mb-1">
-              Carrier Group Code
-            </label>
-            <input
-              type="text"
-              name="code"
-              placeholder="Carrier Group Code"
-              autoComplete="off"
-              onChange={addCarrierGroupFormik.handleChange}
-              onBlur={addCarrierGroupFormik.handleBlur}
-              value={addCarrierGroupFormik.values.code}
-              className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                addCarrierGroupFormik.touched.code && addCarrierGroupFormik.errors.code
-                  ? 'border-red-500 focus:ring-red-400'
-                  : 'border-gray-300 focus:ring-blue-400'
-              }`}
-            />
-            {addCarrierGroupFormik.touched.code && addCarrierGroupFormik.errors.code && (
-              <p className="text-red-600 text-sm mt-1">{addCarrierGroupFormik.errors.code}</p>
-            )}
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-800 mb-1">
-              Filling Indicator
-            </label>
-            <input
-              type="text"
-              name="fillingIndicator"
-              placeholder="Filling Indicator"
-              autoComplete="off"
-              onChange={addCarrierGroupFormik.handleChange}
-              onBlur={addCarrierGroupFormik.handleBlur}
-              value={addCarrierGroupFormik.values.fillingIndicator}
-              className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                addCarrierGroupFormik.touched.fillingIndicator &&
-                addCarrierGroupFormik.errors.fillingIndicator
-                  ? 'border-red-500 focus:ring-red-400'
-                  : 'border-gray-300 focus:ring-blue-400'
-              }`}
-            />
-            {addCarrierGroupFormik.touched.fillingIndicator &&
-              addCarrierGroupFormik.errors.fillingIndicator && (
-                <p className="text-red-600 text-sm mt-1">
-                  {addCarrierGroupFormik.errors.fillingIndicator}
-                </p>
-              )}
-          </div>
+          {renderField('description', 'Carrier Group Description')}
+          {renderField('code', 'Carrier Group Code')}
+          {renderField('fillingIndicator', 'Filling Indicator')}
 
           <div className="mb-6">
             <div className="flex items-center">
               <input
                 type="checkbox"
-                id="add-isActive"
+                id="isActive"
                 name="isActive"
-                checked={addCarrierGroupFormik.values.isActive}
-                onChange={addCarrierGroupFormik.handleChange}
-                onBlur={addCarrierGroupFormik.handleBlur}
+                checked={formik.values.isActive || false}
+                onChange={e => formik.setFieldValue('isActive', e.target.checked)}
+                onBlur={formik.handleBlur}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <label htmlFor="add-isActive" className="ml-2 text-sm font-medium text-gray-700">
+              <label htmlFor="isActive" className="ml-2 text-sm font-medium text-gray-700">
                 Is Active
               </label>
             </div>
@@ -411,9 +214,9 @@ export default function AddUpdateCarrierGroup() {
             </button>
             <SubmitButton
               type="submit"
-              title="Add Carrier Group"
+              title={isEditMode ? 'Update Carrier Group' : 'Add Carrier Group'}
               class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={createLoading}
+              btnLoading={isEditMode ? updateLoading || fetchCarrierGroupLoading : createLoading}
               callback_event=""
             />
           </div>

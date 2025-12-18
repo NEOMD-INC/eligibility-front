@@ -10,6 +10,7 @@ import {
   clearCarrierAddressesError,
 } from '@/redux/slices/settings/carrier-addresses/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { getCarrierAddressDetails } from './helper/helper'
 
 export default function CarrierAddressDetail() {
   const router = useRouter()
@@ -17,12 +18,9 @@ export default function CarrierAddressDetail() {
   const carrierAddressId = params?.id as string
 
   const dispatch = useDispatch<AppDispatch>()
-  const {
-    currentCarrierAddress,
-    fetchCarrierAddressLoading,
-    deleteLoading,
-    error,
-  } = useSelector((state: RootState) => state.carrierAddresses)
+  const { currentCarrierAddress, fetchCarrierAddressLoading, deleteLoading, error } = useSelector(
+    (state: RootState) => state.carrierAddresses
+  )
 
   // Fetch carrier address data on mount
   useEffect(() => {
@@ -34,20 +32,6 @@ export default function CarrierAddressDetail() {
       dispatch(clearCurrentCarrierAddress())
     }
   }, [dispatch, carrierAddressId])
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A'
-    try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      })
-    } catch {
-      return dateString
-    }
-  }
 
   const handleDelete = async () => {
     if (!carrierAddressId) return
@@ -69,86 +53,7 @@ export default function CarrierAddressDetail() {
     }
   }
 
-  // Prepare detail data from API response
-  const getCarrierAddressDetails = () => {
-    if (!currentCarrierAddress) return []
-
-    return [
-      {
-        title: 'Carrier Code',
-        value:
-          currentCarrierAddress.carrier_code ||
-          currentCarrierAddress.carrierCode ||
-          'N/A',
-      },
-      {
-        title: 'Actual Name',
-        value:
-          currentCarrierAddress.actual_name ||
-          currentCarrierAddress.actualName ||
-          'N/A',
-      },
-      {
-        title: 'Address ID',
-        value:
-          currentCarrierAddress.address_id ||
-          currentCarrierAddress.addressId ||
-          'N/A',
-      },
-      {
-        title: 'Address Line 1',
-        value:
-          currentCarrierAddress.address_line1 ||
-          currentCarrierAddress.address_line_1 ||
-          currentCarrierAddress.addressLine1 ||
-          'N/A',
-      },
-      {
-        title: 'City',
-        value: currentCarrierAddress.city || 'N/A',
-      },
-      {
-        title: 'State',
-        value: currentCarrierAddress.state || 'N/A',
-      },
-      {
-        title: 'Zip Code',
-        value:
-          currentCarrierAddress.zip_code || currentCarrierAddress.zipCode || 'N/A',
-      },
-      {
-        title: 'Phone Type',
-        value:
-          currentCarrierAddress.phone_type || currentCarrierAddress.phoneType || 'N/A',
-      },
-      {
-        title: 'Phone Number',
-        value:
-          currentCarrierAddress.phone_number ||
-          currentCarrierAddress.phoneNumber ||
-          'N/A',
-      },
-      {
-        title: 'Insurance Department',
-        value:
-          currentCarrierAddress.insurance_department ||
-          currentCarrierAddress.insuranceDepartment ||
-          'N/A',
-      },
-      {
-        title: 'Created At',
-        value: formatDate(
-          currentCarrierAddress.created_at || currentCarrierAddress.createdAt
-        ),
-      },
-      {
-        title: 'Updated At',
-        value: formatDate(currentCarrierAddress.updated_at),
-      },
-    ]
-  }
-
-  const CARRIER_ADDRESS_DETAILS = getCarrierAddressDetails()
+  const CARRIER_ADDRESS_DETAILS = getCarrierAddressDetails(currentCarrierAddress)
 
   if (fetchCarrierAddressLoading) {
     return <ComponentLoader component="carrier address details" variant="card" />

@@ -58,14 +58,12 @@ const mapFormToApi = (obj: any): any => {
 // Async thunk to fetch all availity payers
 export const fetchAllAvailityPayers = createAsyncThunk(
   'availityPayers/fetchAllAvailityPayers',
-  async (page: number, { rejectWithValue }) => {
+  async (page?: number, { rejectWithValue }) => {
     try {
       const response = await AvailityPayerService.getAllAvailityPayer(page)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch availity payers'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch availity payers')
     }
   }
 )
@@ -94,9 +92,7 @@ export const createAvailityPayer = createAsyncThunk(
       const response = await AvailityPayerService.createAvailityPayer(apiData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to create availity payer'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to create availity payer')
     }
   }
 )
@@ -107,15 +103,10 @@ export const updateAvailityPayer = createAsyncThunk(
   async (params: { payerId: string; payerData: {} }, { rejectWithValue }) => {
     try {
       const apiData = mapFormToApi(params.payerData)
-      const response = await AvailityPayerService.updateAvailityPayer(
-        params.payerId,
-        apiData
-      )
+      const response = await AvailityPayerService.updateAvailityPayer(params.payerId, apiData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to update availity payer'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to update availity payer')
     }
   }
 )
@@ -128,13 +119,24 @@ export const deleteAvailityPayer = createAsyncThunk(
       const response = await AvailityPayerService.deleteAvailityPayer(payerId)
       return { payerId, data: response.data }
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to delete availity payer'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to delete availity payer')
     }
   }
 )
 
+// Async thunk to search availity payers
+export const searchAvailityPayers = createAsyncThunk(
+  'availityPayers/searchAvailityPayers',
+  async (searchTerm: string, { rejectWithValue }) => {
+    try {
+      const response = await AvailityPayerService.searchAvailityPayers(searchTerm)
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(error?.response?.data?.message || 'Failed to search availity payers')
+    }
+  }
+)
+// payer_name
 const availityPayersSlice = createSlice({
   name: 'availityPayers',
   initialState,
@@ -161,34 +163,55 @@ const availityPayersSlice = createSlice({
         const payload = action.payload
         let dataArray: any[] = []
 
-        if (payload?.data && Array.isArray(payload.data)) {
-          dataArray = payload.data
-          state.availityPayers = payload.data
-          const apiTotal = payload.total || payload.meta?.total
-          if (apiTotal !== undefined && apiTotal !== null) {
-            state.totalItems = apiTotal
-          } else if (dataArray.length > 0) {
-            if (dataArray.length === state.itemsPerPage) {
-              if (state.totalItems === 0) {
-                state.totalItems = state.currentPage * state.itemsPerPage
-              }
-            } else {
-              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
-            }
-          }
-        } else if (payload?.data?.data && Array.isArray(payload.data.data)) {
+        // Check for nested data structure: { data: { data: [...] }, meta: { pagination: {...} } }
+        if (payload?.data?.data && Array.isArray(payload.data.data)) {
           dataArray = payload.data.data
           state.availityPayers = payload.data.data
-          const apiTotal = payload.data.total || payload.data.meta?.total
-          if (apiTotal !== undefined && apiTotal !== null) {
-            state.totalItems = apiTotal
-          } else if (dataArray.length > 0) {
-            if (dataArray.length === state.itemsPerPage) {
-              if (state.totalItems === 0) {
-                state.totalItems = state.currentPage * state.itemsPerPage
+
+          // Check meta.pagination for pagination info
+          if (payload.meta?.pagination) {
+            const pagination = payload.meta.pagination
+            state.totalItems = pagination.total || 0
+            state.currentPage = pagination.current_page || state.currentPage
+            state.itemsPerPage = pagination.per_page || state.itemsPerPage
+          } else {
+            // Fallback: try to get total from other locations
+            const apiTotal = payload.data.total || payload.meta?.total || payload.total
+            if (apiTotal !== undefined && apiTotal !== null) {
+              state.totalItems = apiTotal
+            } else if (dataArray.length > 0) {
+              if (dataArray.length === state.itemsPerPage) {
+                if (state.totalItems === 0) {
+                  state.totalItems = state.currentPage * state.itemsPerPage
+                }
+              } else {
+                state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
               }
-            } else {
-              state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+            }
+          }
+        } else if (payload?.data && Array.isArray(payload.data)) {
+          dataArray = payload.data
+          state.availityPayers = payload.data
+
+          // Check meta.pagination for pagination info
+          if (payload.meta?.pagination) {
+            const pagination = payload.meta.pagination
+            state.totalItems = pagination.total || 0
+            state.currentPage = pagination.current_page || state.currentPage
+            state.itemsPerPage = pagination.per_page || state.itemsPerPage
+          } else {
+            // Fallback
+            const apiTotal = payload.total || payload.meta?.total
+            if (apiTotal !== undefined && apiTotal !== null) {
+              state.totalItems = apiTotal
+            } else if (dataArray.length > 0) {
+              if (dataArray.length === state.itemsPerPage) {
+                if (state.totalItems === 0) {
+                  state.totalItems = state.currentPage * state.itemsPerPage
+                }
+              } else {
+                state.totalItems = (state.currentPage - 1) * state.itemsPerPage + dataArray.length
+              }
             }
           }
         } else if (Array.isArray(payload)) {
@@ -251,16 +274,11 @@ const availityPayersSlice = createSlice({
         const updatedPayer = action.payload?.data || action.payload
         if (updatedPayer?.id || updatedPayer?.uuid) {
           const id = updatedPayer.id || updatedPayer.uuid
-          const index = state.availityPayers.findIndex(
-            p => p.id === id || p.uuid === id
-          )
+          const index = state.availityPayers.findIndex(p => p.id === id || p.uuid === id)
           if (index !== -1) {
             state.availityPayers[index] = updatedPayer
           }
-          if (
-            state.currentAvailityPayer?.id === id ||
-            state.currentAvailityPayer?.uuid === id
-          ) {
+          if (state.currentAvailityPayer?.id === id || state.currentAvailityPayer?.uuid === id) {
             state.currentAvailityPayer = updatedPayer
           }
         }
@@ -291,10 +309,40 @@ const availityPayersSlice = createSlice({
         state.deleteLoading = false
         state.error = action.payload as string
       })
+
+    // Search availity payers
+    builder
+      .addCase(searchAvailityPayers.pending, state => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(searchAvailityPayers.fulfilled, (state, action) => {
+        state.loading = false
+        const payload = action.payload
+        let dataArray: any[] = []
+
+        // Handle different response structures
+        if (payload?.data?.data && Array.isArray(payload.data.data)) {
+          dataArray = payload.data.data
+          state.availityPayers = payload.data.data
+        } else if (payload?.data && Array.isArray(payload.data)) {
+          dataArray = payload.data
+          state.availityPayers = payload.data
+        } else if (Array.isArray(payload)) {
+          state.availityPayers = payload
+        } else {
+          state.availityPayers = []
+        }
+        state.totalItems = dataArray.length || 0
+        state.error = null
+      })
+      .addCase(searchAvailityPayers.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
   },
 })
 
 export const { clearAvailityPayersError, clearCurrentAvailityPayer, setCurrentPage } =
   availityPayersSlice.actions
 export default availityPayersSlice.reducer
-

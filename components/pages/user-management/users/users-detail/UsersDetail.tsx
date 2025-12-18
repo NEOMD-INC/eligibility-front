@@ -31,7 +31,7 @@ export default function UsersDetail() {
 
   const USER_DETAILS = getUserDetails(currentUser)
 
-  const ROLE_DETAILS = getRoleDetails(currentUser?.roles)
+  const ROLE_DETAILS = getRoleDetails(currentUser)
 
   const allPermissions = currentUser?.roles?.flatMap((role: any) => role?.permissions || []) || []
   const PERMISSIONS_GROUPED = groupPermissionsByPrefix(allPermissions)
@@ -105,15 +105,19 @@ export default function UsersDetail() {
 
         <h1 className="text-2xl font-bold mb-4 pb-3 mt-5">Roles</h1>
 
-        <div className=" border-b">
-          {ROLE_DETAILS.map((obj: { title: string }, index: number) => (
-            <span
-              key={index}
-              className="inline-flex items-center px-3 py-1 mb-5 rounded-full text-xs font-semibold bg-green-100 text-green-700 mr-2"
-            >
-              {obj.title}
-            </span>
-          ))}
+        <div className="border-b pb-6">
+          {ROLE_DETAILS && ROLE_DETAILS.length > 0 ? (
+            ROLE_DETAILS.map((obj: { title: string }, index: number) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-3 py-1 mb-5 rounded-full text-xs font-semibold bg-green-100 text-green-700 mr-2"
+              >
+                {obj.title}
+              </span>
+            ))
+          ) : (
+            <p className="text-gray-500 text-sm mb-5">No roles assigned</p>
+          )}
         </div>
 
         {PERMISSIONS_GROUPED.length > 0 && (

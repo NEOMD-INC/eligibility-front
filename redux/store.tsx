@@ -10,6 +10,7 @@ import carrierAddressesReducer from './slices/settings/carrier-addresses/reducer
 import carrierSetupsReducer from './slices/settings/carrier-setups/reducer'
 import availityPayersReducer from './slices/settings/availity-payers/reducer'
 import eligibilitySettingsReducer from './slices/eligibility/settings/reducer'
+import eligibilityIndivitualReducer from './slices/eligibility/indivitual/reducer'
 import storage from 'redux-persist/lib/storage'
 import { persistStore, persistReducer } from 'redux-persist'
 
@@ -19,7 +20,6 @@ const userPersistConfig = {
   whitelist: ['user'],
 }
 
-// Combine reducers
 const rootReducer = combineReducers({
   user: persistReducer(userPersistConfig, userReducer),
   userProfile: userProfileReducer,
@@ -31,6 +31,7 @@ const rootReducer = combineReducers({
   carrierSetups: carrierSetupsReducer,
   availityPayers: availityPayersReducer,
   eligibilitySettings: eligibilitySettingsReducer,
+  eligibilityIndivitual: eligibilityIndivitualReducer,
 })
 
 export const store = configureStore({
@@ -43,9 +44,7 @@ export const store = configureStore({
     }),
 })
 
-// Create persistor
 export const persistor = persistStore(store)
 
-// Types for hooks
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch

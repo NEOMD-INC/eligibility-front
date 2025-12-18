@@ -5,7 +5,14 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get('access_token')?.value
   const pathname = request.nextUrl.pathname
 
-  const protectedPaths = ['/patient-dashboard', '/settings', '/user-management', '/user-profile']
+  const protectedPaths = [
+    '/patient-dashboard',
+    '/settings',
+    '/user-management',
+    '/user-profile',
+    '/eligibility',
+    '/logs',
+  ]
 
   if (!token && protectedPaths.some(p => pathname.startsWith(p))) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -19,7 +26,8 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  if (token && pathname.startsWith('/login') && pathname.startsWith('/register')) {
+  // Redirect authenticated users away from auth pages
+  if (token && (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/forgot-password') || pathname.startsWith('/reset-password'))) {
     return NextResponse.redirect(new URL('/patient-dashboard', request.url))
   }
 
@@ -34,6 +42,11 @@ export const config = {
     '/settings/:path*',
     '/user-management/:path*',
     '/user-profile/:path*',
+    '/eligibility/:path*',
+    '/logs/:path*',
     '/login',
-  ], // Run middleware on '/'
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+  ],
 }

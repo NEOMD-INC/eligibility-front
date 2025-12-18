@@ -5,6 +5,7 @@ export {
   createAvailityPayer,
   updateAvailityPayer,
   deleteAvailityPayer,
+  searchAvailityPayers,
   clearAvailityPayersError,
   clearCurrentAvailityPayer,
   setCurrentPage,

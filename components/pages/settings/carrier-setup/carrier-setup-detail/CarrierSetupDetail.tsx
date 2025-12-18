@@ -10,6 +10,7 @@ import {
   clearCarrierSetupsError,
 } from '@/redux/slices/settings/carrier-setups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { getCarrierSetupDetails } from './helper/helper'
 
 export default function CarrierSetupDetail() {
   const router = useRouter()
@@ -21,7 +22,6 @@ export default function CarrierSetupDetail() {
     (state: RootState) => state.carrierSetups
   )
 
-  // Fetch carrier setup data on mount
   useEffect(() => {
     if (carrierSetupId) {
       dispatch(clearCarrierSetupsError())
@@ -31,20 +31,6 @@ export default function CarrierSetupDetail() {
       dispatch(clearCurrentCarrierSetup())
     }
   }, [dispatch, carrierSetupId])
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A'
-    try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      })
-    } catch {
-      return dateString
-    }
-  }
 
   const handleDelete = async () => {
     if (!carrierSetupId) return
@@ -66,64 +52,7 @@ export default function CarrierSetupDetail() {
     }
   }
 
-  // Prepare detail data from API response
-  const getCarrierSetupDetails = () => {
-    if (!currentCarrierSetup) return []
-
-    return [
-      {
-        title: 'Carrier Group Code',
-        value:
-          currentCarrierSetup.carrier_group_code || currentCarrierSetup.carrierGroupCode || 'N/A',
-      },
-      {
-        title: 'Group Description',
-        value: currentCarrierSetup.carrier_group_description || 'N/A',
-      },
-      {
-        title: 'Carrier Code',
-        value: currentCarrierSetup.carrier_code || 'N/A',
-      },
-      {
-        title: 'Carrier Description',
-        value: currentCarrierSetup.carrier_description || 'N/A',
-      },
-      {
-        title: 'State',
-        value: currentCarrierSetup.state || 'N/A',
-      },
-      {
-        title: 'Batch Payer ID',
-        value: currentCarrierSetup.batch_payer_id || 'N/A',
-      },
-      {
-        title: 'Is CLIA',
-        value: currentCarrierSetup.is_clia === 0 ? 'false' : 'true' || 'N/A',
-      },
-      {
-        title: 'COB',
-        value: currentCarrierSetup.cob || 'N/A',
-      },
-      {
-        title: 'Corrected Claim',
-        value: currentCarrierSetup.corrected_claim || 'N/A',
-      },
-      {
-        title: 'Enrollment Required',
-        value: currentCarrierSetup.enrollment_required || 'N/A',
-      },
-      {
-        title: 'Created At',
-        value: formatDate(currentCarrierSetup.created_at),
-      },
-      {
-        title: 'Updated At',
-        value: formatDate(currentCarrierSetup.updated_at),
-      },
-    ]
-  }
-
-  const CARRIER_SETUP_DETAILS = getCarrierSetupDetails()
+  const CARRIER_SETUP_DETAILS = getCarrierSetupDetails(currentCarrierSetup)
 
   if (fetchCarrierSetupLoading) {
     return <ComponentLoader component="carrier setup details" variant="card" />

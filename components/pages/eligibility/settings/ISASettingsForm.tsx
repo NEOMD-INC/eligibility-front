@@ -86,15 +86,15 @@ export default function ISASettingsForm() {
         // Pad authorization information to exactly 15 spaces (not more)
         const authInfo = values.authorizationInformation.slice(0, 15)
         const paddedAuthInfo = authInfo.padEnd(15, ' ')
-        
+
         // Pad security information to exactly 15 spaces (not more)
         const securityInfo = values.securityInformation.slice(0, 15)
         const paddedSecurityInfo = securityInfo.padEnd(15, ' ')
-        
+
         // Pad sender ID to exactly 15 chars (not more)
         const senderId = values.senderId.slice(0, 15)
         const paddedSenderId = senderId.padEnd(15, ' ')
-        
+
         // Pad receiver ID to exactly 15 chars (not more)
         const receiverId = values.receiverId.slice(0, 15)
         const paddedReceiverId = receiverId.padEnd(15, ' ')
@@ -118,68 +118,60 @@ export default function ISASettingsForm() {
     },
   })
 
-  // Handle authorization information input - limit to 15 characters (no padding during input)
   const handleAuthInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
     formik.setFieldValue('authorizationInformation', value)
   }
 
-  // Handle security information input - limit to 15 characters (no padding during input)
   const handleSecurityInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
     formik.setFieldValue('securityInformation', value)
   }
 
-  // Handle sender ID input - limit to 15 chars (no padding during input)
   const handleSenderIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
     formik.setFieldValue('senderId', value)
   }
 
-  // Handle receiver ID input - limit to 15 chars (no padding during input)
   const handleReceiverIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
     formik.setFieldValue('receiverId', value)
   }
 
-  // Fetch settings on mount
   useEffect(() => {
     dispatch(clearEligibilitySettingsError())
     dispatch(fetchEligibilitySettings())
   }, [dispatch])
 
-  // Update form values when settings are loaded
   useEffect(() => {
     if (settings) {
-      // Map API response (snake_case) to form fields (camelCase)
-      // Handle nested structure: settings.isa or settings.data.isa or direct settings
       const settingsData = settings.data || settings
       const isaData = settingsData.isa || settingsData
       const subscriberData = settingsData.subscriber || {}
-      
+
       formik.setValues({
-        idQualifier:
-          subscriberData.id_qualifier || subscriberData.idQualifier || '',
+        idQualifier: subscriberData.id_qualifier || subscriberData.idQualifier || '',
         authorizationInformationQualifier:
           isaData.authorization_information_qualifier ||
           isaData.authorizationInformationQualifier ||
           '',
-        authorizationInformation:
-          (isaData.authorization_information ||
-            isaData.authorizationInformation ||
-            '').slice(0, 15), // Limit to 15 chars, preserve spaces
+        authorizationInformation: (
+          isaData.authorization_information ||
+          isaData.authorizationInformation ||
+          ''
+        ).slice(0, 15), // Limit to 15 chars, preserve spaces
         securityInformationQualifier:
-          isaData.security_information_qualifier ||
-          isaData.securityInformationQualifier ||
-          '',
-        securityInformation:
-          (isaData.security_information || isaData.securityInformation || '').slice(0, 15), // Limit to 15 chars, preserve spaces
+          isaData.security_information_qualifier || isaData.securityInformationQualifier || '',
+        securityInformation: (
+          isaData.security_information ||
+          isaData.securityInformation ||
+          ''
+        ).slice(0, 15), // Limit to 15 chars, preserve spaces
         senderQualifier: isaData.sender_qualifier || isaData.senderQualifier || '',
         senderId: (isaData.sender_id || isaData.senderId || '').slice(0, 15), // Limit to 15 chars, preserve spaces
         receiverQualifier: isaData.receiver_qualifier || isaData.receiverQualifier || '',
         receiverId: (isaData.receiver_id || isaData.receiverId || '').slice(0, 15), // Limit to 15 chars, preserve spaces
-        repetitionSeparator:
-          isaData.repetition_separator || isaData.repetitionSeparator || '',
+        repetitionSeparator: isaData.repetition_separator || isaData.repetitionSeparator || '',
         controlVersion: isaData.control_version || isaData.controlVersion || '',
         acknowledgmentRequested:
           isaData.acknowledgment_requested || isaData.acknowledgmentRequested || '',
@@ -249,362 +241,353 @@ export default function ISASettingsForm() {
             </div>
           </div>
 
-          {/* ISA Settings Section */}
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">ISA Settings (Interchange Control Header)</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              ISA Settings (Interchange Control Header)
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Authorization Information Qualifier */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Authorization Information Qualifier
-              </label>
-              <input
-                type="text"
-                name="authorizationInformationQualifier"
-                placeholder="Authorization Information Qualifier"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.authorizationInformationQualifier}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.authorizationInformationQualifier &&
-                  formik.errors.authorizationInformationQualifier
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.authorizationInformationQualifier &&
-                formik.errors.authorizationInformationQualifier && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {formik.errors.authorizationInformationQualifier}
-                  </p>
-                )}
-            </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Authorization Information Qualifier
+                </label>
+                <input
+                  type="text"
+                  name="authorizationInformationQualifier"
+                  placeholder="Authorization Information Qualifier"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.authorizationInformationQualifier}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.authorizationInformationQualifier &&
+                    formik.errors.authorizationInformationQualifier
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.authorizationInformationQualifier &&
+                  formik.errors.authorizationInformationQualifier && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {formik.errors.authorizationInformationQualifier}
+                    </p>
+                  )}
+              </div>
 
-            {/* Authorization Information */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Authorization Information (15 spaces)
-              </label>
-              <input
-                type="text"
-                name="authorizationInformation"
-                placeholder="Authorization Information"
-                autoComplete="off"
-                onChange={handleAuthInfoChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.authorizationInformation.trim()}
-                maxLength={15}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.authorizationInformation && formik.errors.authorizationInformation
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.authorizationInformation && formik.errors.authorizationInformation && (
-                <p className="text-red-600 text-sm mt-1">
-                  {formik.errors.authorizationInformation}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Authorization Information (15 spaces)
+                </label>
+                <input
+                  type="text"
+                  name="authorizationInformation"
+                  placeholder="Authorization Information"
+                  autoComplete="off"
+                  onChange={handleAuthInfoChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.authorizationInformation.trim()}
+                  maxLength={15}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.authorizationInformation &&
+                    formik.errors.authorizationInformation
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.authorizationInformation &&
+                  formik.errors.authorizationInformation && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {formik.errors.authorizationInformation}
+                    </p>
+                  )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {formik.values.authorizationInformation.length}/15 characters (will be padded to
+                  15 spaces)
                 </p>
-              )}
-              <p className="text-xs text-gray-500 mt-1">
-                {formik.values.authorizationInformation.length}/15 characters (will be padded to 15 spaces)
-              </p>
-            </div>
+              </div>
 
-            {/* Security Information Qualifier */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Security Information Qualifier
-              </label>
-              <input
-                type="text"
-                name="securityInformationQualifier"
-                placeholder="Security Information Qualifier"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.securityInformationQualifier}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.securityInformationQualifier &&
-                  formik.errors.securityInformationQualifier
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.securityInformationQualifier &&
-                formik.errors.securityInformationQualifier && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {formik.errors.securityInformationQualifier}
-                  </p>
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Security Information Qualifier
+                </label>
+                <input
+                  type="text"
+                  name="securityInformationQualifier"
+                  placeholder="Security Information Qualifier"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.securityInformationQualifier}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.securityInformationQualifier &&
+                    formik.errors.securityInformationQualifier
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.securityInformationQualifier &&
+                  formik.errors.securityInformationQualifier && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {formik.errors.securityInformationQualifier}
+                    </p>
+                  )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Security Information (15 spaces)
+                </label>
+                <input
+                  type="text"
+                  name="securityInformation"
+                  placeholder="Security Information"
+                  autoComplete="off"
+                  onChange={handleSecurityInfoChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.securityInformation}
+                  maxLength={15}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.securityInformation && formik.errors.securityInformation
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.securityInformation && formik.errors.securityInformation && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.securityInformation}</p>
                 )}
-            </div>
-
-            {/* Security Information */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Security Information (15 spaces)
-              </label>
-              <input
-                type="text"
-                name="securityInformation"
-                placeholder="Security Information"
-                autoComplete="off"
-                onChange={handleSecurityInfoChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.securityInformation}
-                maxLength={15}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.securityInformation && formik.errors.securityInformation
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.securityInformation && formik.errors.securityInformation && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.securityInformation}</p>
-              )}
-              <p className="text-xs text-gray-500 mt-1">
-                {formik.values.securityInformation.length}/15 characters (will be padded to 15 spaces)
-              </p>
-            </div>
-
-            {/* Sender Qualifier */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Sender Qualifier
-              </label>
-              <input
-                type="text"
-                name="senderQualifier"
-                placeholder="Sender Qualifier"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.senderQualifier}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.senderQualifier && formik.errors.senderQualifier
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.senderQualifier && formik.errors.senderQualifier && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.senderQualifier}</p>
-              )}
-            </div>
-
-            {/* Sender ID */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Sender ID (max 15 chars)
-              </label>
-              <input
-                type="text"
-                name="senderId"
-                placeholder="Sender ID"
-                autoComplete="off"
-                onChange={handleSenderIdChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.senderId}
-                maxLength={15}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.senderId && formik.errors.senderId
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.senderId && formik.errors.senderId && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.senderId}</p>
-              )}
-              <p className="text-xs text-gray-500 mt-1">
-                {formik.values.senderId.length}/15 characters (will be padded to 15 spaces)
-              </p>
-            </div>
-
-            {/* Receiver Qualifier */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Receiver Qualifier
-              </label>
-              <input
-                type="text"
-                name="receiverQualifier"
-                placeholder="Receiver Qualifier"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.receiverQualifier}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.receiverQualifier && formik.errors.receiverQualifier
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.receiverQualifier && formik.errors.receiverQualifier && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.receiverQualifier}</p>
-              )}
-            </div>
-
-            {/* Receiver ID */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Receiver ID (max 15 chars)
-              </label>
-              <input
-                type="text"
-                name="receiverId"
-                placeholder="Receiver ID"
-                autoComplete="off"
-                onChange={handleReceiverIdChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.receiverId}
-                maxLength={15}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.receiverId && formik.errors.receiverId
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.receiverId && formik.errors.receiverId && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.receiverId}</p>
-              )}
-              <p className="text-xs text-gray-500 mt-1">
-                {formik.values.receiverId.length}/15 characters (will be padded to 15 spaces)
-              </p>
-            </div>
-
-            {/* Repetition Separator */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Repetition Separator
-              </label>
-              <input
-                type="text"
-                name="repetitionSeparator"
-                placeholder="Repetition Separator"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.repetitionSeparator}
-                maxLength={1}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.repetitionSeparator && formik.errors.repetitionSeparator
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.repetitionSeparator && formik.errors.repetitionSeparator && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.repetitionSeparator}</p>
-              )}
-            </div>
-
-            {/* Control Version */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Control Version
-              </label>
-              <input
-                type="text"
-                name="controlVersion"
-                placeholder="Control Version"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.controlVersion}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.controlVersion && formik.errors.controlVersion
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.controlVersion && formik.errors.controlVersion && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.controlVersion}</p>
-              )}
-            </div>
-
-            {/* Acknowledgment Requested */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Acknowledgment Requested
-              </label>
-              <select
-                name="acknowledgmentRequested"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.acknowledgmentRequested}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.acknowledgmentRequested &&
-                  formik.errors.acknowledgmentRequested
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              >
-                <option value="">Select Option</option>
-                <option value="0">No Acknowledgment Requested</option>
-                <option value="1">Acknowledgment Requested</option>
-              </select>
-              {formik.touched.acknowledgmentRequested && formik.errors.acknowledgmentRequested && (
-                <p className="text-red-600 text-sm mt-1">
-                  {formik.errors.acknowledgmentRequested}
+                <p className="text-xs text-gray-500 mt-1">
+                  {formik.values.securityInformation.length}/15 characters (will be padded to 15
+                  spaces)
                 </p>
-              )}
-            </div>
+              </div>
 
-            {/* Usage Indicator */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Usage Indicator
-              </label>
-              <select
-                name="usageIndicator"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.usageIndicator}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.usageIndicator && formik.errors.usageIndicator
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              >
-                <option value="">Select Usage Indicator</option>
-                <option value="P">Production Data</option>
-                <option value="T">Test Data</option>
-              </select>
-              {formik.touched.usageIndicator && formik.errors.usageIndicator && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.usageIndicator}</p>
-              )}
-            </div>
-
-            {/* Component Element Separator */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
-                Component Element Separator
-              </label>
-              <input
-                type="text"
-                name="componentElementSeparator"
-                placeholder="Component Element Separator"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.componentElementSeparator}
-                maxLength={1}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.componentElementSeparator &&
-                  formik.errors.componentElementSeparator
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-              />
-              {formik.touched.componentElementSeparator &&
-                formik.errors.componentElementSeparator && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {formik.errors.componentElementSeparator}
-                  </p>
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Sender Qualifier
+                </label>
+                <input
+                  type="text"
+                  name="senderQualifier"
+                  placeholder="Sender Qualifier"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.senderQualifier}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.senderQualifier && formik.errors.senderQualifier
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.senderQualifier && formik.errors.senderQualifier && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.senderQualifier}</p>
                 )}
-            </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Sender ID (max 15 chars)
+                </label>
+                <input
+                  type="text"
+                  name="senderId"
+                  placeholder="Sender ID"
+                  autoComplete="off"
+                  onChange={handleSenderIdChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.senderId}
+                  maxLength={15}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.senderId && formik.errors.senderId
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.senderId && formik.errors.senderId && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.senderId}</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {formik.values.senderId.length}/15 characters (will be padded to 15 spaces)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Receiver Qualifier
+                </label>
+                <input
+                  type="text"
+                  name="receiverQualifier"
+                  placeholder="Receiver Qualifier"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.receiverQualifier}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.receiverQualifier && formik.errors.receiverQualifier
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.receiverQualifier && formik.errors.receiverQualifier && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.receiverQualifier}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Receiver ID (max 15 chars)
+                </label>
+                <input
+                  type="text"
+                  name="receiverId"
+                  placeholder="Receiver ID"
+                  autoComplete="off"
+                  onChange={handleReceiverIdChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.receiverId}
+                  maxLength={15}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.receiverId && formik.errors.receiverId
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.receiverId && formik.errors.receiverId && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.receiverId}</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {formik.values.receiverId.length}/15 characters (will be padded to 15 spaces)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Repetition Separator
+                </label>
+                <input
+                  type="text"
+                  name="repetitionSeparator"
+                  placeholder="Repetition Separator"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.repetitionSeparator}
+                  maxLength={1}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.repetitionSeparator && formik.errors.repetitionSeparator
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.repetitionSeparator && formik.errors.repetitionSeparator && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.repetitionSeparator}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Control Version
+                </label>
+                <input
+                  type="text"
+                  name="controlVersion"
+                  placeholder="Control Version"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.controlVersion}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.controlVersion && formik.errors.controlVersion
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.controlVersion && formik.errors.controlVersion && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.controlVersion}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Acknowledgment Requested
+                </label>
+                <select
+                  name="acknowledgmentRequested"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.acknowledgmentRequested}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.acknowledgmentRequested && formik.errors.acknowledgmentRequested
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                >
+                  <option value="">Select Option</option>
+                  <option value="0">No Acknowledgment Requested</option>
+                  <option value="1">Acknowledgment Requested</option>
+                </select>
+                {formik.touched.acknowledgmentRequested &&
+                  formik.errors.acknowledgmentRequested && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {formik.errors.acknowledgmentRequested}
+                    </p>
+                  )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Usage Indicator
+                </label>
+                <select
+                  name="usageIndicator"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.usageIndicator}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.usageIndicator && formik.errors.usageIndicator
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                >
+                  <option value="">Select Usage Indicator</option>
+                  <option value="P">Production Data</option>
+                  <option value="T">Test Data</option>
+                </select>
+                {formik.touched.usageIndicator && formik.errors.usageIndicator && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.usageIndicator}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Component Element Separator
+                </label>
+                <input
+                  type="text"
+                  name="componentElementSeparator"
+                  placeholder="Component Element Separator"
+                  autoComplete="off"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.componentElementSeparator}
+                  maxLength={1}
+                  className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                    formik.touched.componentElementSeparator &&
+                    formik.errors.componentElementSeparator
+                      ? 'border-red-500 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-blue-400'
+                  }`}
+                />
+                {formik.touched.componentElementSeparator &&
+                  formik.errors.componentElementSeparator && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {formik.errors.componentElementSeparator}
+                    </p>
+                  )}
+              </div>
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="flex justify-end gap-3 mt-8">
             <button
               type="button"
@@ -626,4 +609,3 @@ export default function ISASettingsForm() {
     </div>
   )
 }
-

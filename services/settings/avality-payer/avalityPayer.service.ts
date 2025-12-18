@@ -1,12 +1,12 @@
 import api from '@/lib/api/axios'
 
 export const AvailityPayerService = {
-  getAllAvailityPayer: (page: number) => {
+  getAllAvailityPayer: (page?: number) => {
     const params = new URLSearchParams({
       page: String(page),
     })
 
-    return api.get(`/availity-payers?${params.toString()}`)
+    return api.get(`/availity-payers?${page ? params.toString() : ''}`)
   },
 
   getAvailityPayerById: (userId: string) => {
@@ -23,5 +23,12 @@ export const AvailityPayerService = {
 
   deleteAvailityPayer: (userId: string) => {
     return api.delete(`/availity-payers/${userId}/delete`)
+  },
+
+  searchAvailityPayers: (searchTerm: string) => {
+    const params = new URLSearchParams({
+      payer_name: searchTerm,
+    })
+    return api.get(`/availity-payers/?${params.toString()}`)
   },
 }

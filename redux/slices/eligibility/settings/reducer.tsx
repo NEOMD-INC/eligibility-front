@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { EligibilitySettingsService } from '@/services/eligibility/settings/settings.service'
-import type { EligibilitySettings, EligibilitySettingsState } from '@/types'
+import type { EligibilitySettingsState } from '@/types'
 
 const initialState: EligibilitySettingsState = {
   settings: null,
@@ -81,23 +81,23 @@ export const updateEligibilitySettings = createAsyncThunk(
     try {
       // Convert form data to API format
       const apiData = mapFormToApi(settingsData)
-      
+
       // Separate subscriber settings from ISA settings
       const subscriberData: any = {}
       const isaData: any = {}
-      
+
       // Extract subscriber fields
       if (apiData.id_qualifier !== undefined) {
         subscriberData.id_qualifier = apiData.id_qualifier
       }
-      
+
       // Extract ISA fields
       Object.keys(apiData).forEach(key => {
         if (key !== 'id_qualifier') {
           isaData[key] = apiData[key]
         }
       })
-      
+
       const payload: any = {}
       if (Object.keys(isaData).length > 0) {
         payload.isa = isaData
@@ -105,7 +105,7 @@ export const updateEligibilitySettings = createAsyncThunk(
       if (Object.keys(subscriberData).length > 0) {
         payload.subscriber = subscriberData
       }
-      
+
       const response = await EligibilitySettingsService.updateEligibilitySettings(payload)
       return response.data
     } catch (error: any) {
@@ -187,4 +187,3 @@ const eligibilitySettingsSlice = createSlice({
 
 export const { clearEligibilitySettingsError } = eligibilitySettingsSlice.actions
 export default eligibilitySettingsSlice.reducer
-

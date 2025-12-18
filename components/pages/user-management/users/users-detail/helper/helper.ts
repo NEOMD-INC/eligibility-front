@@ -1,12 +1,4 @@
-const formatDate = (dateString?: string) => {
-  if (!dateString) return 'N/A'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-}
+import { formatDate } from '@/utils/formatDate'
 
 export const getUserDetails = (currentUser: any) => [
   {
@@ -19,29 +11,47 @@ export const getUserDetails = (currentUser: any) => [
   },
   {
     title: 'Member Since',
-    value: formatDate(currentUser?.created_at),
+    value: formatDate(currentUser?.created_at, 'user'),
   },
   {
     title: 'Last Updated',
-    value: currentUser?.updated_at ? formatDate(currentUser.updated_at) : 'N/A',
+    value: currentUser?.updated_at ? formatDate(currentUser.updated_at, 'user') : 'N/A',
   },
 ]
 
-export const getRoleDetails = (currentUser: any) =>
-  currentUser?.roles
-    ? currentUser.roles.map((role: any) => ({
-        title: typeof role === 'string' ? role : role?.name || 'N/A',
-      }))
-    : currentUser?.role
-      ? [
-          {
-            title:
-              typeof currentUser.role === 'string'
-                ? currentUser.role
-                : currentUser.role?.name || 'N/A',
-          },
-        ]
-      : []
+export const getRoleDetails = (currentUser: any) => {
+  if (!currentUser) return []
+  
+  // Check for roles array first
+  if (currentUser.roles && Array.isArray(currentUser.roles) && currentUser.roles.length > 0) {
+    return currentUser.roles.map((role: any) => ({
+      title: typeof role === 'string' ? role : role?.name || role?.title || 'N/A',
+    }))
+  }
+  
+  // Check for single role object
+  if (currentUser.role) {
+    return [
+      {
+        title:
+          typeof currentUser.role === 'string'
+            ? currentUser.role
+            : currentUser.role?.name || currentUser.role?.title || 'N/A',
+      },
+    ]
+  }
+  
+  // Check for role_id and fetch role name if needed
+  if (currentUser.role_id) {
+    return [
+      {
+        title: String(currentUser.role_id),
+      },
+    ]
+  }
+  
+  return []
+}
 
 export const groupPermissionsByPrefix = (permissions: any[]) => {
   if (!permissions || !Array.isArray(permissions) || permissions.length === 0) {

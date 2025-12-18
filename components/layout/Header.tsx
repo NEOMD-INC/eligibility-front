@@ -142,7 +142,9 @@ const Header = () => {
             )}
           </div>
 
-          <a style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}>Logs</a>
+          <Link style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }} href="/logs">
+            Logs
+          </Link>
 
           <div ref={userMgmtRef} className="relative">
             <button
