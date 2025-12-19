@@ -15,6 +15,7 @@ import {
 } from '@/redux/slices/settings/availity-payers/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { AvailityPayerFormValues } from '@/types'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function AddUpdateAvailityPayer() {
   const router = useRouter()
@@ -79,7 +80,9 @@ export default function AddUpdateAvailityPayer() {
         router.push('/settings/availity-payer')
       } catch (err: any) {
         setIsError(true)
-        setErrorMsg(err || `An error occurred while ${isEditMode ? 'updating' : 'creating'} the payer.`)
+        setErrorMsg(
+          err || `An error occurred while ${isEditMode ? 'updating' : 'creating'} the payer.`
+        )
       }
     },
   })
@@ -133,61 +136,138 @@ export default function AddUpdateAvailityPayer() {
     }
   }, [error])
 
+  // Helper function to render form fields
+  const renderField = (
+    name: keyof AvailityPayerFormValues,
+    label: string,
+    type: 'text' | 'email' | 'textarea' | 'checkbox' = 'text'
+  ) => {
+    const fieldValue = formik.values[name]
+    const fieldError = formik.touched[name] && formik.errors[name]
+
+    if (type === 'textarea') {
+      return (
+        <div key={name} className="mb-4">
+          <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+            {label}
+          </label>
+          <textarea
+            id={name}
+            name={name}
+            value={fieldValue as string}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            rows={4}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              fieldError ? 'border-red-500' : 'border-gray-300'
+            }`}
+          />
+          {fieldError && (
+            <p className="mt-1 text-sm text-red-600">{formik.errors[name] as string}</p>
+          )}
+        </div>
+      )
+    }
+
+    if (type === 'checkbox') {
+      return (
+        <div key={name} className="mb-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              id={name}
+              name={name}
+              checked={fieldValue as boolean}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="text-sm font-medium text-gray-700">{label}</span>
+          </label>
+          {fieldError && (
+            <p className="mt-1 text-sm text-red-600">{formik.errors[name] as string}</p>
+          )}
+        </div>
+      )
+    }
+
+    return (
+      <div key={name} className="mb-4">
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+        <input
+          type={type}
+          id={name}
+          name={name}
+          value={fieldValue as string}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            fieldError ? 'border-red-500' : 'border-gray-300'
+          }`}
+        />
+        {fieldError && <p className="mt-1 text-sm text-red-600">{formik.errors[name] as string}</p>}
+      </div>
+    )
+  }
+
   if (isEditMode && fetchAvailityPayerLoading) {
     return <ComponentLoader component="Availity Payer" message="Loading Availity Payer data..." />
   }
 
-
   return (
-    <div className="flex flex-col justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-6">
-          {isEditMode ? 'Edit Availity Payer' : 'Add Availity Payer'}
-        </h1>
+    <PageTransition>
+      <div className="flex flex-col justify-center bg-gray-100 p-6">
+        <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
+          <h1 className="text-2xl font-bold mb-6">
+            {isEditMode ? 'Edit Availity Payer' : 'Add Availity Payer'}
+          </h1>
 
-        <form onSubmit={formik.handleSubmit}>
-          {errorMsg && (
-            <div
-              className={`mb-6 p-4 rounded-lg ${
-                isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-              }`}
-            >
-              <span>{errorMsg}</span>
+          <form onSubmit={formik.handleSubmit}>
+            {errorMsg && (
+              <div
+                className={`mb-6 p-4 rounded-lg ${
+                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                }`}
+              >
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {renderField('payerId', 'Payer ID')}
+            {renderField('payerName', 'Payer Name')}
+            {renderField('payerCode', 'Payer Code')}
+            {renderField('contactName', 'Contact Name')}
+            {renderField('addressLine1', 'Address Line 1')}
+            {renderField('addressLine2', 'Address Line 2')}
+            {renderField('city', 'City')}
+            {renderField('state', 'State')}
+            {renderField('zipCode', 'Zip Code')}
+            {renderField('phone', 'Phone')}
+            {renderField('email', 'Email', 'email')}
+            {renderField('isActive', 'Is Active', 'checkbox')}
+            {renderField('notes', 'Notes', 'textarea')}
+
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <SubmitButton
+                type="submit"
+                title={isEditMode ? 'Update Payer' : 'Add Payer'}
+                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                btnLoading={isEditMode ? updateLoading || fetchAvailityPayerLoading : createLoading}
+                callback_event=""
+              />
             </div>
-          )}
-
-          {renderField('payerId', 'Payer ID')}
-          {renderField('payerName', 'Payer Name')}
-          {renderField('payerCode', 'Payer Code')}
-          {renderField('contactName', 'Contact Name')}
-          {renderField('addressLine1', 'Address Line 1')}
-          {renderField('addressLine2', 'Address Line 2')}
-          {renderField('city', 'City')}
-          {renderField('state', 'State')}
-          {renderField('zipCode', 'Zip Code')}
-          {renderField('phone', 'Phone')}
-          {renderField('email', 'Email', 'email')}
-          {renderField('isActive', 'Is Active')}
-          {renderField('notes', 'Notes', 'textarea')}
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
-            >
-              Cancel
-            </button>
-            <SubmitButton
-              type="submit"
-              title={isEditMode ? 'Update Payer' : 'Add Payer'}
-              class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={isEditMode ? updateLoading || fetchAvailityPayerLoading : createLoading}
-              callback_event=""
-            />
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }

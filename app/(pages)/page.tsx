@@ -1,2 +1,1 @@
-import PatientDashboard from '@/app/(pages)/patient-dashboard/page'
-export default <PatientDashboard />
+export { default } from '@/app/(pages)/quick-link-dashboard/page'

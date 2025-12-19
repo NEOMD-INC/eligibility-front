@@ -1,144 +1,219 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CoverageAndBenefits from './components/tabs/coverage-and-benefits/CoverageAndBenefits'
 import Copay from './components/tabs/copay/Copay'
 import Deductible from './components/tabs/deductible/Deductible'
 import Coinsurance from './components/tabs/coinsurance/Coinsurance'
 import OutOfPocket from './components/tabs/out-of-pocket/OutOfPocket'
+import { AppDispatch, RootState } from '@/redux/store'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchPatientDashboard } from '@/redux/slices/patient-dashboard/actions'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { TabTransition } from '@/components/providers/tab-transition-provider/TabTransitionProvider'
 
 export default function Dashboard() {
+  const dispatch = useDispatch<AppDispatch>()
+  const { patientData, loading, error } = useSelector((state: RootState) => state.patientDashboard)
   const [activeTab, setActiveTab] = useState('Coverage and Benefits')
+  const patientInformation = patientData?.patient || {}
+  const subscriber = patientData?.subscriber || {}
+  const managedCareOrganization = patientData?.mco || {}
+  const coverages = patientData?.coverage || []
+  const provider = patientData?.provider || {}
+  const dates = patientData?.dates || {}
+  const benefits = patientData?.benefits || {}
+  const primaryCareProvider = patientData?.primary_care_provider || {}
+  const payer = patientData?.payer || {}
+
+  useEffect(() => {
+    dispatch(fetchPatientDashboard(''))
+  }, [dispatch])
 
   const tabs = ['Coverage and Benefits', 'Copay', 'Deductible', 'Coinsurance', 'Out of Pocket']
 
+  // Helper function to format address (handles both string and object formats)
+  const formatAddress = (address: any, city?: string, state?: string, zip?: string) => {
+    if (!address) {
+      return city && state && zip ? `${city}, ${state} ${zip}` : ''
+    }
+
+    if (typeof address === 'string') {
+      return city && state && zip ? `${address}, ${city}, ${state} ${zip}` : address
+    }
+
+    // Handle object format {line1, line2, city, state, zip}
+    const line1 = address.line1 || ''
+    const line2 = address.line2 || ''
+    const addrCity = address.city || city || ''
+    const addrState = address.state || state || ''
+    const addrZip = address.zip || zip || ''
+
+    const addressParts = [line1, line2].filter(Boolean).join(' ')
+    const locationParts = [addrCity, addrState, addrZip].filter(Boolean).join(' ')
+
+    return [addressParts, locationParts].filter(Boolean).join(', ')
+  }
+
+  console.log('patientData:', payer)
+
   return (
-    <div className="w-full bg-gray-50 p-6 space-y-6">
-      <div className="bg-white border rounded-lg p-6 flex justify-between items-start">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold text-green-700 flex items-center gap-2">
-            Jess Andrew
-            <span className="text-green-600">☂️</span>
-          </h1>
+    <PageTransition>
+      <div className="w-full bg-gray-50 p-6 space-y-6">
+        <div className="bg-white shadow rounded-lg p-6 flex justify-between items-start">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-semibold text-green-700 flex items-center gap-2">
+              {patientInformation.name || 'Jane Doe'}
+              <span className="text-green-600">☂️</span>
+            </h1>
 
-          <p className="text-sm text-gray-600">
-            Female · 33Yrs · DOB 24 Aug, 1978 ·
-            <span className="font-medium">Relationship to Subscriber</span> Spouse
-          </p>
+            <p className="text-sm text-gray-600">
+              {patientInformation.gender} . {patientInformation.age}Yrs . {patientInformation.dob} ·
+              <span className="font-medium"> Relationship to Subscriber</span>{' '}
+              <b>{patientInformation.relationship_name}</b>
+            </p>
 
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">Policy No.</span> 101482350800
-            <span className="mx-2">|</span>
-            <span className="font-medium">Group No.</span> 084287705000407
-            <span className="mx-2">|</span>
-            <span className="font-medium">Group Name</span> MA Individual - Florida
-          </p>
-        </div>
-
-        <div className="text-left space-y-2">
-          <div className="flex justify-start">
-            <span className="text-purple-600 text-3xl font-bold">aetna</span>
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">Policy No.</span> <b>{coverages.plan_number}</b>
+              <span className="mx-2">|</span>
+              <span className="font-medium">Group No.</span> <b>{coverages.group_number}</b>
+              <br />
+              <span className="mr-2">|</span>
+              <span className="font-medium">Group Name</span> <b>{coverages.group_name}</b> -
+              Florida
+            </p>
           </div>
 
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">Insurance</span> Aetna
-          </p>
-
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">Insurance Active From</span>
-            <br />
-            01/01/2023 to 12/31/2024
-          </p>
-        </div>
-
-        <div className="text-right space-y-2">
-          <p className="text-sm text-gray-600">verified on 12 May, 2025</p>
-
-          <p className="text-sm text-gray-600">
-            Benefit effective from 01 Jan, 2023 - 31 Dec, 2024
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border rounded-lg p-6 space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2">👤 Subscriber</h2>
-
-          <p className="text-sm">
-            <span className="font-medium">Name</span> Medicare Richard Evas
-          </p>
-
-          <p className="text-sm text-gray-600">DOB 24 Aug, 1978 · Female 33Yrs</p>
-
-          <p className="text-sm text-gray-600">
-            486 Grove Street Apartment #20, New York, NY 10014-1203
-          </p>
-        </div>
-
-        <div className="bg-white border rounded-lg p-6 space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            🩺 Primary Care Provider
-          </h2>
-
-          <p className="text-sm">
-            <span className="font-medium">John Doe MD</span>
-            <span className="ml-2 text-gray-500">NPI 1234567891</span>
-          </p>
-
-          <p className="text-sm text-gray-600">
-            486 Grove Street Apartment #20, New York, NY 10014-4444
-          </p>
-        </div>
-
-        <div className="bg-white border rounded-lg p-6 space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            🩺 Managed Care Organization (Hospital)
-          </h2>
-
-          <p className="text-sm text-gray-600">
-            486 Grove Street Apartment #20, New York, NY 10014-4444
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-white border rounded-lg">
-        <div className="flex border-b border-gray-200">
-          {tabs.map((tab, index) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer ${
-                activeTab === tab
-                  ? 'bg-blue-50 text-gray-700'
-                  : 'bg-white text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              {tab}
-              {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-              )}
-            </button>
-          ))}
-        </div>
-        <div>
-          {activeTab === 'Coverage and Benefits' ? (
-            <CoverageAndBenefits />
-          ) : activeTab === 'Copay' ? (
-            <Copay />
-          ) : activeTab === 'Deductible' ? (
-            <Deductible />
-          ) : activeTab === 'Coinsurance' ? (
-            <Coinsurance />
-          ) : activeTab === 'Out of Pocket' ? (
-            <OutOfPocket />
-          ) : (
-            <div className="p-12 text-center">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-2">{activeTab}</h2>
-              <p className="text-gray-500 text-lg">Coming Soon</p>
+          <div className="text-left space-y-2">
+            <div className="flex justify-start">
+              <span className="text-purple-600 text-3xl font-bold">{payer.name}</span>
             </div>
-          )}
+
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">Insurance</span> {payer.name}
+            </p>
+
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">Insurance Active From</span>
+              <br />
+              {dates?.eligibility_begin_date} to {dates?.eligibility_end_date}
+            </p>
+          </div>
+
+          <div className="text-right space-y-2">
+            <p className="text-sm text-gray-600">verified on {dates?.transaction_date}</p>
+
+            <p className="text-sm text-gray-600">
+              Benefit effective from {dates?.eligibility_begin_date} - {dates?.eligibility_end_date}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white shadow rounded-lg p-6 space-y-3">
+            <h2 className="text-lg font-semibold flex items-center gap-2">👤 Subscriber</h2>
+
+            <p className="text-sm">
+              <span className="font-medium">Name</span> {subscriber.name || 'John Doe'}
+            </p>
+
+            <p className="text-sm text-gray-600">
+              DOB {subscriber.dob} · {subscriber.gender ? subscriber.gender : 'Other'}{' '}
+              {subscriber.age}Yrs
+            </p>
+
+            <p className="text-sm text-gray-600">
+              {formatAddress(
+                subscriber.address,
+                subscriber.city,
+                subscriber.state,
+                subscriber.zip
+              ) || '486 Grove Street Apartment #20, New York, NY 10014-1203'}
+            </p>
+          </div>
+
+          <div className="bg-white shadow rounded-lg p-6 space-y-3">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              🩺 Primary Care Provider
+            </h2>
+
+            <p className="text-sm">
+              <span className="font-medium">{primaryCareProvider.name}</span>
+              <span className="ml-2 text-gray-500">NPI {primaryCareProvider.npi}</span>
+            </p>
+
+            <p className="text-sm text-gray-600">
+              {formatAddress(
+                primaryCareProvider.address,
+                primaryCareProvider.city,
+                primaryCareProvider.state,
+                primaryCareProvider.zip
+              ) || '486 Grove Street Apartment #20, New York, NY 10014-4444'}
+            </p>
+          </div>
+
+          <div className="bg-white shadow rounded-lg p-6 space-y-3">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              🩺 Managed Care Organization
+            </h2>
+
+            <p className="text-sm">
+              <span className="font-medium">Name</span>
+              <span className="ml-2 text-gray-500">{managedCareOrganization.name}</span>
+            </p>
+
+            <p className="text-sm text-gray-600">
+              {formatAddress(
+                managedCareOrganization.address,
+                managedCareOrganization.city,
+                managedCareOrganization.state,
+                managedCareOrganization.zip
+              ) || 'Address not available'}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white shadow rounded-lg">
+          <div className="flex border-b border-gray-200">
+            {tabs.map((tab, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer ${
+                  activeTab === tab
+                    ? 'bg-blue-50 text-gray-700'
+                    : 'bg-white text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {tab}
+                {activeTab === tab && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                )}
+              </button>
+            ))}
+          </div>
+          <div>
+            <TabTransition>
+              {activeTab === 'Coverage and Benefits' ? (
+                <CoverageAndBenefits benefits={benefits} />
+              ) : activeTab === 'Copay' ? (
+                <Copay />
+              ) : activeTab === 'Deductible' ? (
+                <Deductible />
+              ) : activeTab === 'Coinsurance' ? (
+                <Coinsurance />
+              ) : activeTab === 'Out of Pocket' ? (
+                <OutOfPocket />
+              ) : (
+                <div className="p-12 text-center">
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-2">{activeTab}</h2>
+                  <p className="text-gray-500 text-lg">Coming Soon</p>
+                </div>
+              )}
+            </TabTransition>
+          </div>
         </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }

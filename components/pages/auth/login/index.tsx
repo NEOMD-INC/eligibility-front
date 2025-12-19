@@ -10,6 +10,7 @@ import { authService } from '@/services/auth.service'
 import { setCookie } from '@/lib/cookies/cookies'
 import { useDispatch } from 'react-redux'
 import { setUser } from '@/redux/slices/current-user/userSlice'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 interface LoginValues {
   email: string
@@ -67,81 +68,83 @@ export default function LoginPage() {
   })
 
   return (
-    <form className="w-full" onSubmit={formik.handleSubmit} id="kt_login_signin_form">
-      <div
-        className={`mb-6 p-4 rounded-lg ${
-          isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-        }`}
-      >
-        <span>{errorMsg}</span>
-      </div>
+    <PageTransition>
+      <form className="w-full" onSubmit={formik.handleSubmit} id="kt_login_signin_form">
+        <div
+          className={`mb-6 p-4 rounded-lg ${
+            isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+          }`}
+        >
+          <span>{errorMsg}</span>
+        </div>
 
-      {/* EMAIL */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-800 mb-1">Email</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          autoComplete="off"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.email}
-          className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 
+        {/* EMAIL */}
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-gray-800 mb-1">Email</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            autoComplete="off"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.email}
+            className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 
             ${
               formik.touched.email && formik.errors.email
                 ? 'border-red-500 focus:ring-red-400'
                 : 'border-gray-300 focus:ring-blue-400'
             }`}
-        />
-        {formik.touched.email && formik.errors.email && (
-          <p className="text-red-600 text-sm mt-1">{formik.errors.email}</p>
-        )}
-      </div>
+          />
+          {formik.touched.email && formik.errors.email && (
+            <p className="text-red-600 text-sm mt-1">{formik.errors.email}</p>
+          )}
+        </div>
 
-      {/* PASSWORD */}
-      <div className="mb-4">
-        <label className="block text-sm font-semibold text-gray-800 mb-1">Password</label>
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          autoComplete="off"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.password}
-          className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 
+        {/* PASSWORD */}
+        <div className="mb-4">
+          <label className="block text-sm font-semibold text-gray-800 mb-1">Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            autoComplete="off"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.password}
+            className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 
             ${
               formik.touched.password && formik.errors.password
                 ? 'border-red-500 focus:ring-red-400'
                 : 'border-gray-300 focus:ring-blue-400'
             }`}
-        />
-        {formik.touched.password && formik.errors.password && (
-          <p className="text-red-600 text-sm mt-1">{formik.errors.password}</p>
-        )}
-      </div>
+          />
+          {formik.touched.password && formik.errors.password && (
+            <p className="text-red-600 text-sm mt-1">{formik.errors.password}</p>
+          )}
+        </div>
 
-      {/* FORGOT PASSWORD */}
-      <div className="flex justify-end mb-6">
-        <Link href="/register" className="text-blue-600 text-sm mr-3">
-          Register
-        </Link>
-        <Link href="/forgot-password" className="text-blue-600 text-sm">
-          Forgot Password ?
-        </Link>
-      </div>
+        {/* FORGOT PASSWORD */}
+        <div className="flex justify-end mb-6">
+          <Link href="/register" className="text-blue-600 text-sm mr-3">
+            Register
+          </Link>
+          <Link href="/forgot-password" className="text-blue-600 text-sm">
+            Forgot Password ?
+          </Link>
+        </div>
 
-      {/* SUBMIT */}
-      <div className="w-full">
-        <SubmitButton
-          type="submit"
-          class_name="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition"
-          title="Continue"
-          callback_event=""
-          btnLoading={btnLoading}
-        />
-      </div>
-    </form>
+        {/* SUBMIT */}
+        <div className="w-full">
+          <SubmitButton
+            type="submit"
+            class_name="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition"
+            title="Continue"
+            callback_event=""
+            btnLoading={btnLoading}
+          />
+        </div>
+      </form>
+    </PageTransition>
   )
 }

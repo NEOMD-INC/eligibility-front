@@ -15,6 +15,7 @@ import {
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { CarrierGroupFormValues } from '@/types'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function AddUpdateCarrierGroup() {
   const router = useRouter()
@@ -23,13 +24,8 @@ export default function AddUpdateCarrierGroup() {
   const isEditMode = !!carrierGroupId
 
   const dispatch = useDispatch<AppDispatch>()
-  const {
-    currentCarrierGroup,
-    createLoading,
-    updateLoading,
-    fetchCarrierGroupLoading,
-    error,
-  } = useSelector((state: RootState) => state.carrierGroups)
+  const { currentCarrierGroup, createLoading, updateLoading, fetchCarrierGroupLoading, error } =
+    useSelector((state: RootState) => state.carrierGroups)
 
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
@@ -59,9 +55,7 @@ export default function AddUpdateCarrierGroup() {
       try {
         if (isEditMode) {
           if (!carrierGroupId) return
-          await dispatch(
-            updateCarrierGroup({ carrierGroupId, carrierGroupData: values })
-          ).unwrap()
+          await dispatch(updateCarrierGroup({ carrierGroupId, carrierGroupData: values })).unwrap()
         } else {
           await dispatch(createCarrierGroup(values)).unwrap()
         }
@@ -107,15 +101,10 @@ export default function AddUpdateCarrierGroup() {
 
       formik.setValues({
         description:
-          currentCarrierGroup.carrier_group_description ||
-          currentCarrierGroup.description ||
-          '',
-        code:
-          currentCarrierGroup.carrier_group_code || currentCarrierGroup.code || '',
+          currentCarrierGroup.carrier_group_description || currentCarrierGroup.description || '',
+        code: currentCarrierGroup.carrier_group_code || currentCarrierGroup.code || '',
         fillingIndicator:
-          currentCarrierGroup.filling_indicator ||
-          currentCarrierGroup.fillingIndicator ||
-          '',
+          currentCarrierGroup.filling_indicator || currentCarrierGroup.fillingIndicator || '',
         isActive: isActiveValue,
       })
     }
@@ -166,63 +155,64 @@ export default function AddUpdateCarrierGroup() {
   }
 
   return (
-    <div className="flex flex-col justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-6">
-          {isEditMode ? 'Edit Carrier Group' : 'Add Carrier Group'}
-        </h1>
+    <PageTransition>
+      <div className="flex flex-col justify-center bg-gray-100 p-6">
+        <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
+          <h1 className="text-2xl font-bold mb-6">
+            {isEditMode ? 'Edit Carrier Group' : 'Add Carrier Group'}
+          </h1>
 
-        <form onSubmit={formik.handleSubmit}>
-          {errorMsg && (
-            <div
-              className={`mb-6 p-4 rounded-lg ${
-                isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-              }`}
-            >
-              <span>{errorMsg}</span>
+          <form onSubmit={formik.handleSubmit}>
+            {errorMsg && (
+              <div
+                className={`mb-6 p-4 rounded-lg ${
+                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                }`}
+              >
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {renderField('description', 'Carrier Group Description')}
+            {renderField('code', 'Carrier Group Code')}
+            {renderField('fillingIndicator', 'Filling Indicator')}
+
+            <div className="mb-6">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={formik.values.isActive || false}
+                  onChange={e => formik.setFieldValue('isActive', e.target.checked)}
+                  onBlur={formik.handleBlur}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <label htmlFor="isActive" className="ml-2 text-sm font-medium text-gray-700">
+                  Is Active
+                </label>
+              </div>
             </div>
-          )}
 
-          {renderField('description', 'Carrier Group Description')}
-          {renderField('code', 'Carrier Group Code')}
-          {renderField('fillingIndicator', 'Filling Indicator')}
-
-          <div className="mb-6">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="isActive"
-                name="isActive"
-                checked={formik.values.isActive || false}
-                onChange={e => formik.setFieldValue('isActive', e.target.checked)}
-                onBlur={formik.handleBlur}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <SubmitButton
+                type="submit"
+                title={isEditMode ? 'Update Carrier Group' : 'Add Carrier Group'}
+                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                btnLoading={isEditMode ? updateLoading || fetchCarrierGroupLoading : createLoading}
+                callback_event=""
               />
-              <label htmlFor="isActive" className="ml-2 text-sm font-medium text-gray-700">
-                Is Active
-              </label>
             </div>
-          </div>
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
-            >
-              Cancel
-            </button>
-            <SubmitButton
-              type="submit"
-              title={isEditMode ? 'Update Carrier Group' : 'Add Carrier Group'}
-              class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={isEditMode ? updateLoading || fetchCarrierGroupLoading : createLoading}
-              callback_event=""
-            />
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }
-

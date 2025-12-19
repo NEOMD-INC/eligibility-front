@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import { updateUserPassword, clearPasswordError } from '@/redux/slices/user-profile/reducer'
 import { AppDispatch, RootState } from '@/redux/store'
-// Theme colors - Tailwind classes like bg-blue-600, text-gray-800, etc. use theme colors via CSS variables
 import { themeColors } from '@/theme'
 
 export default function UpdatePasswordForm() {

@@ -1,0 +1,1 @@
+export { fetchPatientDashboard } from './reducer'

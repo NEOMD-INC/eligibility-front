@@ -15,6 +15,7 @@ import {
   clearCarrierGroupsError,
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function CarrierGroupList() {
   const dispatch = useDispatch<AppDispatch>()
@@ -146,63 +147,65 @@ export default function CarrierGroupList() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between max-w-auto rounded bg-white p-6">
-        <div>
-          <h1
-            className="text-2xl font-bold text-gray-900"
-            style={{ color: themeColors.text.primary }}
-          >
-            Carrier Groups
-          </h1>
-          <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
-            Manage carrier groups and their configurations
-          </p>
-        </div>
-        <div>
-          <div className="flex flex-wrap">
-            <Link
-              href="/settings/carrier-group/add"
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
+    <PageTransition>
+      <div className="p-6">
+        <div className="flex justify-between max-w-auto rounded bg-white p-6">
+          <div>
+            <h1
+              className="text-2xl font-bold text-gray-900"
+              style={{ color: themeColors.text.primary }}
             >
-              <Plus size={16} />
-              Add New Carrier Group
-            </Link>
+              Carrier Groups
+            </h1>
+            <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
+              Manage carrier groups and their configurations
+            </p>
+          </div>
+          <div>
+            <div className="flex flex-wrap">
+              <Link
+                href="/settings/carrier-group/add"
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
+              >
+                <Plus size={16} />
+                Add New Carrier Group
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <Filters
-          fields={filterFields}
-          onReset={handleReset}
-          onSubmit={handleSubmit}
-          columns={4}
-        />
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <Filters
+            fields={filterFields}
+            onReset={handleReset}
+            onSubmit={handleSubmit}
+            columns={4}
+          />
 
-        {error && (
-          <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
-            <p className="text-sm font-medium">{error}</p>
-          </div>
-        )}
-
-        <DataTable
-          columns={columns}
-          data={carrierGroups}
-          loading={loading || deleteLoading}
-          totalItems={totalItems}
-          itemsPerPage={itemsPerPage}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-          clientSidePagination={false}
-          noDataMessage={
-            <div className="text-center py-8">
-              <p className="text-gray-500">No carrier groups found</p>
+          {error && (
+            <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
+              <p className="text-sm font-medium">{error}</p>
             </div>
-          }
-          className="shadow-none rounded-none"
-        />
+          )}
+
+          <DataTable
+            columns={columns}
+            data={carrierGroups}
+            loading={loading || deleteLoading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+            clientSidePagination={false}
+            noDataMessage={
+              <div className="text-center py-8">
+                <p className="text-gray-500">No carrier groups found</p>
+              </div>
+            }
+            className="shadow-none rounded-none"
+          />
+        </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }

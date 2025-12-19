@@ -15,6 +15,7 @@ import {
 } from '@/redux/slices/settings/carrier-setups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { CarrierSetupFormValues } from '@/types'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function AddUpdateCarrierSetup() {
   const router = useRouter()
@@ -74,7 +75,8 @@ export default function AddUpdateCarrierSetup() {
       } catch (err: any) {
         setIsError(true)
         setErrorMsg(
-          err || `An error occurred while ${isEditMode ? 'updating' : 'creating'} the carrier setup.`
+          err ||
+            `An error occurred while ${isEditMode ? 'updating' : 'creating'} the carrier setup.`
         )
       }
     },
@@ -105,8 +107,7 @@ export default function AddUpdateCarrierSetup() {
         isClia:
           typeof currentCarrierSetup.is_clia === 'boolean'
             ? currentCarrierSetup.is_clia
-            : currentCarrierSetup.is_clia === 1 ||
-                currentCarrierSetup.is_clia === '1'
+            : currentCarrierSetup.is_clia === 1 || currentCarrierSetup.is_clia === '1'
               ? true
               : false,
         cob: currentCarrierSetup.cob || '',
@@ -145,7 +146,10 @@ export default function AddUpdateCarrierSetup() {
             name={name}
             onChange={e => {
               if (name === 'isClia') {
-                formik.setFieldValue('isClia', e.target.value === '' ? undefined : e.target.value === 'true')
+                formik.setFieldValue(
+                  'isClia',
+                  e.target.value === '' ? undefined : e.target.value === 'true'
+                )
               } else {
                 formik.handleChange(e)
               }
@@ -198,60 +202,62 @@ export default function AddUpdateCarrierSetup() {
   }
 
   return (
-    <div className="flex flex-col justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-6">
-          {isEditMode ? 'Edit Carrier Setup' : 'Add Carrier Setup'}
-        </h1>
+    <PageTransition>
+      <div className="flex flex-col justify-center bg-gray-100 p-6">
+        <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
+          <h1 className="text-2xl font-bold mb-6">
+            {isEditMode ? 'Edit Carrier Setup' : 'Add Carrier Setup'}
+          </h1>
 
-        <form onSubmit={formik.handleSubmit}>
-          {errorMsg && (
-            <div
-              className={`mb-6 p-4 rounded-lg ${
-                isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-              }`}
-            >
-              <span>{errorMsg}</span>
+          <form onSubmit={formik.handleSubmit}>
+            {errorMsg && (
+              <div
+                className={`mb-6 p-4 rounded-lg ${
+                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                }`}
+              >
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {renderField('carrierGroupCode', 'Carrier Group Code')}
+            {renderField('carrierGroupDescription', 'Carrier Group Description')}
+            {renderField('carrierCode', 'Carrier Code')}
+            {renderField('carrierDescription', 'Carrier Description')}
+            {renderField('state', 'State')}
+            {renderField('batchPlayerId', 'Batch Player ID')}
+            {renderField('isClia', 'Is CLIA', 'select', [
+              { value: '', label: 'Select' },
+              { value: 'true', label: 'Yes' },
+              { value: 'false', label: 'No' },
+            ])}
+            {renderField('cob', 'COB')}
+            {renderField('correctedClaim', 'Corrected Claim')}
+            {renderField('enrollmentRequired', 'Enrollment Required', 'select', [
+              { value: '', label: 'Select' },
+              { value: 'Required', label: 'Required' },
+              { value: 'Not Required', label: 'Not Required' },
+            ])}
+
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <SubmitButton
+                type="submit"
+                title={isEditMode ? 'Update Carrier Setup' : 'Add Carrier Setup'}
+                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                btnLoading={isEditMode ? updateLoading || fetchCarrierSetupLoading : createLoading}
+                callback_event=""
+              />
             </div>
-          )}
-
-          {renderField('carrierGroupCode', 'Carrier Group Code')}
-          {renderField('carrierGroupDescription', 'Carrier Group Description')}
-          {renderField('carrierCode', 'Carrier Code')}
-          {renderField('carrierDescription', 'Carrier Description')}
-          {renderField('state', 'State')}
-          {renderField('batchPlayerId', 'Batch Player ID')}
-          {renderField('isClia', 'Is CLIA', 'select', [
-            { value: '', label: 'Select' },
-            { value: 'true', label: 'Yes' },
-            { value: 'false', label: 'No' },
-          ])}
-          {renderField('cob', 'COB')}
-          {renderField('correctedClaim', 'Corrected Claim')}
-          {renderField('enrollmentRequired', 'Enrollment Required', 'select', [
-            { value: '', label: 'Select' },
-            { value: 'Required', label: 'Required' },
-            { value: 'Not Required', label: 'Not Required' },
-          ])}
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
-            >
-              Cancel
-            </button>
-            <SubmitButton
-              type="submit"
-              title={isEditMode ? 'Update Carrier Setup' : 'Add Carrier Setup'}
-              class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={isEditMode ? updateLoading || fetchCarrierSetupLoading : createLoading}
-              callback_event=""
-            />
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }

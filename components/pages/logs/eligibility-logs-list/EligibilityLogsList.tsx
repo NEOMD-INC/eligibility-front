@@ -7,6 +7,7 @@ import EligibilityLogListColumns from './components/columns'
 import { themeColors } from '@/theme'
 import { Filter, ChevronDown } from 'lucide-react'
 import type { FilterField } from '@/components/ui/filters/Filters'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function EligibilityLogsList() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
@@ -160,66 +161,68 @@ export default function EligibilityLogsList() {
   ]
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between max-w-auto rounded bg-white p-6">
-        <div>
-          <h1
-            className="text-2xl font-bold text-gray-900"
-            style={{ color: themeColors.text.primary }}
-          >
-            Eligibility Logs
-          </h1>
-          <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
-            View and manage eligibility check logs
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-white shadow rounded-lg overflow-hidden mt-6">
-        {/* Filter Dropdown Button - Right Side */}
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-end">
-          <button
-            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
-          >
-            <Filter size={18} />
-            <span>Filters</span>
-            <ChevronDown
-              size={16}
-              className={`transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-        </div>
-
-        {/* Filters Dropdown Content */}
-        {isFiltersOpen && (
-          <div className="border-b border-gray-200 bg-gray-50">
-            <Filters
-              fields={filterFields}
-              onReset={handleFilterReset}
-              onSubmit={handleFilterSubmit}
-              columns={filterFields.length}
-            />
+    <PageTransition>
+      <div className="p-6">
+        <div className="flex justify-between max-w-auto rounded bg-white p-6">
+          <div>
+            <h1
+              className="text-2xl font-bold text-gray-900"
+              style={{ color: themeColors.text.primary }}
+            >
+              Eligibility Logs
+            </h1>
+            <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
+              View and manage eligibility check logs
+            </p>
           </div>
-        )}
+        </div>
 
-        {/* DataTable */}
-        <DataTable
-          columns={columns}
-          data={mockLogs}
-          loading={false}
-          totalItems={totalItems}
-          itemsPerPage={itemsPerPage}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-          clientSidePagination={false}
-          noDataMessage={
-            <div className="text-center py-8">
-              <p className="text-gray-500">No eligibility logs found</p>
+        <div className="bg-white shadow rounded-lg overflow-hidden mt-6">
+          {/* Filter Dropdown Button - Right Side */}
+          <div className="px-6 py-4 border-b border-gray-200 flex justify-end">
+            <button
+              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
+            >
+              <Filter size={18} />
+              <span>Filters</span>
+              <ChevronDown
+                size={16}
+                className={`transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+          </div>
+
+          {/* Filters Dropdown Content */}
+          {isFiltersOpen && (
+            <div className="border-b border-gray-200 bg-gray-50">
+              <Filters
+                fields={filterFields}
+                onReset={handleFilterReset}
+                onSubmit={handleFilterSubmit}
+                columns={filterFields.length}
+              />
             </div>
-          }
-        />
+          )}
+
+          {/* DataTable */}
+          <DataTable
+            columns={columns}
+            data={mockLogs}
+            loading={false}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+            clientSidePagination={false}
+            noDataMessage={
+              <div className="text-center py-8">
+                <p className="text-gray-500">No eligibility logs found</p>
+              </div>
+            }
+          />
+        </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }

@@ -20,14 +20,20 @@ export function proxy(request: NextRequest) {
 
   if (pathname === '/') {
     if (token) {
-      return NextResponse.redirect(new URL('/patient-dashboard', request.url))
+      return NextResponse.redirect(new URL('/quick-link-dashboard', request.url))
     } else {
       return NextResponse.redirect(new URL('/login', request.url))
     }
   }
 
   // Redirect authenticated users away from auth pages
-  if (token && (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/forgot-password') || pathname.startsWith('/reset-password'))) {
+  if (
+    token &&
+    (pathname.startsWith('/login') ||
+      pathname.startsWith('/register') ||
+      pathname.startsWith('/forgot-password') ||
+      pathname.startsWith('/reset-password'))
+  ) {
     return NextResponse.redirect(new URL('/patient-dashboard', request.url))
   }
 

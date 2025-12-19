@@ -11,8 +11,10 @@ import carrierSetupsReducer from './slices/settings/carrier-setups/reducer'
 import availityPayersReducer from './slices/settings/availity-payers/reducer'
 import eligibilitySettingsReducer from './slices/eligibility/settings/reducer'
 import eligibilityIndivitualReducer from './slices/eligibility/indivitual/reducer'
+import eligibilityHistoryReducer from './slices/eligibility/history/reducer'
 import storage from 'redux-persist/lib/storage'
 import { persistStore, persistReducer } from 'redux-persist'
+import patientDashboardReducer from './slices/patient-dashboard/reducer'
 
 const userPersistConfig = {
   key: 'user',
@@ -32,6 +34,8 @@ const rootReducer = combineReducers({
   availityPayers: availityPayersReducer,
   eligibilitySettings: eligibilitySettingsReducer,
   eligibilityIndivitual: eligibilityIndivitualReducer,
+  eligibilityHistory: eligibilityHistoryReducer,
+  patientDashboard: patientDashboardReducer,
 })
 
 export const store = configureStore({

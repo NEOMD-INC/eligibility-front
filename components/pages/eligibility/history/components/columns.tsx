@@ -1,0 +1,184 @@
+import Link from 'next/link'
+import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
+
+interface EligibilityHistoryColumnsProps {
+  onRetryClick?: (id: string) => void
+}
+
+export default function EligibilityHistoryColumns({
+  onRetryClick,
+}: EligibilityHistoryColumnsProps = {}) {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A'
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    } catch {
+      return dateString
+    }
+  }
+
+  const formatDateOnly = (dateString?: string) => {
+    if (!dateString) return 'N/A'
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })
+    } catch {
+      return dateString
+    }
+  }
+
+  const eligibilityHistoryColumns = [
+    {
+      key: 'neoRef',
+      label: 'Neo Ref',
+      width: '12%',
+      align: 'left' as const,
+      render: (value: any, record: any) => (
+        <Link href={`/eligibility/history/${record.id || record.uuid}`}>
+          <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
+            {record.neoRef || record.neo_ref || record.neoReferenceId || 'N/A'}
+          </div>
+        </Link>
+      ),
+    },
+    {
+      key: 'subscriber',
+      label: 'Subscriber',
+      width: '12%',
+      align: 'left' as const,
+      render: (value: any, record: any) => (
+        <div className="text-gray-900 truncate">
+          {record.subscriber || record.subscriberId || record.subscriber_id || 'N/A'}
+        </div>
+      ),
+    },
+    {
+      key: 'provider',
+      label: 'Provider',
+      width: '12%',
+      align: 'left' as const,
+      render: (value: any, record: any) => (
+        <div className="text-gray-900 truncate" title={record.provider || record.providerName || record.provider_name || ''}>
+          {record.provider || record.providerName || record.provider_name || 'N/A'}
+        </div>
+      ),
+    },
+    {
+      key: 'serviceDate',
+      label: 'Service Date',
+      width: '10%',
+      align: 'left' as const,
+      render: (value: any, record: any) => (
+        <div className="text-gray-900 truncate">
+          {formatDateOnly(record.serviceDate || record.service_date)}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      width: '10%',
+      align: 'left' as const,
+      render: (value: any, record: any) => {
+        const status = record.status || record.queueStatus || record.queue_status || 'N/A'
+        const statusColor =
+          status === 'success' || status === 'completed'
+            ? 'bg-green-100 text-green-800'
+            : status === 'failed' || status === 'error'
+              ? 'bg-red-100 text-red-800'
+              : status === 'pending'
+                ? 'bg-yellow-100 text-yellow-800'
+                : status === 'processing'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-gray-100 text-gray-800'
+        return (
+          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}>
+            {status}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'response',
+      label: 'Response',
+      width: '15%',
+      align: 'left' as const,
+      render: (value: any, record: any) => (
+        <div
+          className="text-gray-900 truncate"
+          title={record.response || record.responseMessage || record.response_message || ''}
+        >
+          {record.response || record.responseMessage || record.response_message || 'N/A'}
+        </div>
+      ),
+    },
+    {
+      key: 'responseReceivedAt',
+      label: 'Response Received At',
+      width: '12%',
+      align: 'left' as const,
+      render: (value: any, record: any) => (
+        <div className="text-gray-900 truncate">
+          {formatDate(record.responseReceivedAt || record.response_received_at || record.responseReceivedAt)}
+        </div>
+      ),
+    },
+    {
+      key: 'createdAt',
+      label: 'Created At',
+      width: '12%',
+      align: 'left' as const,
+      render: (value: any, record: any) => (
+        <div className="text-gray-900 truncate">
+          {formatDate(record.createdAt || record.created_at || record.created)}
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      width: '12%',
+      align: 'center' as const,
+      render: (value: any, record: any) => (
+        <div className="flex justify-center items-center w-full">
+          <GridActionButtons
+            data={record}
+            from="id"
+            editBtnPath={`/eligibility/history/edit/${record.id || record.uuid}`}
+            showBtnPath={`/eligibility/history/${record.id || record.uuid}`}
+            retryResourceId={
+              onRetryClick
+                ? (id: string) => {
+                    onRetryClick(id)
+                  }
+                : undefined
+            }
+            showIdDispatch={() => {}}
+            editIdDispatch={() => {}}
+            editDrawerId=""
+            showDrawerId=""
+            viewPermission={true}
+            updatePermission={true}
+            deletePermission={false}
+            retryPermission={true}
+            isUser={false}
+          />
+        </div>
+      ),
+    },
+  ]
+
+  return eligibilityHistoryColumns
+}
+

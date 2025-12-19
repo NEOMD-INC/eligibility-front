@@ -67,6 +67,13 @@ const Header = () => {
 
           <Link
             style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
+            href="/quick-link-dashboard"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
             href="/patient-dashboard"
           >
             Patient Dashboard
@@ -88,10 +95,16 @@ const Header = () => {
                 >
                   Indivitual
                 </Link>
-                <Link className="block px-3 py-2 hover:bg-gray-100 cursor-pointer" href="#">
+                <Link
+                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  href="/eligibility/bulk"
+                >
                   Bulk
                 </Link>
-                <Link className="block px-3 py-2 hover:bg-gray-100 cursor-pointer" href="#">
+                <Link
+                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  href="/eligibility/history"
+                >
                   History
                 </Link>
                 <Link

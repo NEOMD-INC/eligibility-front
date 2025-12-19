@@ -121,7 +121,6 @@ export default function ProfileInfoForm() {
           </div>
         </div>
 
-        {/* Submit button */}
         <div className="w-30 mt-6">
           <SubmitButton
             type="submit"

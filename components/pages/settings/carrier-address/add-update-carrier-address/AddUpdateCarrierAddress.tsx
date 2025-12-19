@@ -15,6 +15,7 @@ import {
 } from '@/redux/slices/settings/carrier-addresses/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { CarrierAddressFormValues } from '@/types'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function AddUpdateCarrierAddress() {
   const router = useRouter()
@@ -102,7 +103,8 @@ export default function AddUpdateCarrierAddress() {
         carrierCode: currentCarrierAddress.carrier_code || '',
         actualName: currentCarrierAddress.actual_name || '',
         addressId: currentCarrierAddress.address_id || '',
-        addressLine1: currentCarrierAddress.address_line1 || currentCarrierAddress.address_line_1 || '',
+        addressLine1:
+          currentCarrierAddress.address_line1 || currentCarrierAddress.address_line_1 || '',
         city: currentCarrierAddress.city || '',
         state: currentCarrierAddress.state || '',
         zipCode: currentCarrierAddress.zip_code || '',
@@ -154,52 +156,56 @@ export default function AddUpdateCarrierAddress() {
   }
 
   return (
-    <div className="flex flex-col justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-6">
-          {isEditMode ? 'Edit Carrier Address' : 'Add Carrier Address'}
-        </h1>
+    <PageTransition>
+      <div className="flex flex-col justify-center bg-gray-100 p-6">
+        <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
+          <h1 className="text-2xl font-bold mb-6">
+            {isEditMode ? 'Edit Carrier Address' : 'Add Carrier Address'}
+          </h1>
 
-        <form onSubmit={formik.handleSubmit}>
-          {errorMsg && (
-            <div
-              className={`mb-6 p-4 rounded-lg ${
-                isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-              }`}
-            >
-              <span>{errorMsg}</span>
+          <form onSubmit={formik.handleSubmit}>
+            {errorMsg && (
+              <div
+                className={`mb-6 p-4 rounded-lg ${
+                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                }`}
+              >
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {renderField('carrierCode', 'Carrier Code')}
+            {renderField('actualName', 'Actual Name')}
+            {renderField('addressId', 'Address ID')}
+            {renderField('addressLine1', 'Address 1')}
+            {renderField('city', 'City')}
+            {renderField('state', 'State')}
+            {renderField('zipCode', 'Zip Code')}
+            {renderField('phoneType', 'Phone Type')}
+            {renderField('phoneNumber', 'Phone Number')}
+            {renderField('insuranceDepartment', 'Insurance Department')}
+
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <SubmitButton
+                type="submit"
+                title={isEditMode ? 'Update Carrier Address' : 'Add Carrier Address'}
+                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                btnLoading={
+                  isEditMode ? updateLoading || fetchCarrierAddressLoading : createLoading
+                }
+                callback_event=""
+              />
             </div>
-          )}
-
-          {renderField('carrierCode', 'Carrier Code')}
-          {renderField('actualName', 'Actual Name')}
-          {renderField('addressId', 'Address ID')}
-          {renderField('addressLine1', 'Address 1')}
-          {renderField('city', 'City')}
-          {renderField('state', 'State')}
-          {renderField('zipCode', 'Zip Code')}
-          {renderField('phoneType', 'Phone Type')}
-          {renderField('phoneNumber', 'Phone Number')}
-          {renderField('insuranceDepartment', 'Insurance Department')}
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
-            >
-              Cancel
-            </button>
-            <SubmitButton
-              type="submit"
-              title={isEditMode ? 'Update Carrier Address' : 'Add Carrier Address'}
-              class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={isEditMode ? updateLoading || fetchCarrierAddressLoading : createLoading}
-              callback_event=""
-            />
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }

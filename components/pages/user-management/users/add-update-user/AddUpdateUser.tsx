@@ -15,6 +15,7 @@ import {
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { rolesService } from '@/services/user-management/roles/roles.service'
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 type UserFormValues = {
   fullName: string
@@ -250,119 +251,121 @@ export default function AddUpdateUser() {
   }
 
   return (
-    <div className="flex flex-col justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-6">{isEditMode ? 'Edit User' : 'Add User'}</h1>
+    <PageTransition>
+      <div className="flex flex-col justify-center bg-gray-100 p-6">
+        <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
+          <h1 className="text-2xl font-bold mb-6">{isEditMode ? 'Edit User' : 'Add User'}</h1>
 
-        <form onSubmit={formik.handleSubmit}>
-          {error && (
-            <div className="mb-6 p-4 rounded-lg bg-red-100 text-red-700">
-              <span>{error}</span>
-            </div>
-          )}
+          <form onSubmit={formik.handleSubmit}>
+            {error && (
+              <div className="mb-6 p-4 rounded-lg bg-red-100 text-red-700">
+                <span>{error}</span>
+              </div>
+            )}
 
-          {renderField('fullName', 'Full Name')}
-          {renderField('email', 'Email', 'email')}
+            {renderField('fullName', 'Full Name')}
+            {renderField('email', 'Email', 'email')}
 
-          {isEditMode ? (
-            <>
-              {renderField(
-                'newPassword',
-                'New Password',
-                'password',
-                'New Password (Optional)',
-                '(Leave blank to keep current password)'
-              )}
-              {renderField(
-                'confirmNewPassword',
-                'Confirm New Password',
-                'password',
-                'Confirm New Password',
-                '(Required if password is provided)'
-              )}
-            </>
-          ) : (
-            <>
-              {renderField('password', 'Password', 'password')}
-              {renderField('confirmPassword', 'Confirm Password', 'password')}
-            </>
-          )}
+            {isEditMode ? (
+              <>
+                {renderField(
+                  'newPassword',
+                  'New Password',
+                  'password',
+                  'New Password (Optional)',
+                  '(Leave blank to keep current password)'
+                )}
+                {renderField(
+                  'confirmNewPassword',
+                  'Confirm New Password',
+                  'password',
+                  'Confirm New Password',
+                  '(Required if password is provided)'
+                )}
+              </>
+            ) : (
+              <>
+                {renderField('password', 'Password', 'password')}
+                {renderField('confirmPassword', 'Confirm Password', 'password')}
+              </>
+            )}
 
-          {isEditMode ? (
-            <div className="mb-6 pt-4 border-t border-gray-200">
-              <label className="block text-sm font-semibold text-gray-800 mb-3">
-                Current Roles
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {currentRoles.length > 0 ? (
-                  currentRoles.map((role, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
-                    >
-                      {role}
-                    </span>
-                  ))
+            {isEditMode ? (
+              <div className="mb-6 pt-4 border-t border-gray-200">
+                <label className="block text-sm font-semibold text-gray-800 mb-3">
+                  Current Roles
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {currentRoles.length > 0 ? (
+                    currentRoles.map((role, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+                      >
+                        {role}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-gray-500 text-sm">No roles assigned</span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-800 mb-3">Role</label>
+                {rolesLoading ? (
+                  <ComponentLoader message="Loading roles..." size="sm" variant="inline" />
+                ) : availableRoles.length === 0 ? (
+                  <div className="text-red-500 text-sm">No roles available</div>
                 ) : (
-                  <span className="text-gray-500 text-sm">No roles assigned</span>
+                  <div className="space-y-2">
+                    {availableRoles.map(role => (
+                      <div key={role.id} className="flex items-center">
+                        <input
+                          type="radio"
+                          id={`role-${role.id}`}
+                          name="role"
+                          value={role.id}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          checked={String(formik.values.role) === String(role.id)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                        />
+                        <label
+                          htmlFor={`role-${role.id}`}
+                          className="ml-2 text-sm font-medium text-gray-700 capitalize cursor-pointer"
+                        >
+                          {role.name || role.title || `Role ${role.id}`}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {formik.touched.role && formik.errors.role && (
+                  <p className="text-red-600 text-sm mt-1">{formik.errors.role}</p>
                 )}
               </div>
-            </div>
-          ) : (
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-800 mb-3">Role</label>
-              {rolesLoading ? (
-                <ComponentLoader message="Loading roles..." size="sm" variant="inline" />
-              ) : availableRoles.length === 0 ? (
-                <div className="text-red-500 text-sm">No roles available</div>
-              ) : (
-                <div className="space-y-2">
-                  {availableRoles.map(role => (
-                    <div key={role.id} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`role-${role.id}`}
-                        name="role"
-                        value={role.id}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        checked={String(formik.values.role) === String(role.id)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                      />
-                      <label
-                        htmlFor={`role-${role.id}`}
-                        className="ml-2 text-sm font-medium text-gray-700 capitalize cursor-pointer"
-                      >
-                        {role.name || role.title || `Role ${role.id}`}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {formik.touched.role && formik.errors.role && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.role}</p>
-              )}
-            </div>
-          )}
+            )}
 
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
-            >
-              Cancel
-            </button>
-            <SubmitButton
-              type="submit"
-              title={isEditMode ? 'Update User' : 'Add User'}
-              class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              btnLoading={isEditMode ? updateLoading : createLoading}
-              callback_event=""
-            />
-          </div>
-        </form>
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <SubmitButton
+                type="submit"
+                title={isEditMode ? 'Update User' : 'Add User'}
+                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                btnLoading={isEditMode ? updateLoading : createLoading}
+                callback_event=""
+              />
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }
