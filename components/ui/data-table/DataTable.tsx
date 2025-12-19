@@ -79,6 +79,39 @@ const DataTable: React.FC<DataTableProps> = ({
   }
 
   const DefaultTableRow = ({ row, index }: { row: any; index: number }) => {
+    const renderCellValue = (value: any): React.ReactNode => {
+      if (value === null || value === undefined) return 'N/A'
+      
+      // Handle arrays
+      if (Array.isArray(value)) {
+        if (value.length === 0) return 'N/A'
+        // If array contains objects, try to extract meaningful values
+        return value.map((item, idx) => {
+          if (typeof item === 'object' && item !== null) {
+            return item.name || item.id || item.member_id || JSON.stringify(item)
+          }
+          return String(item)
+        }).join(', ')
+      }
+      
+      // Handle objects
+      if (typeof value === 'object') {
+        // Try to find a meaningful string representation
+        if (value.member_id) return value.member_id
+        if (value.name) {
+          // If there's also an npi, show both
+          if (value.npi) return `${value.name} (${value.npi})`
+          return value.name
+        }
+        if (value.npi) return value.npi
+        if (value.id) return value.id
+        // Otherwise, return a safe string representation
+        return '[Object]'
+      }
+      
+      return String(value)
+    }
+
     return (
       <tr className="hover:bg-gray-50 transition-colors">
         {columns.map(column => (
@@ -87,7 +120,7 @@ const DataTable: React.FC<DataTableProps> = ({
             className={`px-4 py-3 text-sm ${getAlignmentClass(column.align)}`}
             style={column.width ? { width: column.width } : {}}
           >
-            {column.render ? column.render(row[column.key], row) : row[column.key]}
+            {column.render ? column.render(row[column.key], row) : renderCellValue(row[column.key])}
           </td>
         ))}
       </tr>

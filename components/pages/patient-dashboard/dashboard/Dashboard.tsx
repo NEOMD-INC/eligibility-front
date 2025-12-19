@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchPatientDashboard } from '@/redux/slices/patient-dashboard/actions'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { TabTransition } from '@/components/providers/tab-transition-provider/TabTransitionProvider'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>()
@@ -32,7 +33,6 @@ export default function Dashboard() {
 
   const tabs = ['Coverage and Benefits', 'Copay', 'Deductible', 'Coinsurance', 'Out of Pocket']
 
-  // Helper function to format address (handles both string and object formats)
   const formatAddress = (address: any, city?: string, state?: string, zip?: string) => {
     if (!address) {
       return city && state && zip ? `${city}, ${state} ${zip}` : ''
@@ -42,7 +42,6 @@ export default function Dashboard() {
       return city && state && zip ? `${address}, ${city}, ${state} ${zip}` : address
     }
 
-    // Handle object format {line1, line2, city, state, zip}
     const line1 = address.line1 || ''
     const line2 = address.line2 || ''
     const addrCity = address.city || city || ''
@@ -55,7 +54,9 @@ export default function Dashboard() {
     return [addressParts, locationParts].filter(Boolean).join(', ')
   }
 
-  console.log('patientData:', payer)
+  if (loading) {
+    return <ComponentLoader component="Patient Dashboard" />
+  }
 
   return (
     <PageTransition>

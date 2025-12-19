@@ -57,22 +57,45 @@ export default function EligibilityHistoryColumns({
       label: 'Subscriber',
       width: '12%',
       align: 'left' as const,
-      render: (value: any, record: any) => (
-        <div className="text-gray-900 truncate">
-          {record.subscriber || record.subscriberId || record.subscriber_id || 'N/A'}
-        </div>
-      ),
+      render: (value: any, record: any) => {
+        // Handle if subscriber is an object
+        if (record.subscriber && typeof record.subscriber === 'object') {
+          return (
+            <div className="text-gray-900 truncate">
+              {record.subscriber.member_id || record.subscriber.name || record.subscriberId || record.subscriber_id || 'N/A'}
+            </div>
+          )
+        }
+        return (
+          <div className="text-gray-900 truncate">
+            {record.subscriber || record.subscriberId || record.subscriber_id || 'N/A'}
+          </div>
+        )
+      },
     },
     {
       key: 'provider',
       label: 'Provider',
       width: '12%',
       align: 'left' as const,
-      render: (value: any, record: any) => (
-        <div className="text-gray-900 truncate" title={record.provider || record.providerName || record.provider_name || ''}>
-          {record.provider || record.providerName || record.provider_name || 'N/A'}
-        </div>
-      ),
+      render: (value: any, record: any) => {
+        // Handle if provider is an object
+        if (record.provider && typeof record.provider === 'object') {
+          const providerName = record.provider.name || record.provider.provider_name || ''
+          const providerNpi = record.provider.npi || ''
+          const displayText = providerName ? (providerNpi ? `${providerName} (${providerNpi})` : providerName) : providerNpi || 'N/A'
+          return (
+            <div className="text-gray-900 truncate" title={displayText}>
+              {displayText}
+            </div>
+          )
+        }
+        return (
+          <div className="text-gray-900 truncate" title={record.provider || record.providerName || record.provider_name || ''}>
+            {record.provider || record.providerName || record.provider_name || 'N/A'}
+          </div>
+        )
+      },
     },
     {
       key: 'serviceDate',

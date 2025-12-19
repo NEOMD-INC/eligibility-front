@@ -21,23 +21,23 @@ export const fetchPatientDashboard = createAsyncThunk(
 )
 
 const PatientDashboardSlice = createSlice({
-  name: 'users',
+  name: 'patientDashboard',
   initialState,
   reducers: {},
   extraReducers: builder => {
     // Fetch user by ID
     builder
       .addCase(fetchPatientDashboard.pending, state => {
-        state.fetchUserLoading = true
+        state.loading = true
         state.error = null
       })
       .addCase(fetchPatientDashboard.fulfilled, (state, action) => {
-        state.fetchUserLoading = false
+        state.loading = false
         state.patientData = action.payload?.data || action.payload || null
         state.error = null
       })
       .addCase(fetchPatientDashboard.rejected, (state, action) => {
-        state.fetchUserLoading = false
+        state.loading = false
         state.error = action.payload as string
       })
   },
