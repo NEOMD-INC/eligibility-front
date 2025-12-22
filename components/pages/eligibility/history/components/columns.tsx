@@ -47,7 +47,7 @@ export default function EligibilityHistoryColumns({
       render: (value: any, record: any) => (
         <Link href={`/eligibility/history/${record.id || record.uuid}`}>
           <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
-            {record.neoRef || record.neo_ref || record.neoReferenceId || 'N/A'}
+            {record.neo_reference_id || 'N/A'}
           </div>
         </Link>
       ),
@@ -62,7 +62,11 @@ export default function EligibilityHistoryColumns({
         if (record.subscriber && typeof record.subscriber === 'object') {
           return (
             <div className="text-gray-900 truncate">
-              {record.subscriber.member_id || record.subscriber.name || record.subscriberId || record.subscriber_id || 'N/A'}
+              {record.subscriber.member_id ||
+                record.subscriber.name ||
+                record.subscriberId ||
+                record.subscriber_id ||
+                'N/A'}
             </div>
           )
         }
@@ -83,7 +87,11 @@ export default function EligibilityHistoryColumns({
         if (record.provider && typeof record.provider === 'object') {
           const providerName = record.provider.name || record.provider.provider_name || ''
           const providerNpi = record.provider.npi || ''
-          const displayText = providerName ? (providerNpi ? `${providerName} (${providerNpi})` : providerName) : providerNpi || 'N/A'
+          const displayText = providerName
+            ? providerNpi
+              ? `${providerName} (${providerNpi})`
+              : providerName
+            : providerNpi || 'N/A'
           return (
             <div className="text-gray-900 truncate" title={displayText}>
               {displayText}
@@ -91,7 +99,10 @@ export default function EligibilityHistoryColumns({
           )
         }
         return (
-          <div className="text-gray-900 truncate" title={record.provider || record.providerName || record.provider_name || ''}>
+          <div
+            className="text-gray-900 truncate"
+            title={record.provider || record.providerName || record.provider_name || ''}
+          >
             {record.provider || record.providerName || record.provider_name || 'N/A'}
           </div>
         )
@@ -137,14 +148,15 @@ export default function EligibilityHistoryColumns({
       label: 'Response',
       width: '15%',
       align: 'left' as const,
-      render: (value: any, record: any) => (
-        <div
-          className="text-gray-900 truncate"
-          title={record.response || record.responseMessage || record.response_message || ''}
-        >
-          {record.response || record.responseMessage || record.response_message || 'N/A'}
-        </div>
-      ),
+      render: (value: any, record: any) => {
+        const resp = record.has_response
+        const respColor = resp === true ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        return (
+          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${respColor}`}>
+            {resp === true ? 'Success' : 'Failed'}
+          </span>
+        )
+      },
     },
     {
       key: 'responseReceivedAt',
@@ -153,7 +165,9 @@ export default function EligibilityHistoryColumns({
       align: 'left' as const,
       render: (value: any, record: any) => (
         <div className="text-gray-900 truncate">
-          {formatDate(record.responseReceivedAt || record.response_received_at || record.responseReceivedAt)}
+          {formatDate(
+            record.responseReceivedAt || record.response_received_at || record.responseReceivedAt
+          )}
         </div>
       ),
     },
@@ -173,35 +187,44 @@ export default function EligibilityHistoryColumns({
       label: 'Actions',
       width: '12%',
       align: 'center' as const,
-      render: (value: any, record: any) => (
-        <div className="flex justify-center items-center w-full">
-          <GridActionButtons
-            data={record}
-            from="id"
-            editBtnPath={`/eligibility/history/edit/${record.id || record.uuid}`}
-            showBtnPath={`/eligibility/history/${record.id || record.uuid}`}
-            retryResourceId={
-              onRetryClick
-                ? (id: string) => {
-                    onRetryClick(id)
-                  }
-                : undefined
-            }
-            showIdDispatch={() => {}}
-            editIdDispatch={() => {}}
-            editDrawerId=""
-            showDrawerId=""
-            viewPermission={true}
-            updatePermission={true}
-            deletePermission={false}
-            retryPermission={true}
-            isUser={false}
-          />
-        </div>
-      ),
+      render: (value: any, record: any) => {
+        console.log(record, 'the record is here')
+        const historyId = record.eligibility_id
+        return (
+          <div className="flex justify-center items-center w-full">
+            <GridActionButtons
+              data={record}
+              from="id"
+              editBtnPath={historyId ? `/eligibility/indivitual?logId=${historyId}` : '#'}
+              showBtnPath={`/patient-dashboard`}
+              retryResourceId={
+                onRetryClick
+                  ? (id: string) => {
+                      onRetryClick(id)
+                    }
+                  : undefined
+              }
+              showIdDispatch={() => {}}
+              editIdDispatch={() => {}}
+              editDrawerId=""
+              showDrawerId=""
+              viewPermission={
+                record.status === 'rejected' ? false : record.status === 'pending' ? false : true
+              }
+              updatePermission={
+                record.status === 'completed' ? false : record.status === 'pending' ? false : true
+              }
+              deletePermission={false}
+              retryPermission={
+                record.status === 'completed' ? false : record.status === 'pending' ? false : true
+              }
+              isUser={false}
+            />
+          </div>
+        )
+      },
     },
   ]
 
   return eligibilityHistoryColumns
 }
-

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { EligibilityHistoryService } from '@/services/eligibility/history/history.service'
+import { LogsService } from '@/services/logs/logs.service'
 
-interface EligibilityHistoryItem {
+interface EligibilityLogItem {
   id?: string
   uuid?: string
   neoRef?: string
@@ -26,86 +26,91 @@ interface EligibilityHistoryItem {
   createdAt?: string
   created_at?: string
   created?: string
+  name?: string
 }
 
-interface EligibilityHistoryFilters {
-  serviceType?: string
-  relationshipCode?: string
-  subscriberId?: string
-  dateFrom?: string
-  dateTo?: string
+interface EligibilityLogsFilters {
+  name?: string
+  subscriber_id?: string
+  status?: string
+  queue_status?: string
+  service_date_from?: string
+  service_date_to?: string
 }
 
-interface EligibilityHistoryState {
-  history: EligibilityHistoryItem[]
+interface EligibilityLogsState {
+  logs: EligibilityLogItem[]
+  currentLog: EligibilityLogItem | null
   loading: boolean
+  fetchLogLoading: boolean
   error: string | null
   totalItems: number
   currentPage: number
   itemsPerPage: number
-  filters: EligibilityHistoryFilters
+  filters: EligibilityLogsFilters
 }
 
-const initialState: EligibilityHistoryState = {
-  history: [],
+const initialState: EligibilityLogsState = {
+  logs: [],
+  currentLog: null,
   loading: false,
+  fetchLogLoading: false,
   error: null,
   totalItems: 0,
   currentPage: 1,
   itemsPerPage: 8,
   filters: {
-    serviceType: '',
-    relationshipCode: '',
-    subscriberId: '',
-    dateFrom: '',
-    dateTo: '',
+    name: '',
+    subscriber_id: '',
+    status: '',
+    queue_status: '',
+    service_date_from: '',
+    service_date_to: '',
   },
 }
 
-// Async thunk to fetch eligibility history
-export const fetchEligibilityHistory = createAsyncThunk(
-  'eligibilityHistory/fetchEligibilityHistory',
+// Async thunk to fetch all logs with pagination
+export const fetchAllLogs = createAsyncThunk(
+  'eligibilityLogs/fetchAllLogs',
   async (
-    params: { page: number; filters?: EligibilityHistoryFilters },
+    params: { page: number; filters?: EligibilityLogsFilters },
     { rejectWithValue }
   ) => {
     try {
-      const apiFilters: any = {
-        page: params.page,
-      }
-
-      if (params.filters?.serviceType) {
-        apiFilters.service_type = params.filters.serviceType
-      }
-      if (params.filters?.relationshipCode) {
-        apiFilters.relationship_code = params.filters.relationshipCode
-      }
-      if (params.filters?.subscriberId) {
-        apiFilters.subscriber_id = params.filters.subscriberId
-      }
-      if (params.filters?.dateFrom) {
-        apiFilters.date_from = params.filters.dateFrom
-      }
-      if (params.filters?.dateTo) {
-        apiFilters.date_to = params.filters.dateTo
-      }
-
-      const response = await EligibilityHistoryService.getEligibilityHistory(apiFilters)
+      const response = await LogsService.getAllLogs(params.page, params.filters)
       return response.data
     } catch (error: any) {
       return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch eligibility history'
+        error?.response?.data?.message || 'Failed to fetch eligibility logs'
       )
     }
   }
 )
 
-const eligibilityHistorySlice = createSlice({
-  name: 'eligibilityHistory',
+// Async thunk to fetch log by ID
+export const fetchLogById = createAsyncThunk(
+  'eligibilityLogs/fetchLogById',
+  async (logId: string, { rejectWithValue }) => {
+    try {
+      const response = await LogsService.getLogById(logId)
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(
+        error?.response?.data?.message || 'Failed to fetch eligibility log details'
+      )
+    }
+  }
+)
+
+const eligibilityLogsSlice = createSlice({
+  name: 'eligibilityLogs',
   initialState,
   reducers: {
-    clearEligibilityHistoryError: state => {
+    clearEligibilityLogsError: state => {
       state.error = null
+    },
+    clearCurrentLog: state => {
+      state.currentLog = null
     },
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload
@@ -115,22 +120,23 @@ const eligibilityHistorySlice = createSlice({
     },
     clearFilters: state => {
       state.filters = {
-        serviceType: '',
-        relationshipCode: '',
-        subscriberId: '',
-        dateFrom: '',
-        dateTo: '',
+        name: '',
+        subscriber_id: '',
+        status: '',
+        queue_status: '',
+        service_date_from: '',
+        service_date_to: '',
       }
     },
   },
   extraReducers: builder => {
-    // Fetch eligibility history
+    // Fetch all logs
     builder
-      .addCase(fetchEligibilityHistory.pending, state => {
+      .addCase(fetchAllLogs.pending, state => {
         state.loading = true
         state.error = null
       })
-      .addCase(fetchEligibilityHistory.fulfilled, (state, action) => {
+      .addCase(fetchAllLogs.fulfilled, (state, action) => {
         state.loading = false
         // Handle different response structures
         const payload = action.payload
@@ -139,7 +145,7 @@ const eligibilityHistorySlice = createSlice({
         // Check for nested data structure: { data: { data: [...] }, meta: { pagination: {...} } }
         if (payload?.data?.data && Array.isArray(payload.data.data)) {
           dataArray = payload.data.data
-          state.history = payload.data.data
+          state.logs = payload.data.data
 
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
@@ -164,7 +170,7 @@ const eligibilityHistorySlice = createSlice({
           }
         } else if (payload?.data && Array.isArray(payload.data)) {
           dataArray = payload.data
-          state.history = payload.data
+          state.logs = payload.data
 
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
@@ -188,26 +194,45 @@ const eligibilityHistorySlice = createSlice({
             }
           }
         } else if (Array.isArray(payload)) {
-          state.history = payload
+          state.logs = payload
           state.totalItems = payload.length
         } else {
-          state.history = []
+          state.logs = []
           state.totalItems = 0
         }
         state.error = null
       })
-      .addCase(fetchEligibilityHistory.rejected, (state, action) => {
+      .addCase(fetchAllLogs.rejected, (state, action) => {
         state.loading = false
+        state.error = action.payload as string
+      })
+
+    // Fetch log by ID
+    builder
+      .addCase(fetchLogById.pending, state => {
+        state.fetchLogLoading = true
+        state.error = null
+      })
+      .addCase(fetchLogById.fulfilled, (state, action) => {
+        state.fetchLogLoading = false
+        // Handle different response structures
+        const payload = action.payload
+        state.currentLog = payload?.data || payload || null
+        state.error = null
+      })
+      .addCase(fetchLogById.rejected, (state, action) => {
+        state.fetchLogLoading = false
         state.error = action.payload as string
       })
   },
 })
 
 export const {
-  clearEligibilityHistoryError,
+  clearEligibilityLogsError,
+  clearCurrentLog,
   setCurrentPage,
   setFilters,
   clearFilters,
-} = eligibilityHistorySlice.actions
-export default eligibilityHistorySlice.reducer
+} = eligibilityLogsSlice.actions
+export default eligibilityLogsSlice.reducer
 

@@ -28,7 +28,7 @@ export default function RolesDetail() {
   const { currentRole, fetchRoleLoading, error } = useSelector((state: RootState) => state.roles)
 
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
+  const itemsPerPage = 8
 
   // Fetch role data on component mount
   useEffect(() => {

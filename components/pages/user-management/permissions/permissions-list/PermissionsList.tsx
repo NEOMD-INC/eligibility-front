@@ -24,7 +24,7 @@ export default function PermissionsList() {
   )
   const [searchText, setSearchText] = useState('')
   const [appliedSearch, setAppliedSearch] = useState('')
-  const itemsPerPage = 10
+  const itemsPerPage = 8
 
   // Fetch permissions on component mount and when applied filters/page change
   useEffect(() => {

@@ -92,24 +92,28 @@ const Header = () => {
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/eligibility/indivitual"
+                  onClick={() => setEligibilityOpen(!eligibilityOpen)}
                 >
                   Indivitual
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/eligibility/bulk"
+                  onClick={() => setEligibilityOpen(!eligibilityOpen)}
                 >
                   Bulk
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/eligibility/history"
+                  onClick={() => setEligibilityOpen(!eligibilityOpen)}
                 >
                   History
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/eligibility/settings"
+                  onClick={() => setEligibilityOpen(!eligibilityOpen)}
                 >
                   Settings
                 </Link>
@@ -130,24 +134,28 @@ const Header = () => {
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/settings/carrier-group"
+                  onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Groups
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/settings/carrier-address"
+                  onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Addresses
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/settings/carrier-setup"
+                  onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Setup
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/settings/availity-payer"
+                  onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Availity Payer
                 </Link>
@@ -172,18 +180,21 @@ const Header = () => {
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/user-management/users"
+                  onClick={() => setUserMgmtOpen(!userMgmtOpen)}
                 >
                   Users
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/user-management/roles"
+                  onClick={() => setUserMgmtOpen(!userMgmtOpen)}
                 >
                   Roles
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/user-management/permissions"
+                  onClick={() => setUserMgmtOpen(!userMgmtOpen)}
                 >
                   Permissions
                 </Link>
@@ -199,7 +210,11 @@ const Header = () => {
             </div>
           </div>
 
-          {isProductOpen && <MenuItems />}
+          {isProductOpen && (
+            <div onClick={() => setIsProductOpen(!isProductOpen)}>
+              <MenuItems />
+            </div>
+          )}
         </div>
       </nav>
     </header>

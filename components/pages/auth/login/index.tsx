@@ -54,7 +54,7 @@ export default function LoginPage() {
         const { access_token } = res.data.data.token
         const { user } = res.data.data
 
-        setCookie('access_token', access_token, 60 * 15)
+        setCookie('access_token', access_token, 60 * 60 * 4)
         dispatch(setUser(user))
 
         router.push(redirect)

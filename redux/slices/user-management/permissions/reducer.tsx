@@ -33,7 +33,7 @@ const initialState: PermissionsState = {
   error: null,
   totalItems: 0,
   currentPage: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 8,
   createLoading: false,
   updateLoading: false,
   deleteLoading: false,

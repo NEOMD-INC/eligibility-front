@@ -26,7 +26,7 @@ export default function UsersList() {
   const [roleFilter, setRoleFilter] = useState('allrole')
   const [appliedSearch, setAppliedSearch] = useState('')
   const [appliedRole, setAppliedRole] = useState('allrole')
-  const itemsPerPage = 10
+  const itemsPerPage = 8
 
   useEffect(() => {
     const filters: { search?: string; role?: string } = {}

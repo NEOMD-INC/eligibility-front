@@ -1,11 +1,8 @@
 'use client'
-
+import { AnimatePresence, motion } from 'motion/react'
 import { useRouter } from 'next/navigation'
 import {
   Building2,
-  FileCheck,
-  Settings,
-  Users,
   MapPin,
   Wrench,
   CreditCard,
@@ -15,6 +12,7 @@ import {
   Cog,
 } from 'lucide-react'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { TitleTransitionButton } from '@/components/providers/title-transition-provider/TittleTransitionProvider'
 
 interface QuickLinkItem {
   name: string
@@ -116,7 +114,7 @@ export default function QuickLinkDashboard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {category.items.map((item, itemIndex) => (
-                      <button
+                      <TitleTransitionButton
                         key={itemIndex}
                         onClick={() => handleNavigation(item.path)}
                         className="cursor-pointer group relative p-6 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all duration-200 text-left"
@@ -147,9 +145,10 @@ export default function QuickLinkDashboard() {
                             />
                           </svg>
                         </div>
-                      </button>
+                      </TitleTransitionButton>
                     ))}
                   </div>
+
                   {categoryIndex < categories.length - 1 && (
                     <div className="mt-8 border-b border-gray-200"></div>
                   )}

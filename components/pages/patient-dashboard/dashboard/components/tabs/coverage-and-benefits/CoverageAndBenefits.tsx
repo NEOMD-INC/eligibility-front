@@ -8,13 +8,14 @@ function CoverageAndBenefits({ benefits }: { benefits: any }) {
   const [networkType, setNetworkType] = useState<'In Network' | 'Out of Network'>('In Network')
 
   const inNetworkBenefits = useMemo(() => {
+    const inNetwork = benefits?.in_network || []
     const inNetworkOnly = benefits?.in_network_only || []
     const bothNetworks = benefits?.both_networks || []
-    const merged = [...inNetworkOnly, ...bothNetworks]
+    const merged = [...inNetwork, ...inNetworkOnly, ...bothNetworks]
 
     const uniqueMap = new Map()
     merged.forEach(benefit => {
-      const key = `${benefit.service_type_code}_${benefit.coverage_level_code}`
+      const key = `${benefit.benefit_type}_${benefit.service_type_code}_${benefit.coverage_level_code}`
       if (!uniqueMap.has(key)) {
         uniqueMap.set(key, benefit)
       }
@@ -24,13 +25,14 @@ function CoverageAndBenefits({ benefits }: { benefits: any }) {
   }, [benefits])
 
   const outOfNetworkBenefits = useMemo(() => {
+    const outOfNetwork = benefits?.out_of_network || []
     const outOfNetworkOnly = benefits?.out_of_network_only || []
     const bothNetworks = benefits?.both_networks || []
-    const merged = [...outOfNetworkOnly, ...bothNetworks]
+    const merged = [...outOfNetwork, ...outOfNetworkOnly, ...bothNetworks]
 
     const uniqueMap = new Map()
     merged.forEach(benefit => {
-      const key = `${benefit.service_type_code}_${benefit.coverage_level_code}`
+      const key = `${benefit.benefit_type}_${benefit.service_type_code}_${benefit.coverage_level_code}`
       if (!uniqueMap.has(key)) {
         uniqueMap.set(key, benefit)
       }
@@ -43,29 +45,50 @@ function CoverageAndBenefits({ benefits }: { benefits: any }) {
 
   const [selectedCoverage, setSelectedCoverage] = useState('')
 
-  // Set initial selected coverage when benefits are first loaded
+  const getBenefitKey = (benefit: any) => {
+    return `${benefit.benefit_type}_${benefit.service_type_code}_${benefit.coverage_level_code}`
+  }
+
   useEffect(() => {
     if (currentBenefits.length > 0 && !selectedCoverage) {
-      setSelectedCoverage(currentBenefits[0]?.benefit_type || '')
+      const firstBenefit = currentBenefits[0]
+      setSelectedCoverage(getBenefitKey(firstBenefit))
     }
   }, [currentBenefits, selectedCoverage])
 
-  // Update selected coverage when network type changes
   useEffect(() => {
     if (currentBenefits.length > 0) {
       const currentSelected = currentBenefits.find(
-        (b: any) => b.benefit_type === selectedCoverage
+        (b: any) => getBenefitKey(b) === selectedCoverage
       )
       if (!currentSelected) {
-        setSelectedCoverage(currentBenefits[0]?.benefit_type || '')
+        const firstBenefit = currentBenefits[0]
+        setSelectedCoverage(getBenefitKey(firstBenefit))
       }
     }
   }, [networkType, currentBenefits, selectedCoverage])
 
-  // Find the selected benefit based on benefit_type and network type
   const selectedBenefit = useMemo(() => {
+    if (!selectedCoverage) return undefined
+
+    if (selectedCoverage.includes('_')) {
+      const parts = selectedCoverage.split('_')
+      const benefitType = parts[0]
+      const serviceTypeCode = parts[1]
+      const coverageLevelCode = parts[2]
+
+      return currentBenefits.find(
+        (benefit: any) =>
+          benefit.benefit_type === benefitType &&
+          benefit.service_type_code === serviceTypeCode &&
+          benefit.coverage_level_code === coverageLevelCode
+      )
+    }
+
     return currentBenefits.find((benefit: any) => benefit.benefit_type === selectedCoverage)
   }, [selectedCoverage, currentBenefits])
+
+  console.log('Selected Benefits here:', selectedBenefit)
 
   return (
     <main className="flex min-h-screen">

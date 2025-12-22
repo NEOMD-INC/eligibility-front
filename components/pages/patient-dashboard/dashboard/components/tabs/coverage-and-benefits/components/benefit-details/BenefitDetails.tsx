@@ -18,22 +18,28 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
     return `$${parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
+  // Format copays object - show only price values
   const copayValue = useMemo(() => {
-    if (!benefit) return 'N/A'
-    return benefit.copay ? formatCurrency(benefit.copay) : 'N/A'
+    if (!benefit || !benefit.copays) return 'N/A'
+    if (typeof benefit.copays === 'object') {
+      const copayValues = Object.values(benefit.copays)
+        .filter(value => value !== null && value !== undefined && value !== 0)
+        .map(value => typeof value === 'number' ? formatCurrency(String(value)) : value)
+      return copayValues.length > 0 ? copayValues.join(', ') : 'N/A'
+    }
+    return formatCurrency(String(benefit.copays))
   }, [benefit])
 
   const coinsuranceValue = useMemo(() => {
     if (!benefit) return 'N/A'
-    return benefit.coinsurance
-      ? typeof benefit.coinsurance === 'string' && benefit.coinsurance.includes('%')
-        ? benefit.coinsurance
-        : `${benefit.coinsurance}%`
-      : 'N/A'
+    if (benefit.coinsurance === null || benefit.coinsurance === undefined) return 'N/A'
+    return typeof benefit.coinsurance === 'string' && benefit.coinsurance.includes('%')
+      ? benefit.coinsurance
+      : `${benefit.coinsurance}%`
   }, [benefit])
 
   const deductibleData = useMemo(() => {
-    if (!benefit) {
+    if (!benefit || !benefit.deductible) {
       return {
         value: 'N/A',
         used: 0,
@@ -42,29 +48,21 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
         additionalInfo: undefined,
       }
     }
-    return benefit.deductible
-      ? {
-          value: formatCurrency(benefit.deductible.amount),
-          used: parseFloat(benefit.deductible.met || '0'),
-          total: parseFloat(benefit.deductible.amount || '0'),
-          footer: benefit.deductible.reset_date
-            ? `Resets on ${benefit.deductible.reset_date}`
-            : undefined,
-          additionalInfo: {
-            notes: `Remaining: ${formatCurrency(benefit.deductible.remaining)}`,
-          },
-        }
-      : {
-          value: 'N/A',
-          used: 0,
-          total: 0,
-          footer: undefined,
-          additionalInfo: undefined,
-        }
+    return {
+      value: formatCurrency(String(benefit.deductible.remaining || '0')),
+      used: parseFloat(benefit.deductible.met || '0'),
+      total: parseFloat(benefit.deductible.total || '0'),
+      footer: benefit.deductible.reset_date
+        ? `Resets on ${benefit.deductible.reset_date}`
+        : undefined,
+      additionalInfo: {
+        notes: `Remaining: ${formatCurrency(String(benefit.deductible.remaining || '0'))}`,
+      },
+    }
   }, [benefit])
 
   const outOfPocketData = useMemo(() => {
-    if (!benefit) {
+    if (!benefit || !benefit.out_of_pocket) {
       return {
         value: 'N/A',
         used: 0,
@@ -73,25 +71,17 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
         additionalInfo: undefined,
       }
     }
-    return benefit.out_of_pocket
-      ? {
-          value: formatCurrency(benefit.out_of_pocket.amount),
-          used: parseFloat(benefit.out_of_pocket.met || '0'),
-          total: parseFloat(benefit.out_of_pocket.amount || '0'),
-          footer: benefit.out_of_pocket.reset_date
-            ? `Resets on ${benefit.out_of_pocket.reset_date}`
-            : undefined,
-          additionalInfo: {
-            notes: `Remaining: ${formatCurrency(benefit.out_of_pocket.remaining)}`,
-          },
-        }
-      : {
-          value: 'N/A',
-          used: 0,
-          total: 0,
-          footer: undefined,
-          additionalInfo: undefined,
-        }
+    return {
+      value: formatCurrency(String(benefit.out_of_pocket.remaining || '0')),
+      used: parseFloat(benefit.out_of_pocket.met || '0'),
+      total: parseFloat(benefit.out_of_pocket.total || '0'),
+      footer: benefit.out_of_pocket.reset_date
+        ? `Resets on ${benefit.out_of_pocket.reset_date}`
+        : undefined,
+      additionalInfo: {
+        notes: `Remaining: ${formatCurrency(String(benefit.out_of_pocket.remaining || '0'))}`,
+      },
+    }
   }, [benefit])
 
   const limitationsData = useMemo(() => {
@@ -160,49 +150,57 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
 
       {/* First Row: Copay, Deductible, Co-Insurance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Copay Card */}
-        <InfoCard
-          key={`copay-${benefit.service_type_code}-${benefit.coverage_level_code}`}
-          title="Copay"
-          value={copayValue}
-          subtitle={benefit.coverage_level}
-        />
+        {/* Copay Card - Only show if copays is not null */}
+        {benefit.copays !== null && benefit.copays !== undefined && (
+          <InfoCard
+            key={`copay-${benefit.service_type_code}-${benefit.coverage_level_code}`}
+            title="Copay"
+            value={copayValue}
+            subtitle={benefit.coverage_level}
+          />
+        )}
 
-        {/* Deductible Card */}
-        <ProgressCard
-          key={`deductible-${benefit.service_type_code}-${benefit.coverage_level_code}`}
-          title="Deductible"
-          value={deductibleData.value}
-          used={deductibleData.used}
-          total={deductibleData.total}
-          footer={deductibleData.footer}
-          additionalInfo={deductibleData.additionalInfo}
-        />
+        {/* Deductible Card - Only show if deductible is not null */}
+        {benefit.deductible !== null && benefit.deductible !== undefined && (
+          <ProgressCard
+            key={`deductible-${benefit.service_type_code}-${benefit.coverage_level_code}`}
+            title="Deductible"
+            value={deductibleData.value}
+            used={deductibleData.used}
+            total={deductibleData.total}
+            footer={deductibleData.footer}
+            additionalInfo={deductibleData.additionalInfo}
+          />
+        )}
 
-        {/* Co-Insurance Card */}
-        <InfoCard
-          key={`coinsurance-${benefit.service_type_code}-${benefit.coverage_level_code}`}
-          title="Co-Insurance"
-          value={coinsuranceValue}
-          subtitle={benefit.coverage_level}
-        />
+        {/* Co-Insurance Card - Only show if coinsurance is not null */}
+        {benefit.coinsurance !== null && benefit.coinsurance !== undefined && (
+          <InfoCard
+            key={`coinsurance-${benefit.service_type_code}-${benefit.coverage_level_code}`}
+            title="Co-Insurance"
+            value={coinsuranceValue}
+            subtitle={benefit.coverage_level}
+          />
+        )}
       </div>
 
       {/* Second Row: Out of Pocket Maximum, Limitations */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Out of Pocket Maximum Card */}
-        <ProgressCard
-          key={`outofpocket-${benefit.service_type_code}-${benefit.coverage_level_code}`}
-          title="Out of Pocket Maximum"
-          value={outOfPocketData.value}
-          used={outOfPocketData.used}
-          total={outOfPocketData.total}
-          footer={outOfPocketData.footer}
-          additionalInfo={outOfPocketData.additionalInfo}
-        />
+        {/* Out of Pocket Maximum Card - Only show if out_of_pocket is not null */}
+        {benefit.out_of_pocket !== null && benefit.out_of_pocket !== undefined && (
+          <ProgressCard
+            key={`outofpocket-${benefit.service_type_code}-${benefit.coverage_level_code}`}
+            title="Out of Pocket Maximum"
+            value={outOfPocketData.value}
+            used={outOfPocketData.used}
+            total={outOfPocketData.total}
+            footer={outOfPocketData.footer}
+            additionalInfo={outOfPocketData.additionalInfo}
+          />
+        )}
 
-        {/* Limitations Card (spans 2 columns) */}
-        <div className="md:col-span-2">
+        {/* Limitations Card (spans remaining columns) */}
+        <div className={benefit.out_of_pocket !== null && benefit.out_of_pocket !== undefined ? 'md:col-span-2' : 'md:col-span-3'}>
           <LimitationsCard
             key={`limitations-${benefit.service_type_code}-${benefit.coverage_level_code}`}
             {...limitationsData}

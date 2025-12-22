@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import CoverageAndBenefits from './components/tabs/coverage-and-benefits/CoverageAndBenefits'
 import Copay from './components/tabs/copay/Copay'
 import Deductible from './components/tabs/deductible/Deductible'
@@ -26,6 +26,128 @@ export default function Dashboard() {
   const benefits = patientData?.benefits || {}
   const primaryCareProvider = patientData?.primary_care_provider || {}
   const payer = patientData?.payer || {}
+
+  // Extract all benefits from all network types
+  const allBenefits = useMemo(() => {
+    const inNetwork = benefits?.in_network || []
+    const outOfNetwork = benefits?.out_of_network || []
+    const bothNetworks = benefits?.both_networks || []
+    return [...inNetwork, ...outOfNetwork, ...bothNetworks]
+  }, [benefits])
+
+  // Extract copays with benefit information
+  const copaysData = useMemo(() => {
+    const copays: Array<{
+      benefit_type: string
+      service_type_code: string
+      coverage_level: string
+      copay_type: string
+      copay_value: number | string
+      network?: string
+      messages?: string[]
+    }> = []
+
+    allBenefits.forEach((benefit: any) => {
+      if (benefit.copays && typeof benefit.copays === 'object') {
+        Object.entries(benefit.copays).forEach(([copayType, copayValue]) => {
+          if (copayValue !== null && copayValue !== undefined) {
+            copays.push({
+              benefit_type: benefit.benefit_type || 'N/A',
+              service_type_code: benefit.service_type_code || '',
+              coverage_level: benefit.coverage_level || benefit.coverage_level_code || '',
+              copay_type: copayType,
+              copay_value: copayValue as number | string,
+              network: benefit.network || null,
+              messages: benefit.messages && Array.isArray(benefit.messages) ? benefit.messages : [],
+            })
+          }
+        })
+      }
+    })
+
+    return copays
+  }, [allBenefits])
+
+  // Extract deductibles with benefit information
+  const deductiblesData = useMemo(() => {
+    const deductibles: Array<{
+      benefit_type: string
+      service_type_code: string
+      coverage_level: string
+      deductible: any
+      network?: string
+      messages?: string[]
+    }> = []
+
+    allBenefits.forEach((benefit: any) => {
+      if (benefit.deductible && typeof benefit.deductible === 'object') {
+        deductibles.push({
+          benefit_type: benefit.benefit_type || 'N/A',
+          service_type_code: benefit.service_type_code || '',
+          coverage_level: benefit.coverage_level || benefit.coverage_level_code || '',
+          deductible: benefit.deductible,
+          network: benefit.network || null,
+          messages: benefit.messages && Array.isArray(benefit.messages) ? benefit.messages : [],
+        })
+      }
+    })
+
+    return deductibles
+  }, [allBenefits])
+
+  // Extract coinsurance with benefit information
+  const coinsuranceData = useMemo(() => {
+    const coinsurance: Array<{
+      benefit_type: string
+      service_type_code: string
+      coverage_level: string
+      coinsurance_value: any
+      network?: string
+      messages?: string[]
+    }> = []
+
+    allBenefits.forEach((benefit: any) => {
+      if (benefit.coinsurance !== null && benefit.coinsurance !== undefined) {
+        coinsurance.push({
+          benefit_type: benefit.benefit_type || 'N/A',
+          service_type_code: benefit.service_type_code || '',
+          coverage_level: benefit.coverage_level || benefit.coverage_level_code || '',
+          coinsurance_value: benefit.coinsurance,
+          network: benefit.network || null,
+          messages: benefit.messages && Array.isArray(benefit.messages) ? benefit.messages : [],
+        })
+      }
+    })
+
+    return coinsurance
+  }, [allBenefits])
+
+  // Extract out of pocket with benefit information
+  const outOfPocketData = useMemo(() => {
+    const outOfPocket: Array<{
+      benefit_type: string
+      service_type_code: string
+      coverage_level: string
+      out_of_pocket: any
+      network?: string
+      messages?: string[]
+    }> = []
+
+    allBenefits.forEach((benefit: any) => {
+      if (benefit.out_of_pocket && typeof benefit.out_of_pocket === 'object') {
+        outOfPocket.push({
+          benefit_type: benefit.benefit_type || 'N/A',
+          service_type_code: benefit.service_type_code || '',
+          coverage_level: benefit.coverage_level || benefit.coverage_level_code || '',
+          out_of_pocket: benefit.out_of_pocket,
+          network: benefit.network || null,
+          messages: benefit.messages && Array.isArray(benefit.messages) ? benefit.messages : [],
+        })
+      }
+    })
+
+    return outOfPocket
+  }, [allBenefits])
 
   useEffect(() => {
     dispatch(fetchPatientDashboard(''))
@@ -198,13 +320,13 @@ export default function Dashboard() {
               {activeTab === 'Coverage and Benefits' ? (
                 <CoverageAndBenefits benefits={benefits} />
               ) : activeTab === 'Copay' ? (
-                <Copay />
+                <Copay copaysData={copaysData} />
               ) : activeTab === 'Deductible' ? (
-                <Deductible />
+                <Deductible deductiblesData={deductiblesData} />
               ) : activeTab === 'Coinsurance' ? (
-                <Coinsurance />
+                <Coinsurance coinsuranceData={coinsuranceData} />
               ) : activeTab === 'Out of Pocket' ? (
-                <OutOfPocket />
+                <OutOfPocket outOfPocketData={outOfPocketData} />
               ) : (
                 <div className="p-12 text-center">
                   <h2 className="text-2xl font-semibold text-gray-800 mb-2">{activeTab}</h2>
