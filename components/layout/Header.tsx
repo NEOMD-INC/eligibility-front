@@ -125,8 +125,7 @@ const Header = () => {
                 </Link> */}
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  // href="/eligibility/settings"
-                  href="#"
+                  href="/eligibility/settings"
                   onClick={() => setEligibilityOpen(!eligibilityOpen)}
                 >
                   Settings
@@ -149,32 +148,28 @@ const Header = () => {
               <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  // href="/settings/carrier-group"
-                  href="#"
+                  href="/settings/carrier-group"
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Groups
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  // href="/settings/carrier-address"
-                  href="#"
+                  href="/settings/carrier-address"
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Addresses
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  // href="/settings/carrier-setup"
-                  href="#"
+                  href="/settings/carrier-setup"
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Setup
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  // href="/settings/availity-payer"
-                  href="#"
+                  href="/settings/availity-payer"
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Availity Payer
