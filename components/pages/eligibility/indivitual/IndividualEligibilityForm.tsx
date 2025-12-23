@@ -25,22 +25,9 @@ import SearchableSelectPayer from '@/components/ui/select/searchable-select-paye
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import { useRouter } from 'next/navigation'
-
-interface IndividualEligibilityValues {
-  payerId: string
-  npi: string
-  practiceLastName: string
-  practiceFirstName: string
-  subscriberId: string
-  lastName: string
-  firstName: string
-  dob: string
-  gender: string
-  relationshipCode: string
-  serviceDate: string
-  serviceType: string
-  placeOfService: string
-}
+import { IndividualEligibilityValues } from './types/type'
+import { getGenderOptions } from '@/utils/constants/gender-options'
+import { getDOBMaxDate, getServiceDateMinMax, splitName } from './helper/helper'
 
 export default function IndividualEligibilityForm() {
   const dispatch = useDispatch<AppDispatch>()
@@ -56,26 +43,18 @@ export default function IndividualEligibilityForm() {
   )
   const { currentLog, fetchLogLoading } = useSelector((state: RootState) => state.eligibilityLogs)
 
-  // Gender options
-  const genderOptions: SearchableSelectOption[] = [
-    { value: 'M', label: 'Male' },
-    { value: 'F', label: 'Female' },
-    { value: 'O', label: 'Other' },
-  ]
+  const genderOptions: SearchableSelectOption[] = getGenderOptions
 
-  // Relationship code options
   const relationshipCodeOptions: SearchableSelectOption[] = RELATIONSHIP_CODES.map(rc => ({
     value: rc.value,
     label: `${rc.value} - ${rc.label}`,
   }))
 
-  // Service type options
   const serviceTypeOptions: SearchableSelectOption[] = SERVICE_TYPES.map(st => ({
     value: st.value,
     label: `${st.value} - ${st.label}`,
   }))
 
-  // Place of service options
   const placeOfServiceOptions: SearchableSelectOption[] = PLACE_OF_SERVICE_CODES.map(pos => ({
     value: pos.value,
     label: `${pos.value} - ${pos.label}`,
@@ -88,30 +67,8 @@ export default function IndividualEligibilityForm() {
   const [reuseErrorMsg, setReuseErrorMsg] = useState('')
   const hasMappedLogData = useRef(false)
 
-  const getDOBMaxDate = () => {
-    const today = new Date()
-    today.setDate(today.getDate() - 1)
-    return today.toISOString().split('T')[0]
-  }
-
-  const getServiceDateMinMax = () => {
-    const today = new Date()
-    const oneYearAndTenDaysAgo = new Date(today)
-    oneYearAndTenDaysAgo.setFullYear(today.getFullYear() - 1)
-    oneYearAndTenDaysAgo.setDate(oneYearAndTenDaysAgo.getDate() - 10) // 1 year and 10 days ago
-
-    const twoMonthsFuture = new Date(today)
-    twoMonthsFuture.setMonth(today.getMonth() + 2) // 2 months in future
-
-    return {
-      min: oneYearAndTenDaysAgo.toISOString().split('T')[0],
-      max: twoMonthsFuture.toISOString().split('T')[0],
-    }
-  }
-
   const serviceDateRestrictions = getServiceDateMinMax()
 
-  // Validation Schema
   const validationSchema = Yup.object({
     payerId: Yup.string().required('Payer ID is required'),
     npi: Yup.string().required('NPI is required'),
@@ -166,23 +123,20 @@ export default function IndividualEligibilityForm() {
     },
   })
 
-  // Fetch practice data on component mount
   useEffect(() => {
     dispatch(clearEligibilityIndivitualError())
     dispatch(fetchEligibilityIndivitualNpiPractice())
     dispatch(fetchAllAvailityPayers())
   }, [dispatch])
 
-  // Fetch log data if logId is present
   useEffect(() => {
     if (logId) {
-      hasMappedLogData.current = false // Reset flag when new log is being fetched
+      hasMappedLogData.current = false
       dispatch(fetchLogById(logId))
     }
   }, [dispatch, logId])
 
   useEffect(() => {
-    // Only set practice data if we're not editing from a log (logId not present)
     if (npiPractice && !logId) {
       const practiceData = npiPractice as any
       formik.setFieldValue('npi', practiceData.npi || practiceData.NPI || '')
@@ -205,32 +159,7 @@ export default function IndividualEligibilityForm() {
     }
   }, [npiPractice, logId])
 
-  // Helper function to split name (e.g., "Miner, Michael" -> lastName: "Miner", firstName: "Michael")
-  const splitName = (fullName: string | null | undefined) => {
-    if (!fullName) return { lastName: '', firstName: '' }
-
-    // Handle "LastName, FirstName" format
-    if (fullName.includes(',')) {
-      const parts = fullName.split(',').map(p => p.trim())
-      return {
-        lastName: parts[0] || '',
-        firstName: parts[1] || '',
-      }
-    }
-
-    // Handle "FirstName LastName" format
-    const parts = fullName.trim().split(/\s+/)
-    if (parts.length === 1) {
-      return { lastName: parts[0], firstName: '' }
-    }
-    const lastName = parts[parts.length - 1]
-    const firstName = parts.slice(0, -1).join(' ')
-    return { lastName, firstName }
-  }
-
-  // Map log data to form fields when currentLog is available
   useEffect(() => {
-    // Only map data once when log is first loaded
     if (
       currentLog &&
       logId &&
@@ -242,7 +171,6 @@ export default function IndividualEligibilityForm() {
       hasMappedLogData.current = true
       const log = currentLog as any
 
-      // Map payer - find payer by payer_id or name
       if (log.payer) {
         const payerId = log.payer.payer_id || log.payer.id
         const payerName = log.payer.name
@@ -270,14 +198,12 @@ export default function IndividualEligibilityForm() {
         }
       }
 
-      // Map provider/NPI - use provider from log or practice data
       if (log.provider) {
         const providerNpi = log.provider.npi || log.provider.id
         if (providerNpi) {
           formik.setFieldValue('npi', providerNpi)
         }
 
-        // Split provider name if available
         if (log.provider.name) {
           const providerName = splitName(log.provider.name)
           formik.setFieldValue('practiceLastName', providerName.lastName)
@@ -285,16 +211,13 @@ export default function IndividualEligibilityForm() {
         }
       }
 
-      // Map subscriber/patient data
       const patient = log.patient || log.subscriber
       if (patient) {
-        // Subscriber ID
         const subId = patient.member_id || patient.id || patient.subscriber_id
         if (subId) {
           formik.setFieldValue('subscriberId', String(subId))
         }
 
-        // Name - split into first and last
         const patientName = patient.name
         if (patientName) {
           const nameParts = splitName(patientName)
@@ -302,12 +225,10 @@ export default function IndividualEligibilityForm() {
           formik.setFieldValue('firstName', nameParts.firstName)
         }
 
-        // DOB
         if (patient.dob) {
           formik.setFieldValue('dob', patient.dob)
         }
 
-        // Gender - convert to single letter if needed
         if (patient.gender) {
           const gender = String(patient.gender).toUpperCase()
           if (gender.startsWith('M')) {
@@ -319,19 +240,16 @@ export default function IndividualEligibilityForm() {
           }
         }
 
-        // Relationship code
         const relationshipCode = log.coverage?.relationship_code || patient.relationship_code
         if (relationshipCode) {
           formik.setFieldValue('relationshipCode', String(relationshipCode))
         }
       }
 
-      // Service date
       if (log.service_date || log.serviceDate) {
         formik.setFieldValue('serviceDate', log.service_date || log.serviceDate)
       }
 
-      // Service type code
       if (log.service_type_code || log.serviceTypeCode || log.service_type || log.serviceType) {
         formik.setFieldValue(
           'serviceType',
@@ -341,7 +259,6 @@ export default function IndividualEligibilityForm() {
         )
       }
 
-      // Place of service - check if it exists in the log
       if (log.place_of_service || log.placeOfService || log.pos) {
         formik.setFieldValue(
           'placeOfService',
@@ -349,7 +266,6 @@ export default function IndividualEligibilityForm() {
         )
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLog, logId, availityPayers, payersLoading])
 
   useEffect(() => {
@@ -364,7 +280,6 @@ export default function IndividualEligibilityForm() {
     setReuseErrorMsg('')
     dispatch(clearEligibilityIndivitualError())
 
-    // Validate practice fields before saving
     if (!formik.values.npi || !formik.values.practiceLastName || !formik.values.practiceFirstName) {
       setReuseError(true)
       setReuseErrorMsg(
@@ -389,7 +304,6 @@ export default function IndividualEligibilityForm() {
     }
   }
 
-  // Show loading while fetching log data
   if (logId && fetchLogLoading) {
     return <ComponentLoader component="eligibility log data" />
   }
@@ -536,7 +450,6 @@ export default function IndividualEligibilityForm() {
               </div>
             </div>
 
-            {/* Subscriber Section */}
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Subscriber</h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -733,7 +646,6 @@ export default function IndividualEligibilityForm() {
               </div>
             </div>
 
-            {/* Submit Button */}
             <div className="flex justify-end gap-3 mt-8">
               <button
                 type="button"

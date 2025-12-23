@@ -2,6 +2,7 @@ import api from '@/lib/api/axios'
 
 interface EligibilityHistoryFilters {
   page?: number
+  per_page?: number
   service_type?: string
   relationship_code?: string
   subscriber_id?: string
@@ -13,9 +14,12 @@ export const EligibilityHistoryService = {
   getEligibilityHistory: (filters?: EligibilityHistoryFilters) => {
     const params = new URLSearchParams()
 
-    // if (filters?.page) {
-    //   params.append('page', String(filters.page))
-    // }
+    if (filters?.page) {
+      params.append('page', String(filters.page))
+    }
+    if (filters?.per_page) {
+      params.append('per_page', String(filters.per_page))
+    }
     if (filters?.service_type) {
       params.append('service_type', filters.service_type)
     }
@@ -34,5 +38,10 @@ export const EligibilityHistoryService = {
 
     const queryString = params.toString()
     return api.get(`eligibility-check/history${queryString ? `?${queryString}` : ''}`)
+  },
+  retryEligibilitySubmission: (userId: string) => {
+    return api.post(`eligibility-logs/${userId}/retry`, {}, {
+      skipToast: true, // Skip interceptor toast, we'll show custom message
+    } as any)
   },
 }

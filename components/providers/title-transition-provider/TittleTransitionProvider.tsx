@@ -17,14 +17,15 @@ export function TitleTransitionButton({
   tapScale = 0.98,
 }: TitleTransitionButtonProps) {
   return (
-    <motion.button
+    <motion.div
       whileHover={{ scale: hoverScale }}
       whileTap={{ scale: tapScale }}
       transition={{ duration: 0.15, ease: 'easeOut' }}
       onClick={onClick}
       className={className}
+      style={{ display: 'inline-block' }}
     >
       {children}
-    </motion.button>
+    </motion.div>
   )
 }

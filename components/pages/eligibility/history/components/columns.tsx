@@ -188,17 +188,16 @@ export default function EligibilityHistoryColumns({
       width: '12%',
       align: 'center' as const,
       render: (value: any, record: any) => {
-        console.log(record, 'the record is here')
-        const historyId = record.eligibility_id
+        const historyId = record.eligibility_id || record.id || record.uuid
         return (
           <div className="flex justify-center items-center w-full">
             <GridActionButtons
-              data={record}
+              data={{ ...record, id: historyId }}
               from="id"
               editBtnPath={historyId ? `/eligibility/indivitual?logId=${historyId}` : '#'}
               showBtnPath={`/patient-dashboard`}
               retryResourceId={
-                onRetryClick
+                onRetryClick && historyId
                   ? (id: string) => {
                       onRetryClick(id)
                     }

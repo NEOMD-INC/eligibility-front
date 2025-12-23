@@ -1,29 +1,40 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { Upload, File, X, CheckCircle2 } from 'lucide-react'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/redux/store'
+import {
+  submitBulkEligibility,
+  clearBulkError,
+  clearBulkData,
+} from '@/redux/slices/eligibility/bulk/actions'
+import { useRouter } from 'next/navigation'
+import {
+  handleFileChange,
+  getFileIcon,
+  formatFileSize,
+  handleDrag,
+  handleDrop,
+  removeFile,
+} from './helper/helper'
 
 const validationSchema = Yup.object({
-  file: Yup.mixed()
+  file: Yup.mixed<File | null>()
     .required('File is required')
-    .test('fileType', 'Only CSV and Excel files are allowed', (value: any) => {
+    .test('fileType', 'Only CSV files are allowed', (value) => {
       if (!value) return false
       const file = value as File
-      const allowedTypes = [
-        'text/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.ms-excel.sheet.macroEnabled.12',
-      ]
-      const allowedExtensions = ['.csv', '.xls', '.xlsx', '.xlsm']
+      const allowedTypes = ['text/csv']
+      const allowedExtensions = ['.csv']
       const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
 
       return allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension)
     })
-    .test('fileSize', 'File size must be less than 10MB', (value: any) => {
+    .test('fileSize', 'File size must be less than 10MB', (value) => {
       if (!value) return false
       const file = value as File
       return file.size <= 10 * 1024 * 1024 // 10MB
@@ -31,8 +42,14 @@ const validationSchema = Yup.object({
 })
 
 export default function BulkEligibilityForm() {
+  const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [dragActive, setDragActive] = useState(false)
+
+  const { submitLoading, error, bulkData } = useSelector(
+    (state: RootState) => state.eligibilityBulk
+  )
 
   const formik = useFormik({
     initialValues: {
@@ -40,71 +57,33 @@ export default function BulkEligibilityForm() {
     },
     validationSchema,
     onSubmit: async values => {
+      if (!values.file) return
+
+      dispatch(clearBulkError())
+      dispatch(clearBulkData())
+
       try {
-        // Handle file upload here
-        console.log('File to upload:', values.file)
-        // Add your API call here
-        alert('File uploaded successfully!')
+        await dispatch(submitBulkEligibility(values.file)).unwrap()
+        router.push('/eligibility/history')
       } catch (error) {
-        console.error('Upload error:', error)
-        alert('Failed to upload file')
+        // Error is handled by Redux and toast will be shown via axios interceptor
       }
     },
   })
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      formik.setFieldValue('file', file)
-      setUploadedFile(file)
+  useEffect(() => {
+    if (bulkData && !submitLoading) {
+      formik.resetForm()
+      setUploadedFile(null)
+      dispatch(clearBulkData())
     }
-  }
+  }, [bulkData, submitLoading, dispatch])
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true)
-    } else if (e.type === 'dragleave') {
-      setDragActive(false)
+  useEffect(() => {
+    if (error && !submitLoading) {
+      dispatch(clearBulkError())
     }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0]
-      formik.setFieldValue('file', file)
-      setUploadedFile(file)
-      formik.setFieldTouched('file', true)
-    }
-  }
-
-  const removeFile = () => {
-    formik.setFieldValue('file', null)
-    setUploadedFile(null)
-  }
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]
-  }
-
-  const getFileIcon = (fileName: string) => {
-    const extension = fileName.split('.').pop()?.toLowerCase()
-    if (extension === 'csv') {
-      return '📄'
-    } else if (['xls', 'xlsx', 'xlsm'].includes(extension || '')) {
-      return '📊'
-    }
-    return '📎'
-  }
+  }, [error, submitLoading, dispatch])
 
   return (
     <PageTransition>
@@ -118,16 +97,14 @@ export default function BulkEligibilityForm() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select File <span className="text-red-500">*</span>
               </label>
-              <p className="text-sm text-gray-500 mb-4">
-                Accepted formats: CSV, XLS, XLSX, XLSM (Max size: 10MB)
-              </p>
+              <p className="text-sm text-gray-500 mb-4">Accepted formats: CSV (Max size: 10MB)</p>
 
               {!uploadedFile ? (
                 <div
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
+                  onDragEnter={e => handleDrag(e, setDragActive)}
+                  onDragLeave={e => handleDrag(e, setDragActive)}
+                  onDragOver={e => handleDrag(e, setDragActive)}
+                  onDrop={e => handleDrop(e, setDragActive, formik, setUploadedFile)}
                   className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                     dragActive
                       ? 'border-blue-500 bg-blue-50'
@@ -140,8 +117,8 @@ export default function BulkEligibilityForm() {
                     type="file"
                     id="file"
                     name="file"
-                    accept=".csv,.xls,.xlsx,.xlsm,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
-                    onChange={handleFileChange}
+                    accept=".csv,text/csv"
+                    onChange={e => handleFileChange(e, formik, setUploadedFile)}
                     onBlur={formik.handleBlur}
                     className="hidden"
                   />
@@ -153,7 +130,7 @@ export default function BulkEligibilityForm() {
                     <p className="text-lg font-medium text-gray-700 mb-2">
                       Drag and drop your file here, or click to browse
                     </p>
-                    <p className="text-sm text-gray-500">CSV, XLS, XLSX, or XLSM files only</p>
+                    <p className="text-sm text-gray-500">CSV files only</p>
                   </label>
                 </div>
               ) : (
@@ -174,7 +151,7 @@ export default function BulkEligibilityForm() {
                     </div>
                     <button
                       type="button"
-                      onClick={removeFile}
+                      onClick={() => removeFile(formik, setUploadedFile)}
                       className="p-2 text-red-600 hover:bg-red-100 rounded-md transition"
                       title="Remove file"
                     >
@@ -189,7 +166,6 @@ export default function BulkEligibilityForm() {
               )}
             </div>
 
-            {/* Submit Button */}
             <div className="flex justify-end gap-4">
               <button
                 type="button"
@@ -203,10 +179,10 @@ export default function BulkEligibilityForm() {
               </button>
               <button
                 type="submit"
-                disabled={!formik.values.file || formik.isSubmitting}
+                disabled={!formik.values.file || submitLoading}
                 className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
               >
-                {formik.isSubmitting ? 'Uploading...' : 'Upload File'}
+                {submitLoading ? 'Uploading...' : 'Upload File'}
               </button>
             </div>
           </form>

@@ -2,6 +2,7 @@
 export {
   fetchAllLogs,
   fetchLogById,
+  retryEligibilitySubmission,
   clearEligibilityLogsError,
   clearCurrentLog,
   setCurrentPage,

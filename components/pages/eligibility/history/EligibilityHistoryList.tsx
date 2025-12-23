@@ -9,16 +9,17 @@ import Filters from '@/components/ui/filters/Filters'
 import EligibilityHistoryColumns from './components/columns'
 import { themeColors } from '@/theme'
 import { Filter, ChevronDown, Plus } from 'lucide-react'
-import type { FilterField } from '@/components/ui/filters/Filters'
-import { SERVICE_TYPES } from '@/utils/constants/service-types'
-import { RELATIONSHIP_CODES } from '@/utils/constants/relationship-codes'
+
 import {
   fetchEligibilityHistory,
+  retryEligibilitySubmission,
   setCurrentPage,
   setFilters,
   clearFilters,
 } from '@/redux/slices/eligibility/history/actions'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { toastManager } from '@/utils/toast'
+import { getFilterFields } from './components/eligibility-history-list.config'
 
 export default function EligibilityHistoryList() {
   const router = useRouter()
@@ -28,11 +29,32 @@ export default function EligibilityHistoryList() {
   )
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
 
-  // Fetch data on component mount and when page changes
+  const hasPendingHistory = history.some((item: any) => {
+    const status = (item.status || '').toLowerCase()
+    const queueStatus = (item.queueStatus || item.queue_status || '').toLowerCase()
+    return (
+      status === 'pending' ||
+      status === 'in_process' ||
+      queueStatus === 'pending' ||
+      queueStatus === 'in_process' ||
+      queueStatus === 'processing'
+    )
+  })
+
   useEffect(() => {
-    dispatch(fetchEligibilityHistory({ page: currentPage, filters }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    dispatch(fetchEligibilityHistory({ page: currentPage, filters, itemsPerPage }))
   }, [dispatch, currentPage])
+
+  useEffect(() => {
+    if (!hasPendingHistory || loading) return
+
+    const intervalId = setInterval(() => {
+      dispatch(fetchEligibilityHistory({ page: currentPage, filters, itemsPerPage }))
+    }, 5000)
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [hasPendingHistory, currentPage, filters, itemsPerPage, loading, dispatch])
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -41,13 +63,12 @@ export default function EligibilityHistoryList() {
 
   const handleFilterSubmit = () => {
     dispatch(setCurrentPage(1))
-    dispatch(fetchEligibilityHistory({ page: 1, filters }))
+    dispatch(fetchEligibilityHistory({ page: 1, filters, itemsPerPage }))
   }
 
   const handleFilterReset = () => {
     dispatch(clearFilters())
     dispatch(setCurrentPage(1))
-    // Fetch with empty filters
     dispatch(
       fetchEligibilityHistory({
         page: 1,
@@ -58,20 +79,33 @@ export default function EligibilityHistoryList() {
           dateFrom: '',
           dateTo: '',
         },
+        itemsPerPage,
       })
     )
   }
 
   const handlePageChange = (page: number) => {
     dispatch(setCurrentPage(page))
-    // Scroll to top of table when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleRetryClick = (id: string) => {
+  const handleRetryClick = async (eligibilityId: string) => {
     if (confirm('Are you sure you want to retry this eligibility check?')) {
-      // Handle retry - will be connected to Redux later
-      console.log('Retrying eligibility check:', id)
+      try {
+        const result = await dispatch(retryEligibilitySubmission(eligibilityId))
+        if (retryEligibilitySubmission.fulfilled.match(result)) {
+          toastManager.success('Eligibility submission retried successfully')
+          dispatch(fetchEligibilityHistory({ page: currentPage, filters, itemsPerPage }))
+        } else {
+          const errorMessage =
+            (result.payload as string) || 'Failed to retry eligibility submission'
+          toastManager.error(errorMessage)
+        }
+      } catch (error: any) {
+        toastManager.error(
+          error?.message || 'An error occurred while retrying eligibility submission'
+        )
+      }
     }
   }
 
@@ -81,63 +115,12 @@ export default function EligibilityHistoryList() {
 
   const columns = EligibilityHistoryColumns({ onRetryClick: handleRetryClick })
 
-  const filterFields: FilterField[] = [
-    {
-      name: 'serviceType',
-      label: 'Service Type',
-      type: 'select',
-      value: filters.serviceType || '',
-      onChange: handleFilterChange,
-      options: [
-        { value: '', label: 'All Service Types' },
-        ...SERVICE_TYPES.map(st => ({
-          value: st.value,
-          label: `${st.value} - ${st.label}`,
-        })),
-      ],
-    },
-    {
-      name: 'relationshipCode',
-      label: 'Relationship Code',
-      type: 'select',
-      value: filters.relationshipCode || '',
-      onChange: handleFilterChange,
-      options: [
-        { value: '', label: 'All Relationships' },
-        ...RELATIONSHIP_CODES.map(rc => ({
-          value: rc.value,
-          label: `${rc.value} - ${rc.label}`,
-        })),
-      ],
-    },
-    {
-      name: 'subscriberId',
-      label: 'Subscriber ID',
-      type: 'text',
-      value: filters.subscriberId || '',
-      onChange: handleFilterChange,
-      placeholder: 'Enter Subscriber ID',
-    },
-    {
-      name: 'dateFrom',
-      label: 'Date From',
-      type: 'date',
-      value: filters.dateFrom || '',
-      onChange: handleFilterChange,
-    },
-    {
-      name: 'dateTo',
-      label: 'Date To',
-      type: 'date',
-      value: filters.dateTo || '',
-      onChange: handleFilterChange,
-    },
-  ]
+  const filterFields = getFilterFields({ filters, handleFilterChange })
 
   return (
     <PageTransition>
       <div className="p-6">
-        <div className="flex justify-between items-center max-w-auto rounded bg-white p-6 mb-6">
+        <div className="flex justify-between items-center max-w-auto rounded bg-white p-6 mb-[-5px]">
           <div>
             <h1
               className="text-2xl font-bold text-gray-900"

@@ -43,22 +43,29 @@ export default function EligibilityLogListColumns({
       label: 'Subscriber',
       width: '12%',
       align: 'left' as const,
-      render: (value: any, log: any) => (
-        <div className="text-gray-900 truncate">
-          {log.subscriber || log.subscriberId || log.subscriber_id || 'N/A'}
-        </div>
-      ),
+      render: (value: any, log: any) => {
+        // Handle nested subscriber object
+        let subscriberValue = log.subscriber || log.subscriberId || log.subscriber_id
+        if (subscriberValue && typeof subscriberValue === 'object') {
+          subscriberValue =
+            subscriberValue.name || subscriberValue.member_id || subscriberValue.id || 'N/A'
+        }
+        return <div className="text-gray-900 truncate">{subscriberValue || 'N/A'}</div>
+      },
     },
     {
       key: 'provider',
       label: 'Provider',
       width: '12%',
       align: 'left' as const,
-      render: (value: any, log: any) => (
-        <div className="text-gray-900 truncate">
-          {log.provider || log.providerName || log.provider_name || 'N/A'}
-        </div>
-      ),
+      render: (value: any, log: any) => {
+        // Handle nested provider object
+        let providerValue = log.provider || log.providerName || log.provider_name
+        if (providerValue && typeof providerValue === 'object') {
+          providerValue = providerValue.name || providerValue.npi || providerValue.id || 'N/A'
+        }
+        return <div className="text-gray-900 truncate">{providerValue || 'N/A'}</div>
+      },
     },
     {
       key: 'serviceDate',
@@ -93,20 +100,32 @@ export default function EligibilityLogListColumns({
         )
       },
     },
-    {
-      key: 'responseMessage',
-      label: 'Response Message',
-      width: '15%',
-      align: 'left' as const,
-      render: (value: any, log: any) => (
-        <div
-          className="text-gray-900 truncate"
-          title={log.responseMessage || log.response_message || ''}
-        >
-          {log.responseMessage || log.response_message || 'N/A'}
-        </div>
-      ),
-    },
+    // {
+    //   key: 'responseMessage',
+    //   label: 'Response Message',
+    //   width: '15%',
+    //   align: 'left' as const,
+    //   render: (value: any, log: any) => {
+    //     // Handle nested responseMessage object or array
+    //     let message = log.responseMessage || log.response_message || value
+    //     if (message && typeof message === 'object') {
+    //       if (Array.isArray(message)) {
+    //         message = message.join(', ')
+    //       } else {
+    //         message = JSON.stringify(message)
+    //       }
+    //     }
+    //     const displayMessage = message || 'N/A'
+    //     return (
+    //       <div
+    //         className="text-gray-900 truncate"
+    //         title={typeof displayMessage === 'string' ? displayMessage : ''}
+    //       >
+    //         {displayMessage}
+    //       </div>
+    //     )
+    //   },
+    // },
     {
       key: 'created',
       label: 'Created',
@@ -126,12 +145,12 @@ export default function EligibilityLogListColumns({
       render: (value: any, log: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
-            data={log}
+            data={{ ...log, id: log.eligibility_id || log.id || log.uuid }}
             from="id"
-            editBtnPath={`/logs/edit/${log.id || log.uuid}`}
-            showBtnPath={`/logs/logs-detail/${log.id || log.uuid}`}
+            editBtnPath={`/eligibility/indivitual?logId=${log.eligibility_id}`}
+            showBtnPath={`/logs/logs-detail/${log.eligibility_id}`}
             retryResourceId={
-              onRetryClick
+              onRetryClick && log.eligibility_id
                 ? (id: string) => {
                     onRetryClick(id)
                   }
@@ -141,10 +160,16 @@ export default function EligibilityLogListColumns({
             editIdDispatch={() => {}}
             editDrawerId=""
             showDrawerId=""
-            viewPermission={true}
-            updatePermission={true}
+            viewPermission={
+              log.status === 'rejected' ? false : log.status === 'pending' ? false : true
+            }
+            updatePermission={
+              log.status === 'completed' ? false : log.status === 'pending' ? false : true
+            }
             deletePermission={false}
-            retryPermission={true}
+            retryPermission={
+              log.status === 'completed' ? false : log.status === 'pending' ? false : true
+            }
             isUser={false}
           />
         </div>

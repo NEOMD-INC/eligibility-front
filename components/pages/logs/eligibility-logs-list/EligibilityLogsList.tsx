@@ -1,77 +1,104 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '@/components/ui/data-table/DataTable'
 import Filters from '@/components/ui/filters/Filters'
 import EligibilityLogListColumns from './components/columns'
-import { themeColors } from '@/theme'
 import { Filter, ChevronDown } from 'lucide-react'
 import type { FilterField } from '@/components/ui/filters/Filters'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { AppDispatch, RootState } from '@/redux/store'
+import {
+  fetchAllLogs,
+  retryEligibilitySubmission,
+  setCurrentPage,
+  setFilters,
+  clearFilters,
+} from '@/redux/slices/logs/eligibility-logs/actions'
+import { toastManager } from '@/utils/toast'
 
 export default function EligibilityLogsList() {
+  const dispatch = useDispatch<AppDispatch>()
+  const { logs, loading, error, totalItems, currentPage, itemsPerPage, filters, retryLoading } =
+    useSelector((state: RootState) => state.eligibilityLogs)
+
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [localFilters, setLocalFilters] = useState({
-    queueStatus: '',
-    eligibilityStatus: '',
-    serviceType: '',
-    relationshipCode: '',
-    subscriberId: '',
-    dateFrom: '',
-    dateTo: '',
-  })
 
-  // Mock data - replace with actual data later
-  // Generating more mock data to test pagination
-  const mockLogs = Array.from({ length: 25 }, (_, i) => ({
-    id: String(i + 1),
-    neoReferenceId: `NEO-${String(i + 1).padStart(3, '0')}`,
-    subscriber: `SUB-${String(i + 1).padStart(5, '0')}`,
-    provider: `Provider ${String.fromCharCode(65 + (i % 26))}`,
-    serviceDate: `2024-01-${String((i % 28) + 1).padStart(2, '0')}`,
-    status: ['completed', 'pending', 'failed'][i % 3],
-    responseMessage: `Eligibility check ${i + 1} - ${['success', 'pending', 'failed'][i % 3]}`,
-    created: `2024-01-${String((i % 28) + 1).padStart(2, '0')}T10:30:00`,
-  }))
+  // Check if any logs have pending or in_process status
+  const hasPendingLogs = logs.some(
+    (log: any) => {
+      const status = (log.status || '').toLowerCase()
+      const queueStatus = (log.queueStatus || log.queue_status || '').toLowerCase()
+      return (
+        status === 'pending' ||
+        status === 'in_process' ||
+        queueStatus === 'pending' ||
+        queueStatus === 'in_process' ||
+        queueStatus === 'processing'
+      )
+    }
+  )
 
-  const itemsPerPage = 10
-  const totalItems = mockLogs.length
+  // Fetch data on component mount and when page changes
+  useEffect(() => {
+    dispatch(fetchAllLogs({ page: currentPage, filters, itemsPerPage }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, currentPage])
+
+  // Auto-refresh when there are pending logs
+  useEffect(() => {
+    if (!hasPendingLogs || loading) return
+
+    const intervalId = setInterval(() => {
+      dispatch(fetchAllLogs({ page: currentPage, filters, itemsPerPage }))
+    }, 5000) // Refetch every 5 seconds
+
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [hasPendingLogs, currentPage, filters, itemsPerPage, loading, dispatch])
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setLocalFilters(prev => ({ ...prev, [name]: value }))
+    dispatch(setFilters({ [name]: value }))
   }
 
   const handleFilterSubmit = () => {
-    // Handle filter submit - will be connected to Redux later
-    console.log('Filters submitted:', localFilters)
-    setCurrentPage(1) // Reset to first page when filters are applied
+    dispatch(setCurrentPage(1))
+    dispatch(fetchAllLogs({ page: 1, filters, itemsPerPage }))
   }
 
   const handleFilterReset = () => {
-    setLocalFilters({
-      queueStatus: '',
-      eligibilityStatus: '',
-      serviceType: '',
-      relationshipCode: '',
-      subscriberId: '',
-      dateFrom: '',
-      dateTo: '',
-    })
-    setCurrentPage(1) // Reset to first page when filters are reset
+    dispatch(clearFilters())
+    dispatch(setCurrentPage(1))
+    dispatch(fetchAllLogs({ page: 1, filters: {}, itemsPerPage }))
   }
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    dispatch(setCurrentPage(page))
     // Scroll to top of table when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleRetryClick = (id: string) => {
+  const handleRetryClick = async (eligibilityId: string) => {
     if (confirm('Are you sure you want to retry this eligibility check?')) {
-      // Handle retry - will be connected to Redux later
-      console.log('Retrying log:', id)
+      try {
+        const result = await dispatch(retryEligibilitySubmission(eligibilityId))
+        if (retryEligibilitySubmission.fulfilled.match(result)) {
+          toastManager.success('Eligibility submission retried successfully')
+          // Refresh the logs list
+          dispatch(fetchAllLogs({ page: currentPage, filters, itemsPerPage }))
+        } else {
+          const errorMessage =
+            (result.payload as string) || 'Failed to retry eligibility submission'
+          toastManager.error(errorMessage)
+        }
+      } catch (error: any) {
+        toastManager.error(
+          error?.message || 'An error occurred while retrying eligibility submission'
+        )
+      }
     }
   }
 
@@ -79,10 +106,10 @@ export default function EligibilityLogsList() {
 
   const filterFields: FilterField[] = [
     {
-      name: 'queueStatus',
+      name: 'queue_status',
       label: 'Queue Status',
       type: 'select',
-      value: localFilters.queueStatus,
+      value: filters.queue_status || '',
       onChange: handleFilterChange,
       options: [
         { value: '', label: 'All Queue Status' },
@@ -93,10 +120,10 @@ export default function EligibilityLogsList() {
       ],
     },
     {
-      name: 'eligibilityStatus',
+      name: 'status',
       label: 'Eligibility Status',
       type: 'select',
-      value: localFilters.eligibilityStatus,
+      value: filters.status || '',
       onChange: handleFilterChange,
       options: [
         { value: '', label: 'All Eligibility Status' },
@@ -106,56 +133,25 @@ export default function EligibilityLogsList() {
       ],
     },
     {
-      name: 'serviceType',
-      label: 'Service Type',
-      type: 'select',
-      value: localFilters.serviceType,
-      onChange: handleFilterChange,
-      options: [
-        { value: '', label: 'All Service Types' },
-        { value: '30', label: 'Health Benefit Plan Coverage' },
-        { value: '33', label: 'Dental Care' },
-        { value: '35', label: 'Vision Care' },
-        { value: '47', label: 'Hospital' },
-        { value: '48', label: 'Hospital - Inpatient' },
-        { value: '49', label: 'Hospital - Outpatient' },
-      ],
-    },
-    {
-      name: 'relationshipCode',
-      label: 'Relationship Code',
-      type: 'select',
-      value: localFilters.relationshipCode,
-      onChange: handleFilterChange,
-      options: [
-        { value: '', label: 'All Relationships' },
-        { value: '18', label: 'Self' },
-        { value: '01', label: 'Spouse' },
-        { value: '19', label: 'Child' },
-        { value: '20', label: 'Employee' },
-        { value: '21', label: 'Unknown' },
-      ],
-    },
-    {
-      name: 'subscriberId',
+      name: 'subscriber_id',
       label: 'Subscriber ID',
       type: 'text',
-      value: localFilters.subscriberId,
+      value: filters.subscriber_id || '',
       onChange: handleFilterChange,
       placeholder: 'Enter Subscriber ID',
     },
     {
-      name: 'dateFrom',
+      name: 'service_date_from',
       label: 'Date From',
       type: 'date',
-      value: localFilters.dateFrom,
+      value: filters.service_date_from || '',
       onChange: handleFilterChange,
     },
     {
-      name: 'dateTo',
+      name: 'service_date_to',
       label: 'Date To',
       type: 'date',
-      value: localFilters.dateTo,
+      value: filters.service_date_to || '',
       onChange: handleFilterChange,
     },
   ]
@@ -165,19 +161,12 @@ export default function EligibilityLogsList() {
       <div className="p-6">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
-            <h1
-              className="text-2xl font-bold text-gray-900"
-              style={{ color: themeColors.text.primary }}
-            >
-              Eligibility Logs
-            </h1>
-            <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
-              View and manage eligibility check logs
-            </p>
+            <h1 className="text-2xl font-bold text-gray-900">Eligibility Logs</h1>
+            <p className="mt-1 text-sm text-gray-500">View and manage eligibility check logs</p>
           </div>
         </div>
 
-        <div className="bg-white shadow rounded-lg overflow-hidden mt-6">
+        <div className="bg-white shadow rounded-lg overflow-hidden">
           {/* Filter Dropdown Button - Right Side */}
           <div className="px-6 py-4 border-b border-gray-200 flex justify-end">
             <button
@@ -208,8 +197,8 @@ export default function EligibilityLogsList() {
           {/* DataTable */}
           <DataTable
             columns={columns}
-            data={mockLogs}
-            loading={false}
+            data={logs}
+            loading={loading}
             totalItems={totalItems}
             itemsPerPage={itemsPerPage}
             currentPage={currentPage}
@@ -217,7 +206,7 @@ export default function EligibilityLogsList() {
             clientSidePagination={false}
             noDataMessage={
               <div className="text-center py-8">
-                <p className="text-gray-500">No eligibility logs found</p>
+                <p className="text-gray-500">{error || 'No eligibility logs found'}</p>
               </div>
             }
           />

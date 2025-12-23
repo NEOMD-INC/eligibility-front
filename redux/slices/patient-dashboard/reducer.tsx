@@ -1,8 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { PatientDashboardService } from '@/services/patient-dashboard/patientDashboard.service'
+import { PatientDashboardState } from '@/types/entities/patient-dashboard'
+import { AxiosError } from 'axios'
 
-const initialState: any = {
-  patientData: [],
+const initialState: PatientDashboardState = {
+  patientData: null,
   loading: false,
   error: null,
 }
@@ -14,8 +16,11 @@ export const fetchPatientDashboard = createAsyncThunk(
     try {
       const response = await PatientDashboardService.getPatientDashboardDetails()
       return response.data
-    } catch (error: any) {
-      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch user details')
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>
+      return rejectWithValue(
+        axiosError?.response?.data?.message || 'Failed to fetch user details'
+      )
     }
   }
 )

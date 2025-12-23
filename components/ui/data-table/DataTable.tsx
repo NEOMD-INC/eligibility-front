@@ -1,32 +1,11 @@
 'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
+import { DataTableProps, TablePaginationProps } from '@/types/ui/table'
 
-interface Column {
-  key: string
-  label: string
-  sortable?: boolean
-  render?: (value: any, row: any) => React.ReactNode
-  width?: string
-  align?: 'left' | 'center' | 'right'
-}
+type TableRow = Record<string, unknown>
 
-interface DataTableProps {
-  columns: Column[]
-  data: any[]
-  loading?: boolean
-  totalItems: number
-  itemsPerPage?: number
-  currentPage?: number
-  onPageChange?: (page: number) => void
-  clientSidePagination?: boolean
-  noDataMessage?: React.ReactNode
-  renderRow?: (row: any, index: number) => React.ReactNode
-  onSort?: (key: string, direction: 'asc' | 'desc') => void
-  className?: string
-}
-
-const DataTable: React.FC<DataTableProps> = ({
+const DataTable = <T extends TableRow = TableRow>({
   columns,
   data,
   loading = false,
@@ -39,7 +18,7 @@ const DataTable: React.FC<DataTableProps> = ({
   renderRow,
   onSort,
   className = '',
-}) => {
+}: DataTableProps<T>) => {
   const [internalPage, setInternalPage] = useState(1)
   const [isClient, setIsClient] = useState(false)
 
@@ -78,8 +57,8 @@ const DataTable: React.FC<DataTableProps> = ({
     }
   }
 
-  const DefaultTableRow = ({ row, index }: { row: any; index: number }) => {
-    const renderCellValue = (value: any): React.ReactNode => {
+  const DefaultTableRow = ({ row, index }: { row: T; index: number }) => {
+    const renderCellValue = (value: unknown): React.ReactNode => {
       if (value === null || value === undefined) return 'N/A'
       
       // Handle arrays
@@ -97,14 +76,21 @@ const DataTable: React.FC<DataTableProps> = ({
       // Handle objects
       if (typeof value === 'object') {
         // Try to find a meaningful string representation
-        if (value.member_id) return value.member_id
+        // For subscriber objects: {name, member_id, dob, gender, age, address, eligibility_date, id, id_qualifier}
+        if (value.member_id) return String(value.member_id)
         if (value.name) {
           // If there's also an npi, show both
           if (value.npi) return `${value.name} (${value.npi})`
-          return value.name
+          return String(value.name)
         }
-        if (value.npi) return value.npi
-        if (value.id) return value.id
+        if (value.npi) return String(value.npi)
+        if (value.id) return String(value.id)
+        if (value.id_qualifier) return String(value.id_qualifier)
+        // For provider objects
+        if (value.provider_name) return String(value.provider_name)
+        // For responseMessage objects, try to stringify safely
+        if (value.responseMessage) return String(value.responseMessage)
+        if (value.response_message) return String(value.response_message)
         // Otherwise, return a safe string representation
         return '[Object]'
       }
@@ -114,15 +100,31 @@ const DataTable: React.FC<DataTableProps> = ({
 
     return (
       <tr className="hover:bg-gray-50 transition-colors">
-        {columns.map(column => (
-          <td
-            key={column.key}
-            className={`px-4 py-3 text-sm ${getAlignmentClass(column.align)}`}
-            style={column.width ? { width: column.width } : {}}
-          >
-            {column.render ? column.render(row[column.key], row) : renderCellValue(row[column.key])}
-          </td>
-        ))}
+        {columns.map(column => {
+          const cellValue = row[column.key]
+          let renderedContent: React.ReactNode
+          
+          if (column.render) {
+            try {
+              renderedContent = column.render(cellValue, row)
+            } catch (error) {
+              // If render function fails (e.g., trying to render an object), fall back to renderCellValue
+              renderedContent = renderCellValue(cellValue)
+            }
+          } else {
+            renderedContent = renderCellValue(cellValue)
+          }
+          
+          return (
+            <td
+              key={column.key}
+              className={`px-4 py-3 text-sm ${getAlignmentClass(column.align)}`}
+              style={column.width ? { width: column.width } : {}}
+            >
+              {renderedContent}
+            </td>
+          )
+        })}
       </tr>
     )
   }
@@ -236,13 +238,13 @@ const DataTable: React.FC<DataTableProps> = ({
   )
 }
 
-const TablePagination: React.FC<{
-  currentPage: number
-  totalPages: number
-  totalItems: number
-  onPageChange: (page: number) => void
-  pageSize: number
-}> = ({ currentPage, totalPages, totalItems, onPageChange, pageSize }) => {
+const TablePagination: React.FC<TablePaginationProps> = ({
+  currentPage,
+  totalPages,
+  totalItems,
+  onPageChange,
+  pageSize,
+}) => {
   const getPageNumbers = () => {
     const pages = []
     const showPages = 5

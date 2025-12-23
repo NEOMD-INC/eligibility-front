@@ -39,6 +39,7 @@ interface EligibilityHistoryFilters {
 interface EligibilityHistoryState {
   history: EligibilityHistoryItem[]
   loading: boolean
+  retryLoading: boolean
   error: string | null
   totalItems: number
   currentPage: number
@@ -49,6 +50,7 @@ interface EligibilityHistoryState {
 const initialState: EligibilityHistoryState = {
   history: [],
   loading: false,
+  retryLoading: false,
   error: null,
   totalItems: 0,
   currentPage: 1,
@@ -66,12 +68,13 @@ const initialState: EligibilityHistoryState = {
 export const fetchEligibilityHistory = createAsyncThunk(
   'eligibilityHistory/fetchEligibilityHistory',
   async (
-    params: { page: number; filters?: EligibilityHistoryFilters },
+    params: { page: number; filters?: EligibilityHistoryFilters; itemsPerPage?: number },
     { rejectWithValue }
   ) => {
     try {
       const apiFilters: any = {
         page: params.page,
+        per_page: params.itemsPerPage || 8,
       }
 
       if (params.filters?.serviceType) {
@@ -95,6 +98,21 @@ export const fetchEligibilityHistory = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error?.response?.data?.message || 'Failed to fetch eligibility history'
+      )
+    }
+  }
+)
+
+// Async thunk to retry eligibility submission
+export const retryEligibilitySubmission = createAsyncThunk(
+  'eligibilityHistory/retryEligibilitySubmission',
+  async (eligibilityId: string, { rejectWithValue }) => {
+    try {
+      const response = await EligibilityHistoryService.retryEligibilitySubmission(eligibilityId)
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(
+        error?.response?.data?.message || 'Failed to retry eligibility submission'
       )
     }
   }
@@ -198,6 +216,21 @@ const eligibilityHistorySlice = createSlice({
       })
       .addCase(fetchEligibilityHistory.rejected, (state, action) => {
         state.loading = false
+        state.error = action.payload as string
+      })
+
+    // Retry eligibility submission
+    builder
+      .addCase(retryEligibilitySubmission.pending, state => {
+        state.retryLoading = true
+        state.error = null
+      })
+      .addCase(retryEligibilitySubmission.fulfilled, state => {
+        state.retryLoading = false
+        state.error = null
+      })
+      .addCase(retryEligibilitySubmission.rejected, (state, action) => {
+        state.retryLoading = false
         state.error = action.payload as string
       })
   },

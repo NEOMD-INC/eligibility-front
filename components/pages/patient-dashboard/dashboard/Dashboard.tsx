@@ -12,6 +12,7 @@ import { fetchPatientDashboard } from '@/redux/slices/patient-dashboard/actions'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { TabTransition } from '@/components/providers/tab-transition-provider/TabTransitionProvider'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+import { TitleTransitionButton } from '@/components/providers/title-transition-provider/TittleTransitionProvider'
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>()
@@ -261,17 +262,14 @@ export default function Dashboard() {
             </h2>
 
             <p className="text-sm">
-              <span className="font-medium">{primaryCareProvider.name}</span>
-              <span className="ml-2 text-gray-500">NPI {primaryCareProvider.npi}</span>
+              <span className="font-medium">{provider.name}</span>
+              <br />
+              <span className="text-gray-500">NPI {provider.npi}</span>
             </p>
 
             <p className="text-sm text-gray-600">
-              {formatAddress(
-                primaryCareProvider.address,
-                primaryCareProvider.city,
-                primaryCareProvider.state,
-                primaryCareProvider.zip
-              ) || '486 Grove Street Apartment #20, New York, NY 10014-4444'}
+              {formatAddress(provider.address, provider.city, provider.state, provider.zip) ||
+                '486 Grove Street Apartment #20, New York, NY 10014-4444'}
             </p>
           </div>
 
@@ -299,7 +297,7 @@ export default function Dashboard() {
         <div className="bg-white shadow rounded-lg">
           <div className="flex border-b border-gray-200">
             {tabs.map((tab, index) => (
-              <button
+              <TitleTransitionButton
                 key={index}
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer ${
@@ -312,7 +310,7 @@ export default function Dashboard() {
                 {activeTab === tab && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
                 )}
-              </button>
+              </TitleTransitionButton>
             ))}
           </div>
           <div>

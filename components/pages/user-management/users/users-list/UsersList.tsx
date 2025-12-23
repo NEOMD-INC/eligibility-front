@@ -16,6 +16,7 @@ import {
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { getFilterOptions } from './components/users-list.config'
 
 export default function UsersList() {
   const dispatch = useDispatch<AppDispatch>()
@@ -78,30 +79,12 @@ export default function UsersList() {
     dispatch(setCurrentPage(1))
   }
 
-  const filterFields: FilterField[] = [
-    {
-      name: 'search',
-      label: 'Search',
-      type: 'text',
-      placeholder: 'Quick user search...',
-      value: searchText,
-      onChange: handleSearchChange as () => void,
-    },
-    {
-      name: 'role',
-      label: 'Search by Role',
-      type: 'select',
-      value: roleFilter,
-      onChange: handleRoleChange as () => void,
-      options: [
-        { value: 'allrole', label: 'All Role' },
-        { value: 'super_admin', label: 'Super Admin' },
-        { value: 'employee', label: 'Employee' },
-        { value: 'manager', label: 'Manager' },
-        { value: 'team_lead', label: 'Team Lead' },
-      ],
-    },
-  ]
+  const filterFields: any[] = getFilterOptions({
+    searchText,
+    roleFilter,
+    handleSearchChange,
+    handleRoleChange,
+  })
 
   const columns = UsersListColumns({ onDeleteClick: handleDeleteClick })
 

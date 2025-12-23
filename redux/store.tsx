@@ -12,6 +12,7 @@ import availityPayersReducer from './slices/settings/availity-payers/reducer'
 import eligibilitySettingsReducer from './slices/eligibility/settings/reducer'
 import eligibilityIndivitualReducer from './slices/eligibility/indivitual/reducer'
 import eligibilityHistoryReducer from './slices/eligibility/history/reducer'
+import eligibilityBulkReducer from './slices/eligibility/bulk/reducer'
 import eligibilityLogsReducer from './slices/logs/eligibility-logs/reducer'
 import storage from 'redux-persist/lib/storage'
 import { persistStore, persistReducer } from 'redux-persist'
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   eligibilitySettings: eligibilitySettingsReducer,
   eligibilityIndivitual: eligibilityIndivitualReducer,
   eligibilityHistory: eligibilityHistoryReducer,
+  eligibilityBulk: eligibilityBulkReducer,
   eligibilityLogs: eligibilityLogsReducer,
   patientDashboard: patientDashboardReducer,
 })

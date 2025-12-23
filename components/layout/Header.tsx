@@ -5,6 +5,7 @@ import { themeColors } from '@/theme'
 import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
+import { TitleTransitionButton } from '../providers/title-transition-provider/TittleTransitionProvider'
 
 const Header = () => {
   const [eligibilityOpen, setEligibilityOpen] = useState(false)
@@ -65,27 +66,39 @@ const Header = () => {
         >
           <a style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>NeoMD</a>
 
-          <Link
-            style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
-            href="/quick-link-dashboard"
-          >
-            Dashboard
-          </Link>
+          <TitleTransitionButton>
+            <Link
+              style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
+              href="/quick-link-dashboard"
+            >
+              Dashboard
+            </Link>
+          </TitleTransitionButton>
 
-          <Link
+          {/* <Link
             style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
             href="/patient-dashboard"
           >
             Patient Dashboard
-          </Link>
+          </Link> */}
+          <TitleTransitionButton>
+            <Link
+              style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
+              href="/eligibility/history"
+            >
+              Eligibility History
+            </Link>
+          </TitleTransitionButton>
 
           <div ref={eligibilityRef} className="relative">
-            <button
-              onClick={() => setEligibilityOpen(!eligibilityOpen)}
-              style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
-            >
-              Eligibility ▾
-            </button>
+            <TitleTransitionButton>
+              <button
+                onClick={() => setEligibilityOpen(!eligibilityOpen)}
+                style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
+              >
+                Eligibility ▾
+              </button>
+            </TitleTransitionButton>
 
             {eligibilityOpen && (
               <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
@@ -103,16 +116,17 @@ const Header = () => {
                 >
                   Bulk
                 </Link>
-                <Link
+                {/* <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/eligibility/history"
                   onClick={() => setEligibilityOpen(!eligibilityOpen)}
                 >
                   History
-                </Link>
+                </Link> */}
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/eligibility/settings"
+                  // href="/eligibility/settings"
+                  href="#"
                   onClick={() => setEligibilityOpen(!eligibilityOpen)}
                 >
                   Settings
@@ -122,39 +136,45 @@ const Header = () => {
           </div>
 
           <div ref={settingsRef} className="relative">
-            <button
-              onClick={() => setSettingsOpen(!settingsOpen)}
-              style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
-            >
-              Settings ▾
-            </button>
+            <TitleTransitionButton>
+              <button
+                onClick={() => setSettingsOpen(!settingsOpen)}
+                style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
+              >
+                Settings ▾
+              </button>
+            </TitleTransitionButton>
 
             {settingsOpen && (
               <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/settings/carrier-group"
+                  // href="/settings/carrier-group"
+                  href="#"
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Groups
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/settings/carrier-address"
+                  // href="/settings/carrier-address"
+                  href="#"
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Addresses
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/settings/carrier-setup"
+                  // href="/settings/carrier-setup"
+                  href="#"
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Carrier Setup
                 </Link>
                 <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/settings/availity-payer"
+                  // href="/settings/availity-payer"
+                  href="#"
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   Availity Payer
@@ -163,17 +183,21 @@ const Header = () => {
             )}
           </div>
 
-          <Link style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }} href="/logs">
-            Logs
-          </Link>
+          <TitleTransitionButton>
+            <Link style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }} href="/logs">
+              Logs
+            </Link>
+          </TitleTransitionButton>
 
           <div ref={userMgmtRef} className="relative">
-            <button
-              onClick={() => setUserMgmtOpen(!userMgmtOpen)}
-              style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
-            >
-              User Management ▾
-            </button>
+            <TitleTransitionButton>
+              <button
+                onClick={() => setUserMgmtOpen(!userMgmtOpen)}
+                style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
+              >
+                User Management ▾
+              </button>
+            </TitleTransitionButton>
 
             {userMgmtOpen && (
               <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
@@ -204,11 +228,13 @@ const Header = () => {
         </div>
 
         <div className="relative mt-3" ref={profileRef}>
-          <div onClick={() => setIsProductOpen(!isProductOpen)} className="cursor-pointer">
-            <div className="w-40 h-10 flex justify-end overflow-hidden">
-              <div>{user?.name ? `${user.name} ▾` : 'Super Admin ▾'}</div>
+          <TitleTransitionButton>
+            <div onClick={() => setIsProductOpen(!isProductOpen)} className="cursor-pointer">
+              <div className="w-40 h-10 flex justify-end overflow-hidden">
+                <div>{user?.name ? `${user.name} ▾` : 'Super Admin ▾'}</div>
+              </div>
             </div>
-          </div>
+          </TitleTransitionButton>
 
           {isProductOpen && (
             <div onClick={() => setIsProductOpen(!isProductOpen)}>

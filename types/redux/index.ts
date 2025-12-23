@@ -72,3 +72,11 @@ export interface PermissionsState extends BaseListState<Permission> {
   fetchPermissionLoading: boolean
 }
 
+// Eligibility Bulk State
+export interface EligibilityBulkState {
+  bulkData: unknown | null
+  loading: boolean
+  error: string | null
+  submitLoading: boolean
+}
+

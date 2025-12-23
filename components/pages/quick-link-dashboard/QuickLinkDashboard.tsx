@@ -1,94 +1,15 @@
 'use client'
-import { AnimatePresence, motion } from 'motion/react'
+
 import { useRouter } from 'next/navigation'
-import {
-  Building2,
-  MapPin,
-  Wrench,
-  CreditCard,
-  UserCheck,
-  Upload,
-  History,
-  Cog,
-} from 'lucide-react'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { TitleTransitionButton } from '@/components/providers/title-transition-provider/TittleTransitionProvider'
-
-interface QuickLinkItem {
-  name: string
-  path: string
-  icon: React.ReactNode
-  description?: string
-}
-
-interface QuickLinkCategory {
-  title: string
-  items: QuickLinkItem[]
-}
+import { QuickLinkCategory } from './types/type'
+import { getCategories } from './components/quick-link-dashboard.config'
 
 export default function QuickLinkDashboard() {
   const router = useRouter()
 
-  const categories: QuickLinkCategory[] = [
-    {
-      title: 'Carrier',
-      items: [
-        {
-          name: 'Carrier Group',
-          path: '/settings/carrier-group',
-          icon: <Building2 size={24} />,
-          description: 'Manage carrier groups',
-        },
-        {
-          name: 'Carrier Address',
-          path: '/settings/carrier-address',
-          icon: <MapPin size={24} />,
-          description: 'Manage carrier addresses',
-        },
-        {
-          name: 'Carrier Setup',
-          path: '/settings/carrier-setup',
-          icon: <Wrench size={24} />,
-          description: 'Configure carrier setups',
-        },
-        {
-          name: 'Availity Payer',
-          path: '/settings/availity-payer',
-          icon: <CreditCard size={24} />,
-          description: 'Manage Availity payers',
-        },
-      ],
-    },
-    {
-      title: 'Eligibility',
-      items: [
-        {
-          name: 'Individual Eligibility',
-          path: '/eligibility/indivitual',
-          icon: <UserCheck size={24} />,
-          description: 'Check individual eligibility',
-        },
-        {
-          name: 'Bulk Eligibility',
-          path: '/eligibility/bulk',
-          icon: <Upload size={24} />,
-          description: 'Upload bulk eligibility file',
-        },
-        {
-          name: 'Eligibility History',
-          path: '/eligibility/history',
-          icon: <History size={24} />,
-          description: 'View eligibility history',
-        },
-        {
-          name: 'Eligibility Settings',
-          path: '/eligibility/settings',
-          icon: <Cog size={24} />,
-          description: 'Configure eligibility settings',
-        },
-      ],
-    },
-  ]
+  const categories: QuickLinkCategory[] = getCategories()
 
   const handleNavigation = (path: string) => {
     router.push(path)

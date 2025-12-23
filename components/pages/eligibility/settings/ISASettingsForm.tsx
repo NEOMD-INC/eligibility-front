@@ -23,7 +23,6 @@ export default function ISASettingsForm() {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Validation Schema
   const validationSchema = Yup.object({
     idQualifier: Yup.string().required('ID Qualifier is required'),
     authorizationInformationQualifier: Yup.string().required(
@@ -84,19 +83,15 @@ export default function ISASettingsForm() {
       setErrorMsg('')
       dispatch(clearEligibilitySettingsError())
       try {
-        // Pad authorization information to exactly 15 spaces (not more)
         const authInfo = values.authorizationInformation.slice(0, 15)
         const paddedAuthInfo = authInfo.padEnd(15, ' ')
 
-        // Pad security information to exactly 15 spaces (not more)
         const securityInfo = values.securityInformation.slice(0, 15)
         const paddedSecurityInfo = securityInfo.padEnd(15, ' ')
 
-        // Pad sender ID to exactly 15 chars (not more)
         const senderId = values.senderId.slice(0, 15)
         const paddedSenderId = senderId.padEnd(15, ' ')
 
-        // Pad receiver ID to exactly 15 chars (not more)
         const receiverId = values.receiverId.slice(0, 15)
         const paddedReceiverId = receiverId.padEnd(15, ' ')
 
@@ -109,7 +104,6 @@ export default function ISASettingsForm() {
         }
 
         await dispatch(updateEligibilitySettings(formattedValues)).unwrap()
-        // Show success message or handle success
         setIsError(false)
         setErrorMsg('Settings saved successfully!')
       } catch (err: any) {
@@ -120,22 +114,22 @@ export default function ISASettingsForm() {
   })
 
   const handleAuthInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
+    const value = e.target.value.slice(0, 15)
     formik.setFieldValue('authorizationInformation', value)
   }
 
   const handleSecurityInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
+    const value = e.target.value.slice(0, 15)
     formik.setFieldValue('securityInformation', value)
   }
 
   const handleSenderIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
+    const value = e.target.value.slice(0, 15)
     formik.setFieldValue('senderId', value)
   }
 
   const handleReceiverIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.slice(0, 15) // Limit to exactly 15 chars
+    const value = e.target.value.slice(0, 15)
     formik.setFieldValue('receiverId', value)
   }
 
@@ -160,18 +154,18 @@ export default function ISASettingsForm() {
           isaData.authorization_information ||
           isaData.authorizationInformation ||
           ''
-        ).slice(0, 15), // Limit to 15 chars, preserve spaces
+        ).slice(0, 15),
         securityInformationQualifier:
           isaData.security_information_qualifier || isaData.securityInformationQualifier || '',
         securityInformation: (
           isaData.security_information ||
           isaData.securityInformation ||
           ''
-        ).slice(0, 15), // Limit to 15 chars, preserve spaces
+        ).slice(0, 15),
         senderQualifier: isaData.sender_qualifier || isaData.senderQualifier || '',
-        senderId: (isaData.sender_id || isaData.senderId || '').slice(0, 15), // Limit to 15 chars, preserve spaces
+        senderId: (isaData.sender_id || isaData.senderId || '').slice(0, 15),
         receiverQualifier: isaData.receiver_qualifier || isaData.receiverQualifier || '',
-        receiverId: (isaData.receiver_id || isaData.receiverId || '').slice(0, 15), // Limit to 15 chars, preserve spaces
+        receiverId: (isaData.receiver_id || isaData.receiverId || '').slice(0, 15),
         repetitionSeparator: isaData.repetition_separator || isaData.repetitionSeparator || '',
         controlVersion: isaData.control_version || isaData.controlVersion || '',
         acknowledgmentRequested:
@@ -181,10 +175,8 @@ export default function ISASettingsForm() {
           isaData.component_element_separator || isaData.componentElementSeparator || '',
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings])
 
-  // Update error message from Redux
   useEffect(() => {
     if (error) {
       setIsError(true)
@@ -213,11 +205,9 @@ export default function ISASettingsForm() {
               </div>
             )}
 
-            {/* Subscriber Settings Section */}
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Subscriber Settings</h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {/* ID Qualifier */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
                     ID Qualifier

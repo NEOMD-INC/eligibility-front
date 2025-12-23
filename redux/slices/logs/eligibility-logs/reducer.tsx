@@ -43,6 +43,7 @@ interface EligibilityLogsState {
   currentLog: EligibilityLogItem | null
   loading: boolean
   fetchLogLoading: boolean
+  retryLoading: boolean
   error: string | null
   totalItems: number
   currentPage: number
@@ -55,6 +56,7 @@ const initialState: EligibilityLogsState = {
   currentLog: null,
   loading: false,
   fetchLogLoading: false,
+  retryLoading: false,
   error: null,
   totalItems: 0,
   currentPage: 1,
@@ -73,16 +75,18 @@ const initialState: EligibilityLogsState = {
 export const fetchAllLogs = createAsyncThunk(
   'eligibilityLogs/fetchAllLogs',
   async (
-    params: { page: number; filters?: EligibilityLogsFilters },
+    params: { page: number; filters?: EligibilityLogsFilters; itemsPerPage?: number },
     { rejectWithValue }
   ) => {
     try {
-      const response = await LogsService.getAllLogs(params.page, params.filters)
+      const response = await LogsService.getAllLogs(
+        params.page,
+        params.filters,
+        params.itemsPerPage || 8
+      )
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch eligibility logs'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch eligibility logs')
     }
   }
 )
@@ -92,11 +96,26 @@ export const fetchLogById = createAsyncThunk(
   'eligibilityLogs/fetchLogById',
   async (logId: string, { rejectWithValue }) => {
     try {
-      const response = await LogsService.getLogById(logId)
+      const response = await LogsService.getLogsById(logId)
       return response.data
     } catch (error: any) {
       return rejectWithValue(
         error?.response?.data?.message || 'Failed to fetch eligibility log details'
+      )
+    }
+  }
+)
+
+// Async thunk to retry eligibility submission
+export const retryEligibilitySubmission = createAsyncThunk(
+  'eligibilityLogs/retryEligibilitySubmission',
+  async (eligibilityId: string, { rejectWithValue }) => {
+    try {
+      const response = await LogsService.retryEligibilitySubmission(eligibilityId)
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(
+        error?.response?.data?.message || 'Failed to retry eligibility submission'
       )
     }
   }
@@ -235,4 +254,3 @@ export const {
   clearFilters,
 } = eligibilityLogsSlice.actions
 export default eligibilityLogsSlice.reducer
-

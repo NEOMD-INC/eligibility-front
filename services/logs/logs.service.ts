@@ -10,10 +10,12 @@ export const LogsService = {
       queue_status?: string
       service_date_from?: string
       service_date_to?: string
-    }
+    },
+    perPage: number = 8
   ) => {
     const params = new URLSearchParams({
       page: String(page),
+      per_page: String(perPage),
     })
 
     if (filters?.name) {
@@ -42,7 +44,12 @@ export const LogsService = {
 
     return api.get(`/eligibility-logs?${params.toString()}`)
   },
-  getLogById: (userId: string) => {
+  getLogsById: (userId: string) => {
     return api.get(`/eligibility-logs/${userId}`)
+  },
+  retryEligibilitySubmission: (userId: string) => {
+    return api.post(`eligibility-logs/${userId}/retry`, {}, {
+      skipToast: true, // Skip interceptor toast, we'll show custom message
+    } as any)
   },
 }

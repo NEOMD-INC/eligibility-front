@@ -139,90 +139,161 @@ export default function EligibilityLogDetail() {
   // Extract values from currentLog, handling nested objects based on actual API response
   const log = currentLog
   const queueStatus = getValue(log, 'queueStatus', 'queue_status', 'status') || 'N/A'
-  const eligibilityStatus = getValue(log, 'status', 'eligibilityStatus', 'eligibility_status') || 'N/A'
-  const neoReferenceId = getValue(log, 'neoReferenceId', 'neo_reference_id', 'neoRef', 'neo_ref') || 'N/A'
+  const eligibilityStatus =
+    getValue(log, 'status', 'eligibilityStatus', 'eligibility_status') || 'N/A'
+  const neoReferenceId =
+    getValue(log, 'neoReferenceId', 'neo_reference_id', 'neoRef', 'neo_ref') || 'N/A'
   const createdAt = getValue(log, 'createdAt', 'created_at', 'created') || null
-  
+
   // Handle nested subscriber object (from API response)
   const subscriber = log.subscriber
-  const subscriberId = typeof subscriber === 'object' && subscriber !== null
-    ? getValue(subscriber, 'member_id', 'id', 'subscriber_id')
-    : getValue(log, 'subscriberId', 'subscriber_id', 'subscriber')
-  const subscriberName = typeof subscriber === 'object' && subscriber !== null
-    ? getValue(subscriber, 'name', 'member_name')
-    : null
-  const subscriberDob = typeof subscriber === 'object' && subscriber !== null
-    ? getValue(subscriber, 'dob', 'date_of_birth', 'birth_date')
-    : null
-  const subscriberGender = typeof subscriber === 'object' && subscriber !== null
-    ? getValue(subscriber, 'gender', 'sex')
-    : null
-  
+  const subscriberId =
+    typeof subscriber === 'object' && subscriber !== null
+      ? getValue(subscriber, 'member_id', 'id', 'subscriber_id')
+      : getValue(log, 'subscriberId', 'subscriber_id', 'subscriber')
+  const subscriberName =
+    typeof subscriber === 'object' && subscriber !== null
+      ? getValue(subscriber, 'name', 'member_name')
+      : null
+  const subscriberDob =
+    typeof subscriber === 'object' && subscriber !== null
+      ? getValue(subscriber, 'dob', 'date_of_birth', 'birth_date')
+      : null
+  const subscriberGender =
+    typeof subscriber === 'object' && subscriber !== null
+      ? getValue(subscriber, 'gender', 'sex')
+      : null
+
   // Handle patient object (from API response) - may have more complete info
   const patient = log.patient
-  const patientName = typeof patient === 'object' && patient !== null
-    ? getValue(patient, 'name')
-    : subscriberName
-  const patientDob = typeof patient === 'object' && patient !== null
-    ? getValue(patient, 'dob', 'date_of_birth', 'birth_date')
-    : subscriberDob
-  const patientGender = typeof patient === 'object' && patient !== null
-    ? getValue(patient, 'gender', 'sex')
-    : subscriberGender
-  const patientAddress = typeof patient === 'object' && patient !== null
-    ? getValue(patient, 'address')
-    : null
-  const patientCity = typeof patient === 'object' && patient !== null
-    ? getValue(patient, 'city')
-    : null
-  const patientState = typeof patient === 'object' && patient !== null
-    ? getValue(patient, 'state')
-    : null
-  const patientZip = typeof patient === 'object' && patient !== null
-    ? getValue(patient, 'zip')
-    : null
-  
+  const patientName =
+    typeof patient === 'object' && patient !== null ? getValue(patient, 'name') : subscriberName
+  const patientDob =
+    typeof patient === 'object' && patient !== null
+      ? getValue(patient, 'dob', 'date_of_birth', 'birth_date')
+      : subscriberDob
+  const patientGender =
+    typeof patient === 'object' && patient !== null
+      ? getValue(patient, 'gender', 'sex')
+      : subscriberGender
+  const patientAddress =
+    typeof patient === 'object' && patient !== null ? getValue(patient, 'address') : null
+  const patientCity =
+    typeof patient === 'object' && patient !== null ? getValue(patient, 'city') : null
+  const patientState =
+    typeof patient === 'object' && patient !== null ? getValue(patient, 'state') : null
+  const patientZip =
+    typeof patient === 'object' && patient !== null ? getValue(patient, 'zip') : null
+
   // Handle nested provider object (from API response)
   const provider = log.provider
-  const providerName = typeof provider === 'object' && provider !== null
-    ? getValue(provider, 'name', 'provider_name')
-    : getValue(log, 'providerName', 'provider_name', 'provider')
-  const providerNpi = typeof provider === 'object' && provider !== null
-    ? getValue(provider, 'npi', 'national_provider_id')
-    : getValue(log, 'npi', 'national_provider_id')
-  
+  const providerName =
+    typeof provider === 'object' && provider !== null
+      ? getValue(provider, 'name', 'provider_name')
+      : getValue(log, 'providerName', 'provider_name', 'provider', 'response_message')
+  const providerNpi =
+    typeof provider === 'object' && provider !== null
+      ? getValue(provider, 'npi', 'national_provider_id')
+      : getValue(log, 'npi', 'national_provider_id')
+
   // Handle payer object (from API response)
   const payer = log.payer
-  const payerName = typeof payer === 'object' && payer !== null
-    ? getValue(payer, 'name', 'payer_name')
-    : null
-  const payerId = typeof payer === 'object' && payer !== null
-    ? getValue(payer, 'payer_id', 'id')
-    : null
-  
+  const payerName =
+    typeof payer === 'object' && payer !== null ? getValue(payer, 'name', 'payer_name') : null
+  const payerId =
+    typeof payer === 'object' && payer !== null ? getValue(payer, 'payer_id', 'id') : null
+
   // Handle coverage object (from API response)
   const coverage = log.coverage
-  const relationshipCode = typeof coverage === 'object' && coverage !== null
-    ? getValue(coverage, 'relationship_code')
-    : typeof patient === 'object' && patient !== null
-      ? getValue(patient, 'relationship_code')
-      : typeof subscriber === 'object' && subscriber !== null
-        ? getValue(subscriber, 'relationship_code', 'relationshipCode')
-        : getValue(log, 'relationshipCode', 'relationship_code')
-  const relationshipName = typeof coverage === 'object' && coverage !== null
-    ? getValue(coverage, 'relationship_name')
-    : typeof patient === 'object' && patient !== null
-      ? getValue(patient, 'relationship_name')
-      : null
-  
+  const relationshipCode =
+    typeof coverage === 'object' && coverage !== null
+      ? getValue(coverage, 'relationship_code')
+      : typeof patient === 'object' && patient !== null
+        ? getValue(patient, 'relationship_code')
+        : typeof subscriber === 'object' && subscriber !== null
+          ? getValue(subscriber, 'relationship_code', 'relationshipCode')
+          : getValue(log, 'relationshipCode', 'relationship_code')
+  const relationshipName =
+    typeof coverage === 'object' && coverage !== null
+      ? getValue(coverage, 'relationship_name')
+      : typeof patient === 'object' && patient !== null
+        ? getValue(patient, 'relationship_name')
+        : null
+
   const serviceDate = getValue(log, 'serviceDate', 'service_date') || null
-  const serviceTypeCode = getValue(log, 'serviceTypeCode', 'service_type_code', 'serviceType', 'service_type')
-  
+  const serviceTypeCode = getValue(
+    log,
+    'serviceTypeCode',
+    'service_type_code',
+    'serviceType',
+    'service_type'
+  )
+
   // Place of service - check if it exists in the log
   const placeOfServiceCode = getValue(log, 'placeOfService', 'place_of_service', 'pos')
+
+  const request270 = log['270_edi_request']
+  const response271 = log['271_edi_response']
+
+  // Extract response messages - check multiple possible locations
+  let responseMessage: string | null = null
   
-  const request270 = getValue(log, 'request270', 'request_270', 'requestUrl', 'request_url')
-  const response271 = getValue(log, 'response271', 'response_271', 'responseUrl', 'response_url', 'response_message', 'responseMessage')
+  // First try direct response message fields
+  const directMessage = getValue(log, 'responseMessage', 'response_message')
+  if (directMessage) {
+    if (typeof directMessage === 'string') {
+      responseMessage = directMessage
+    } else if (Array.isArray(directMessage)) {
+      responseMessage = directMessage
+        .filter((msg: any) => msg && typeof msg === 'string')
+        .join('\n')
+    } else if (typeof directMessage === 'object') {
+      responseMessage = JSON.stringify(directMessage, null, 2)
+    } else {
+      responseMessage = String(directMessage)
+    }
+  }
+  
+  // If no direct message, check global_messages array
+  if (!responseMessage && Array.isArray(log.global_messages) && log.global_messages.length > 0) {
+    responseMessage = log.global_messages
+      .filter((msg: any) => msg && typeof msg === 'string')
+      .join('\n')
+  }
+  
+  // If still no message, check messages array
+  if (!responseMessage && Array.isArray(log.messages) && log.messages.length > 0) {
+    responseMessage = log.messages
+      .filter((msg: any) => msg && typeof msg === 'string')
+      .join('\n')
+  }
+  
+  // Check if there are messages in benefits object
+  if (!responseMessage && log.benefits) {
+    const benefitsMessages: string[] = []
+    
+    // Check in_network benefits
+    if (Array.isArray(log.benefits.in_network)) {
+      log.benefits.in_network.forEach((benefit: any) => {
+        if (Array.isArray(benefit.messages)) {
+          benefitsMessages.push(...benefit.messages.filter((m: any) => typeof m === 'string'))
+        }
+      })
+    }
+    
+    // Check both_networks benefits
+    if (Array.isArray(log.benefits.both_networks)) {
+      log.benefits.both_networks.forEach((benefit: any) => {
+        if (Array.isArray(benefit.messages)) {
+          benefitsMessages.push(...benefit.messages.filter((m: any) => typeof m === 'string'))
+        }
+      })
+    }
+    
+    if (benefitsMessages.length > 0) {
+      responseMessage = [...new Set(benefitsMessages)].join('\n')
+    }
+  }
 
   return (
     <PageTransition>
@@ -331,14 +402,17 @@ export default function EligibilityLogDetail() {
                   Relationship
                 </label>
                 <p className="text-gray-900">
-                  {relationshipName || (relationshipCode ? getRelationshipCodeLabel(String(relationshipCode)) : 'N/A')}
+                  {relationshipName ||
+                    (relationshipCode ? getRelationshipCodeLabel(String(relationshipCode)) : 'N/A')}
                 </p>
               </div>
               {(patientAddress || patientCity || patientState || patientZip) && (
                 <div className="md:col-span-2 lg:col-span-3">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
                   <p className="text-gray-900">
-                    {[patientAddress, patientCity, patientState, patientZip].filter(Boolean).join(', ') || 'N/A'}
+                    {[patientAddress, patientCity, patientState, patientZip]
+                      .filter(Boolean)
+                      .join(', ') || 'N/A'}
                   </p>
                 </div>
               )}
@@ -370,6 +444,31 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
+          {/* Response and Information Section */}
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Response and Information
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Response Message
+                </label>
+                <div className="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                  {responseMessage ? (
+                    <p className="text-gray-900 whitespace-pre-wrap break-words">
+                      {typeof responseMessage === 'object'
+                        ? JSON.stringify(responseMessage, null, 2)
+                        : String(responseMessage)}
+                    </p>
+                  ) : (
+                    <p className="text-gray-500">No response message available</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Request 270 and Response 271 Section */}
           <div className="px-6 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -379,7 +478,8 @@ export default function EligibilityLogDetail() {
                 <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 min-h-[200px]">
                   {request270 ? (
                     <div className="space-y-2">
-                      {typeof request270 === 'string' && (request270.startsWith('http://') || request270.startsWith('https://')) ? (
+                      {typeof request270 === 'string' &&
+                      (request270.startsWith('http://') || request270.startsWith('https://')) ? (
                         <a
                           href={request270}
                           target="_blank"
@@ -390,7 +490,9 @@ export default function EligibilityLogDetail() {
                         </a>
                       ) : (
                         <pre className="text-sm text-gray-700 whitespace-pre-wrap break-words">
-                          {typeof request270 === 'object' ? JSON.stringify(request270, null, 2) : String(request270)}
+                          {typeof request270 === 'object'
+                            ? JSON.stringify(request270, null, 2)
+                            : String(request270)}
                         </pre>
                       )}
                     </div>
@@ -406,7 +508,8 @@ export default function EligibilityLogDetail() {
                 <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 min-h-[200px]">
                   {response271 ? (
                     <div className="space-y-2">
-                      {typeof response271 === 'string' && (response271.startsWith('http://') || response271.startsWith('https://')) ? (
+                      {typeof response271 === 'string' &&
+                      (response271.startsWith('http://') || response271.startsWith('https://')) ? (
                         <a
                           href={response271}
                           target="_blank"
@@ -417,7 +520,9 @@ export default function EligibilityLogDetail() {
                         </a>
                       ) : (
                         <pre className="text-sm text-gray-700 whitespace-pre-wrap break-words">
-                          {typeof response271 === 'object' ? JSON.stringify(response271, null, 2) : String(response271)}
+                          {typeof response271 === 'object'
+                            ? JSON.stringify(response271, null, 2)
+                            : String(response271)}
                         </pre>
                       )}
                     </div>
