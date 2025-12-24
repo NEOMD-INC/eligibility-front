@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { TitleTransitionButton } from '../providers/title-transition-provider/TittleTransitionProvider'
+import { PageTransition } from '../providers/page-transition-provider/PageTransitionProvider'
 
 const Header = () => {
   const [eligibilityOpen, setEligibilityOpen] = useState(false)
@@ -75,12 +76,6 @@ const Header = () => {
             </Link>
           </TitleTransitionButton>
 
-          {/* <Link
-            style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
-            href="/patient-dashboard"
-          >
-            Patient Dashboard
-          </Link> */}
           <TitleTransitionButton>
             <Link
               style={{ color: 'white', fontWeight: 500, cursor: 'pointer' }}
@@ -101,36 +96,38 @@ const Header = () => {
             </TitleTransitionButton>
 
             {eligibilityOpen && (
-              <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/eligibility/indivitual"
-                  onClick={() => setEligibilityOpen(!eligibilityOpen)}
-                >
-                  Indivitual
-                </Link>
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/eligibility/bulk"
-                  onClick={() => setEligibilityOpen(!eligibilityOpen)}
-                >
-                  Bulk
-                </Link>
-                {/* <Link
+              <PageTransition>
+                <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/eligibility/indivitual"
+                    onClick={() => setEligibilityOpen(!eligibilityOpen)}
+                  >
+                    Indivitual
+                  </Link>
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/eligibility/bulk"
+                    onClick={() => setEligibilityOpen(!eligibilityOpen)}
+                  >
+                    Bulk
+                  </Link>
+                  {/* <Link
                   className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
                   href="/eligibility/history"
                   onClick={() => setEligibilityOpen(!eligibilityOpen)}
                 >
                   History
                 </Link> */}
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/eligibility/settings"
-                  onClick={() => setEligibilityOpen(!eligibilityOpen)}
-                >
-                  Settings
-                </Link>
-              </div>
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/eligibility/settings"
+                    onClick={() => setEligibilityOpen(!eligibilityOpen)}
+                  >
+                    Settings
+                  </Link>
+                </div>
+              </PageTransition>
             )}
           </div>
 
@@ -145,36 +142,38 @@ const Header = () => {
             </TitleTransitionButton>
 
             {settingsOpen && (
-              <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/settings/carrier-group"
-                  onClick={() => setSettingsOpen(!settingsOpen)}
-                >
-                  Carrier Groups
-                </Link>
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/settings/carrier-address"
-                  onClick={() => setSettingsOpen(!settingsOpen)}
-                >
-                  Carrier Addresses
-                </Link>
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/settings/carrier-setup"
-                  onClick={() => setSettingsOpen(!settingsOpen)}
-                >
-                  Carrier Setup
-                </Link>
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/settings/availity-payer"
-                  onClick={() => setSettingsOpen(!settingsOpen)}
-                >
-                  Availity Payer
-                </Link>
-              </div>
+              <PageTransition>
+                <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/settings/carrier-group"
+                    onClick={() => setSettingsOpen(!settingsOpen)}
+                  >
+                    Carrier Groups
+                  </Link>
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/settings/carrier-address"
+                    onClick={() => setSettingsOpen(!settingsOpen)}
+                  >
+                    Carrier Addresses
+                  </Link>
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/settings/carrier-setup"
+                    onClick={() => setSettingsOpen(!settingsOpen)}
+                  >
+                    Carrier Setup
+                  </Link>
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/settings/availity-payer"
+                    onClick={() => setSettingsOpen(!settingsOpen)}
+                  >
+                    Availity Payer
+                  </Link>
+                </div>
+              </PageTransition>
             )}
           </div>
 
@@ -195,29 +194,31 @@ const Header = () => {
             </TitleTransitionButton>
 
             {userMgmtOpen && (
-              <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/user-management/users"
-                  onClick={() => setUserMgmtOpen(!userMgmtOpen)}
-                >
-                  Users
-                </Link>
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/user-management/roles"
-                  onClick={() => setUserMgmtOpen(!userMgmtOpen)}
-                >
-                  Roles
-                </Link>
-                <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/user-management/permissions"
-                  onClick={() => setUserMgmtOpen(!userMgmtOpen)}
-                >
-                  Permissions
-                </Link>
-              </div>
+              <PageTransition>
+                <div className="absolute mt-2 bg-white text-black shadow-md rounded-md min-w-[200px] p-2">
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/user-management/users"
+                    onClick={() => setUserMgmtOpen(!userMgmtOpen)}
+                  >
+                    Users
+                  </Link>
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/user-management/roles"
+                    onClick={() => setUserMgmtOpen(!userMgmtOpen)}
+                  >
+                    Roles
+                  </Link>
+                  <Link
+                    className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    href="/user-management/permissions"
+                    onClick={() => setUserMgmtOpen(!userMgmtOpen)}
+                  >
+                    Permissions
+                  </Link>
+                </div>
+              </PageTransition>
             )}
           </div>
         </div>
@@ -233,7 +234,9 @@ const Header = () => {
 
           {isProductOpen && (
             <div onClick={() => setIsProductOpen(!isProductOpen)}>
-              <MenuItems />
+              <PageTransition>
+                <MenuItems />
+              </PageTransition>
             </div>
           )}
         </div>

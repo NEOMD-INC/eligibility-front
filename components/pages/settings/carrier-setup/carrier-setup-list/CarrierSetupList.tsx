@@ -15,11 +15,21 @@ import {
 } from '@/redux/slices/settings/carrier-setups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function CarrierSetupList() {
   const dispatch = useDispatch<AppDispatch>()
   const { carrierSetups, loading, error, totalItems, currentPage, itemsPerPage, deleteLoading } =
     useSelector((state: RootState) => state.carrierSetups)
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    id: string | null
+    carrierSetupName: string | null
+  }>({
+    isOpen: false,
+    id: null,
+    carrierSetupName: null,
+  })
 
   // Fetch carrier setups on mount and when page changes
   useEffect(() => {
@@ -28,11 +38,20 @@ export default function CarrierSetupList() {
   }, [dispatch, currentPage])
 
   const handleDeleteClick = (id: string, carrierSetupName: string) => {
-    if (confirm(`Are you sure you want to delete carrier setup "${carrierSetupName}"?`)) {
-      dispatch(deleteCarrierSetup(id)).then(() => {
-        dispatch(fetchAllCarrierSetups(currentPage))
-      })
-    }
+    setDeleteModal({
+      isOpen: true,
+      id,
+      carrierSetupName,
+    })
+  }
+
+  const handleDeleteConfirm = () => {
+    if (!deleteModal.id) return
+
+    dispatch(deleteCarrierSetup(deleteModal.id)).then(() => {
+      dispatch(fetchAllCarrierSetups(currentPage))
+      setDeleteModal({ isOpen: false, id: null, carrierSetupName: null })
+    })
   }
 
   const columns = CarrierSetupListColumns({ onDeleteClick: handleDeleteClick })
@@ -43,7 +62,7 @@ export default function CarrierSetupList() {
 
   return (
     <PageTransition>
-      <div className="p-6">
+      <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
             <h1
@@ -95,6 +114,19 @@ export default function CarrierSetupList() {
             className="shadow-none rounded-none"
           />
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal.isOpen}
+          onClose={() => setDeleteModal({ isOpen: false, id: null, carrierSetupName: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Carrier Setup"
+          message={`Are you sure you want to delete carrier setup "${deleteModal.carrierSetupName}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

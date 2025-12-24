@@ -25,7 +25,7 @@ import {
 const validationSchema = Yup.object({
   file: Yup.mixed<File | null>()
     .required('File is required')
-    .test('fileType', 'Only CSV files are allowed', (value) => {
+    .test('fileType', 'Only CSV files are allowed', value => {
       if (!value) return false
       const file = value as File
       const allowedTypes = ['text/csv']
@@ -34,10 +34,10 @@ const validationSchema = Yup.object({
 
       return allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension)
     })
-    .test('fileSize', 'File size must be less than 10MB', (value) => {
+    .test('fileSize', 'File size must be less than 10MB', value => {
       if (!value) return false
       const file = value as File
-      return file.size <= 10 * 1024 * 1024 // 10MB
+      return file.size <= 10 * 1024 * 1024
     }),
 })
 
@@ -65,9 +65,7 @@ export default function BulkEligibilityForm() {
       try {
         await dispatch(submitBulkEligibility(values.file)).unwrap()
         router.push('/eligibility/history')
-      } catch (error) {
-        // Error is handled by Redux and toast will be shown via axios interceptor
-      }
+      } catch (error) {}
     },
   })
 
@@ -92,7 +90,6 @@ export default function BulkEligibilityForm() {
           <h1 className="text-2xl font-semibold text-gray-900 mb-6">Upload Eligibility File</h1>
 
           <form onSubmit={formik.handleSubmit} className="space-y-6">
-            {/* File Upload Area */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select File <span className="text-red-500">*</span>

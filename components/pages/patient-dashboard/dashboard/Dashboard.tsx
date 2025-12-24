@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import CoverageAndBenefits from './components/tabs/coverage-and-benefits/CoverageAndBenefits'
 import Copay from './components/tabs/copay/Copay'
 import Deductible from './components/tabs/deductible/Deductible'
@@ -15,18 +16,20 @@ import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLo
 import { TitleTransitionButton } from '@/components/providers/title-transition-provider/TittleTransitionProvider'
 
 export default function Dashboard() {
+  const searchParams = useSearchParams()
+  const logId = searchParams?.get('logId')
   const dispatch = useDispatch<AppDispatch>()
   const { patientData, loading, error } = useSelector((state: RootState) => state.patientDashboard)
   const [activeTab, setActiveTab] = useState('Coverage and Benefits')
-  const patientInformation = patientData?.patient || {}
-  const subscriber = patientData?.subscriber || {}
-  const managedCareOrganization = patientData?.mco || {}
-  const coverages = patientData?.coverage || []
-  const provider = patientData?.provider || {}
-  const dates = patientData?.dates || {}
-  const benefits = patientData?.benefits || {}
-  const primaryCareProvider = patientData?.primary_care_provider || {}
-  const payer = patientData?.payer || {}
+  const patientInformation: any = patientData?.patient || {}
+  const subscriber: any = patientData?.subscriber || {}
+  const managedCareOrganization: any = patientData?.mco || {}
+  const coverages: any = patientData?.coverage || []
+  const provider: any = patientData?.provider || {}
+  const dates: any = patientData?.dates || {}
+  const benefits: any = patientData?.benefits || {}
+  const primaryCareProvider: any = patientData?.primary_care_provider || {}
+  const payer: any = patientData?.payer || {}
 
   // Extract all benefits from all network types
   const allBenefits = useMemo(() => {
@@ -102,18 +105,35 @@ export default function Dashboard() {
       benefit_type: string
       service_type_code: string
       coverage_level: string
-      coinsurance_value: any
+      coinsurance_value: number | string | null
+      coinsurance_percent?: number
+      coinsurance_time_period?: string
       network?: string
       messages?: string[]
     }> = []
 
     allBenefits.forEach((benefit: any) => {
       if (benefit.coinsurance !== null && benefit.coinsurance !== undefined) {
+        // Handle coinsurance as object with percent and time_period
+        let coinsuranceValue: number | string | null = null
+        let coinsurancePercent: number | undefined
+        let coinsuranceTimePeriod: string | undefined
+
+        if (typeof benefit.coinsurance === 'object') {
+          coinsurancePercent = benefit.coinsurance.percent
+          coinsuranceTimePeriod = benefit.coinsurance.time_period
+          coinsuranceValue = coinsurancePercent !== undefined ? coinsurancePercent : null
+        } else {
+          coinsuranceValue = benefit.coinsurance
+        }
+
         coinsurance.push({
           benefit_type: benefit.benefit_type || 'N/A',
           service_type_code: benefit.service_type_code || '',
           coverage_level: benefit.coverage_level || benefit.coverage_level_code || '',
-          coinsurance_value: benefit.coinsurance,
+          coinsurance_value: coinsuranceValue,
+          coinsurance_percent: coinsurancePercent,
+          coinsurance_time_period: coinsuranceTimePeriod,
           network: benefit.network || null,
           messages: benefit.messages && Array.isArray(benefit.messages) ? benefit.messages : [],
         })
@@ -151,10 +171,47 @@ export default function Dashboard() {
   }, [allBenefits])
 
   useEffect(() => {
-    dispatch(fetchPatientDashboard(''))
-  }, [dispatch])
+    if (logId) {
+      dispatch(fetchPatientDashboard(logId))
+    }
+  }, [dispatch, logId])
+
+  // Show error if logId is missing
+  if (!logId) {
+    return (
+      <PageTransition>
+        <div className="w-full bg-gray-50 p-6">
+          <div className="bg-white shadow rounded-lg p-6 text-center">
+            <h1 className="text-2xl font-semibold text-gray-900 mb-4">Patient Dashboard</h1>
+            <p className="text-gray-600">
+              No log ID provided. Please select an eligibility check from the history.
+            </p>
+          </div>
+        </div>
+      </PageTransition>
+    )
+  }
 
   const tabs = ['Coverage and Benefits', 'Copay', 'Deductible', 'Coinsurance', 'Out of Pocket']
+
+  // Check if all tabs have empty data
+  const hasCoverageAndBenefitsData =
+    (benefits?.in_network && benefits.in_network.length > 0) ||
+    (benefits?.out_of_network && benefits.out_of_network.length > 0) ||
+    (benefits?.both_networks && benefits.both_networks.length > 0)
+
+  const hasCopayData = copaysData.length > 0
+  const hasDeductibleData = deductiblesData.length > 0
+  const hasCoinsuranceData = coinsuranceData.length > 0
+  const hasOutOfPocketData = outOfPocketData.length > 0
+
+  // Check if ALL tabs are empty
+  const allTabsEmpty =
+    !hasCoverageAndBenefitsData &&
+    !hasCopayData &&
+    !hasDeductibleData &&
+    !hasCoinsuranceData &&
+    !hasOutOfPocketData
 
   const formatAddress = (address: any, city?: string, state?: string, zip?: string) => {
     if (!address) {
@@ -268,8 +325,7 @@ export default function Dashboard() {
             </p>
 
             <p className="text-sm text-gray-600">
-              {formatAddress(provider.address, provider.city, provider.state, provider.zip) ||
-                '486 Grove Street Apartment #20, New York, NY 10014-4444'}
+              {formatAddress(provider.address, provider.city, provider.state, provider.zip)}
             </p>
           </div>
 
@@ -280,7 +336,7 @@ export default function Dashboard() {
 
             <p className="text-sm">
               <span className="font-medium">Name</span>
-              <span className="ml-2 text-gray-500">{managedCareOrganization.name}</span>
+              <span className="ml-2 text-gray-500">{payer.name}</span>
             </p>
 
             <p className="text-sm text-gray-600">
@@ -289,51 +345,53 @@ export default function Dashboard() {
                 managedCareOrganization.city,
                 managedCareOrganization.state,
                 managedCareOrganization.zip
-              ) || 'Address not available'}
+              )}
             </p>
           </div>
         </div>
 
-        <div className="bg-white shadow rounded-lg">
-          <div className="flex border-b border-gray-200">
-            {tabs.map((tab, index) => (
-              <TitleTransitionButton
-                key={index}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer ${
-                  activeTab === tab
-                    ? 'bg-blue-50 text-gray-700'
-                    : 'bg-white text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {tab}
-                {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+        {!allTabsEmpty && (
+          <div className="bg-white shadow rounded-lg">
+            <div className="flex border-b border-gray-200">
+              {tabs.map((tab, index) => (
+                <TitleTransitionButton
+                  key={index}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer ${
+                    activeTab === tab
+                      ? 'bg-blue-50 text-gray-700'
+                      : 'bg-white text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {tab}
+                  {activeTab === tab && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                  )}
+                </TitleTransitionButton>
+              ))}
+            </div>
+            <div>
+              <TabTransition>
+                {activeTab === 'Coverage and Benefits' ? (
+                  <CoverageAndBenefits benefits={benefits} />
+                ) : activeTab === 'Copay' ? (
+                  <Copay copaysData={copaysData} />
+                ) : activeTab === 'Deductible' ? (
+                  <Deductible deductiblesData={deductiblesData} />
+                ) : activeTab === 'Coinsurance' ? (
+                  <Coinsurance coinsuranceData={coinsuranceData} />
+                ) : activeTab === 'Out of Pocket' ? (
+                  <OutOfPocket outOfPocketData={outOfPocketData} />
+                ) : (
+                  <div className="p-12 text-center">
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">{activeTab}</h2>
+                    <p className="text-gray-500 text-lg">Coming Soon</p>
+                  </div>
                 )}
-              </TitleTransitionButton>
-            ))}
+              </TabTransition>
+            </div>
           </div>
-          <div>
-            <TabTransition>
-              {activeTab === 'Coverage and Benefits' ? (
-                <CoverageAndBenefits benefits={benefits} />
-              ) : activeTab === 'Copay' ? (
-                <Copay copaysData={copaysData} />
-              ) : activeTab === 'Deductible' ? (
-                <Deductible deductiblesData={deductiblesData} />
-              ) : activeTab === 'Coinsurance' ? (
-                <Coinsurance coinsuranceData={coinsuranceData} />
-              ) : activeTab === 'Out of Pocket' ? (
-                <OutOfPocket outOfPocketData={outOfPocketData} />
-              ) : (
-                <div className="p-12 text-center">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-2">{activeTab}</h2>
-                  <p className="text-gray-500 text-lg">Coming Soon</p>
-                </div>
-              )}
-            </TabTransition>
-          </div>
-        </div>
+        )}
       </div>
     </PageTransition>
   )

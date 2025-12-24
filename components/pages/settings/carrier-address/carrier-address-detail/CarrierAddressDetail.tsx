@@ -12,6 +12,8 @@ import {
 import { AppDispatch, RootState } from '@/redux/store'
 import { getCarrierAddressDetails } from './helper/helper'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+import { useState } from 'react'
 
 export default function CarrierAddressDetail() {
   const router = useRouter()
@@ -22,6 +24,7 @@ export default function CarrierAddressDetail() {
   const { currentCarrierAddress, fetchCarrierAddressLoading, deleteLoading, error } = useSelector(
     (state: RootState) => state.carrierAddresses
   )
+  const [deleteModal, setDeleteModal] = useState(false)
 
   // Fetch carrier address data on mount
   useEffect(() => {
@@ -34,17 +37,21 @@ export default function CarrierAddressDetail() {
     }
   }, [dispatch, carrierAddressId])
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    if (!carrierAddressId) return
+    setDeleteModal(true)
+  }
+
+  const handleDeleteConfirm = async () => {
     if (!carrierAddressId) return
 
-    if (confirm('Are you sure you want to delete this carrier address?')) {
-      dispatch(clearCarrierAddressesError())
-      try {
-        await dispatch(deleteCarrierAddress(carrierAddressId)).unwrap()
-        router.push('/settings/carrier-address')
-      } catch (err: any) {
-        alert(err || 'Failed to delete carrier address')
-      }
+    dispatch(clearCarrierAddressesError())
+    try {
+      await dispatch(deleteCarrierAddress(carrierAddressId)).unwrap()
+      router.push('/settings/carrier-address')
+    } catch (err: any) {
+      setDeleteModal(false)
+      alert(err || 'Failed to delete carrier address')
     }
   }
 
@@ -80,7 +87,7 @@ export default function CarrierAddressDetail() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
+      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6 relative">
         {/* Main Detail Card */}
         <div className="w-full bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-4 pb-3">Carrier Address Details</h1>
@@ -125,6 +132,19 @@ export default function CarrierAddressDetail() {
             </button>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal}
+          onClose={() => setDeleteModal(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Carrier Address"
+          message="Are you sure you want to delete this carrier address?"
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

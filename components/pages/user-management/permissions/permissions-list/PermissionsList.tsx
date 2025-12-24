@@ -16,6 +16,7 @@ import {
 } from '@/redux/slices/user-management/permissions/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function PermissionsList() {
   const dispatch = useDispatch<AppDispatch>()
@@ -24,6 +25,15 @@ export default function PermissionsList() {
   )
   const [searchText, setSearchText] = useState('')
   const [appliedSearch, setAppliedSearch] = useState('')
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    id: string | null
+    permissionName: string | null
+  }>({
+    isOpen: false,
+    id: null,
+    permissionName: null,
+  })
   const itemsPerPage = 8
 
   // Fetch permissions on component mount and when applied filters/page change
@@ -35,17 +45,28 @@ export default function PermissionsList() {
     dispatch(fetchAllPermissions({ page: currentPage, filters }))
   }, [dispatch, currentPage, appliedSearch])
 
-  const handleDeleteClick = async (id: string, permissionName: string) => {
-    if (confirm(`Are you sure you want to delete permission "${permissionName}"?`)) {
-      dispatch(clearPermissionsError())
-      const result = await dispatch(deletePermission(id))
-      if (deletePermission.fulfilled.match(result)) {
-        const filters: { search?: string } = {}
-        if (appliedSearch.trim()) {
-          filters.search = appliedSearch.trim()
-        }
-        dispatch(fetchAllPermissions({ page: currentPage, filters }))
+  const handleDeleteClick = (id: string, permissionName: string) => {
+    setDeleteModal({
+      isOpen: true,
+      id,
+      permissionName,
+    })
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.id) return
+
+    dispatch(clearPermissionsError())
+    const result = await dispatch(deletePermission(deleteModal.id))
+    if (deletePermission.fulfilled.match(result)) {
+      const filters: { search?: string } = {}
+      if (appliedSearch.trim()) {
+        filters.search = appliedSearch.trim()
       }
+      dispatch(fetchAllPermissions({ page: currentPage, filters }))
+      setDeleteModal({ isOpen: false, id: null, permissionName: null })
+    } else {
+      setDeleteModal({ isOpen: false, id: null, permissionName: null })
     }
   }
 
@@ -83,7 +104,7 @@ export default function PermissionsList() {
 
   return (
     <PageTransition>
-      <div className="p-6">
+      <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
             <h1
@@ -139,6 +160,19 @@ export default function PermissionsList() {
             </div>
           )}
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal.isOpen}
+          onClose={() => setDeleteModal({ isOpen: false, id: null, permissionName: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Permission"
+          message={`Are you sure you want to delete permission "${deleteModal.permissionName}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

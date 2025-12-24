@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-import { themeColors } from '@/theme'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/services/auth.service'
 import { useSearchParams } from 'next/navigation'
@@ -44,7 +43,7 @@ export default function ResetPage() {
           password_confirmation: values.confirmPassword,
         }
 
-        await authService.resetPassword(payload)
+        await authService.resetPassword(payload as any)
 
         router.push('/login')
       } catch (err: any) {

@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
+import React from 'react'
 
 const variants = {
   hidden: { opacity: 0, y: 6 },
@@ -11,7 +12,11 @@ const transition = {
   ease: [0.22, 1, 0.36, 1],
 }
 
-export function TabTransition({ children }) {
+export interface TabTransitionProps {
+  children: React.ReactNode
+}
+
+export function TabTransition({ children }: TabTransitionProps) {
   return (
     <AnimatePresence mode="wait">
       <motion.div

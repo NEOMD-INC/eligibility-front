@@ -89,15 +89,21 @@ export default function AddUpdateUser() {
   // Extract current roles when user data is loaded
   useEffect(() => {
     if (isEditMode && currentUser) {
-      if (currentUser.roles && Array.isArray(currentUser.roles)) {
-        const roleNames = currentUser.roles.map((role: any) =>
-          typeof role === 'string' ? role : role?.name || ''
-        )
+      if (currentUser.roles && Array.isArray(currentUser.roles) && currentUser.roles.length > 0) {
+        const roleNames = currentUser.roles
+          .map((role: any) => (typeof role === 'string' ? role : role?.name || ''))
+          .filter((name: string) => name !== '')
         setCurrentRoles(roleNames)
       } else if (currentUser.role) {
         const roleName =
           typeof currentUser.role === 'string' ? currentUser.role : currentUser.role?.name || ''
-        setCurrentRoles([roleName])
+        if (roleName) {
+          setCurrentRoles([roleName])
+        } else {
+          setCurrentRoles([])
+        }
+      } else {
+        setCurrentRoles([])
       }
     }
   }, [currentUser, isEditMode])
@@ -146,8 +152,8 @@ export default function AddUpdateUser() {
   // Unified Formik instance
   const formik = useFormik<UserFormValues>({
     initialValues: {
-      fullName: currentUser?.name || currentUser?.full_name || '',
-      email: currentUser?.email || '',
+      fullName: (isEditMode && currentUser) ? (currentUser.name || currentUser.full_name || '') : '',
+      email: (isEditMode && currentUser) ? (currentUser.email || '') : '',
       password: '',
       confirmPassword: '',
       newPassword: '',
@@ -172,8 +178,11 @@ export default function AddUpdateUser() {
             userData.password_confirmation = values.confirmNewPassword?.trim() || ''
           }
           // Preserve existing roles
-          if (currentUser?.roles) {
-            userData.roles = [currentUser.roles[0].id]
+          if (currentUser?.roles && Array.isArray(currentUser.roles) && currentUser.roles.length > 0) {
+            const firstRole = currentUser.roles[0]
+            if (firstRole && (firstRole.id || firstRole)) {
+              userData.roles = [firstRole.id || firstRole]
+            }
           }
           const result = await dispatch(updateUser({ userId, userData }))
           if (updateUser.fulfilled.match(result)) {

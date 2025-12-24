@@ -12,4 +12,7 @@ export const EligibilityIndivitualService = {
   addEligibilityIndivitualNpiPractice: (userData: {}) => {
     return api.post('/eligibility-check/store', userData)
   },
+  verifyNpiNumber: (npiNumber: string) => {
+    return api.get(`/verify-npi/${npiNumber}`)
+  },
 }

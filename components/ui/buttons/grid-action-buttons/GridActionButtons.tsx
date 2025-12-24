@@ -2,29 +2,44 @@ import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { Eye, FilePenLine, Trash2, RotateCw } from 'lucide-react'
 
-const GridActionButtons = ({
+export interface GridActionButtonsProps {
+  data: Record<string, any>
+  from?: string
+  editBtnPath?: string
+  showBtnPath?: string
+  deleteResourceId?: (id: string | number) => void
+  retryResourceId?: (id: string | number) => void
+  showIdDispatch?: (id: string | number | null) => void
+  editIdDispatch?: (id: string | number | null) => void
+  editDrawerId?: string
+  showDrawerId?: string
+  viewPermission?: boolean
+  updatePermission?: boolean
+  deletePermission?: boolean
+  retryPermission?: boolean
+  isUser?: boolean
+  isPending?: boolean
+}
+
+const GridActionButtons: React.FC<GridActionButtonsProps> = ({
   data,
   from = 'uuid',
-
   editBtnPath,
   showBtnPath,
   deleteResourceId,
   retryResourceId,
-
   showIdDispatch,
   editIdDispatch,
-
   editDrawerId,
   showDrawerId,
-
   viewPermission,
   updatePermission,
   deletePermission,
   retryPermission,
-
   isUser,
+  isPending,
 }) => {
-  const handleShowClick = e => {
+  const handleShowClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!showBtnPath) e.preventDefault()
     editIdDispatch && editIdDispatch(null)
     showIdDispatch && showIdDispatch(data[from])
@@ -36,7 +51,7 @@ const GridActionButtons = ({
     }
   }
 
-  const handleEditClick = e => {
+  const handleEditClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!editBtnPath) e.preventDefault()
     showIdDispatch && showIdDispatch(null)
     editIdDispatch && editIdDispatch(data[from])
@@ -48,13 +63,24 @@ const GridActionButtons = ({
     }
   }
 
+  const PendingSpinner = () => (
+    <div
+      className="flex items-center justify-center w-8 h-8 rounded-md bg-yellow-500 mr-2"
+      title="Pending"
+    >
+      <div className="relative w-4 h-4">
+        <div className="absolute top-0 left-0 w-full h-full border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    </div>
+  )
+
   return (
     <Suspense fallback={<div className="text-gray-500 text-sm">Loading...</div>}>
       <div
         id="event_trigger"
         className="flex flex-row flex-nowrap items-center justify-start min-w-max"
       >
-        {/* Retry */}
+        {isPending && <PendingSpinner />}
         {retryPermission && (
           <button
             type="button"
@@ -71,7 +97,6 @@ const GridActionButtons = ({
           </button>
         )}
 
-        {/* View */}
         {viewPermission && (
           <Link
             href={showBtnPath || '#'}
@@ -84,7 +109,6 @@ const GridActionButtons = ({
           </Link>
         )}
 
-        {/* Edit */}
         {updatePermission && (
           <Link
             href={editBtnPath || '#'}
@@ -97,7 +121,6 @@ const GridActionButtons = ({
           </Link>
         )}
 
-        {/* Delete */}
         {deletePermission && (
           <button
             type="button"

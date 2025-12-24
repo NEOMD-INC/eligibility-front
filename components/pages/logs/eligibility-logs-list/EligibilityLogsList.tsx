@@ -17,6 +17,7 @@ import {
   clearFilters,
 } from '@/redux/slices/logs/eligibility-logs/actions'
 import { toastManager } from '@/utils/toast'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function EligibilityLogsList() {
   const dispatch = useDispatch<AppDispatch>()
@@ -24,35 +25,36 @@ export default function EligibilityLogsList() {
     useSelector((state: RootState) => state.eligibilityLogs)
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [retryModal, setRetryModal] = useState<{
+    isOpen: boolean
+    eligibilityId: string | null
+  }>({
+    isOpen: false,
+    eligibilityId: null,
+  })
 
-  // Check if any logs have pending or in_process status
-  const hasPendingLogs = logs.some(
-    (log: any) => {
-      const status = (log.status || '').toLowerCase()
-      const queueStatus = (log.queueStatus || log.queue_status || '').toLowerCase()
-      return (
-        status === 'pending' ||
-        status === 'in_process' ||
-        queueStatus === 'pending' ||
-        queueStatus === 'in_process' ||
-        queueStatus === 'processing'
-      )
-    }
-  )
+  const hasPendingLogs = logs.some((log: any) => {
+    const status = (log.status || '').toLowerCase()
+    const queueStatus = (log.queueStatus || log.queue_status || '').toLowerCase()
+    return (
+      status === 'pending' ||
+      status === 'in_process' ||
+      queueStatus === 'pending' ||
+      queueStatus === 'in_process' ||
+      queueStatus === 'processing'
+    )
+  })
 
-  // Fetch data on component mount and when page changes
   useEffect(() => {
     dispatch(fetchAllLogs({ page: currentPage, filters, itemsPerPage }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, currentPage])
 
-  // Auto-refresh when there are pending logs
   useEffect(() => {
     if (!hasPendingLogs || loading) return
 
     const intervalId = setInterval(() => {
       dispatch(fetchAllLogs({ page: currentPage, filters, itemsPerPage }))
-    }, 5000) // Refetch every 5 seconds
+    }, 5000)
 
     return () => {
       clearInterval(intervalId)
@@ -77,28 +79,35 @@ export default function EligibilityLogsList() {
 
   const handlePageChange = (page: number) => {
     dispatch(setCurrentPage(page))
-    // Scroll to top of table when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleRetryClick = async (eligibilityId: string) => {
-    if (confirm('Are you sure you want to retry this eligibility check?')) {
-      try {
-        const result = await dispatch(retryEligibilitySubmission(eligibilityId))
-        if (retryEligibilitySubmission.fulfilled.match(result)) {
-          toastManager.success('Eligibility submission retried successfully')
-          // Refresh the logs list
-          dispatch(fetchAllLogs({ page: currentPage, filters, itemsPerPage }))
-        } else {
-          const errorMessage =
-            (result.payload as string) || 'Failed to retry eligibility submission'
-          toastManager.error(errorMessage)
-        }
-      } catch (error: any) {
-        toastManager.error(
-          error?.message || 'An error occurred while retrying eligibility submission'
-        )
+  const handleRetryClick = (eligibilityId: string) => {
+    setRetryModal({
+      isOpen: true,
+      eligibilityId,
+    })
+  }
+
+  const handleRetryConfirm = async () => {
+    if (!retryModal.eligibilityId) return
+
+    try {
+      const result = await dispatch(retryEligibilitySubmission(retryModal.eligibilityId))
+      if (retryEligibilitySubmission.fulfilled.match(result)) {
+        toastManager.success('Eligibility submission retried successfully')
+        dispatch(fetchAllLogs({ page: currentPage, filters, itemsPerPage }))
+        setRetryModal({ isOpen: false, eligibilityId: null })
+      } else {
+        const errorMessage = (result.payload as string) || 'Failed to retry eligibility submission'
+        toastManager.error(errorMessage)
+        setRetryModal({ isOpen: false, eligibilityId: null })
       }
+    } catch (error: any) {
+      toastManager.error(
+        error?.message || 'An error occurred while retrying eligibility submission'
+      )
+      setRetryModal({ isOpen: false, eligibilityId: null })
     }
   }
 
@@ -158,7 +167,7 @@ export default function EligibilityLogsList() {
 
   return (
     <PageTransition>
-      <div className="p-6">
+      <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Eligibility Logs</h1>
@@ -167,7 +176,6 @@ export default function EligibilityLogsList() {
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          {/* Filter Dropdown Button - Right Side */}
           <div className="px-6 py-4 border-b border-gray-200 flex justify-end">
             <button
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
@@ -182,7 +190,6 @@ export default function EligibilityLogsList() {
             </button>
           </div>
 
-          {/* Filters Dropdown Content */}
           {isFiltersOpen && (
             <div className="border-b border-gray-200 bg-gray-50">
               <Filters
@@ -194,7 +201,6 @@ export default function EligibilityLogsList() {
             </div>
           )}
 
-          {/* DataTable */}
           <DataTable
             columns={columns}
             data={logs}
@@ -211,6 +217,18 @@ export default function EligibilityLogsList() {
             }
           />
         </div>
+
+        <ConfirmationModal
+          isOpen={retryModal.isOpen}
+          onClose={() => setRetryModal({ isOpen: false, eligibilityId: null })}
+          onConfirm={handleRetryConfirm}
+          title="Retry Eligibility Check"
+          message="Are you sure you want to retry this eligibility check?"
+          confirmText="Retry"
+          cancelText="Cancel"
+          confirmButtonClass="bg-blue-600 hover:bg-blue-700"
+          isLoading={retryLoading}
+        />
       </div>
     </PageTransition>
   )

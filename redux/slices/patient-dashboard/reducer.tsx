@@ -9,17 +9,17 @@ const initialState: PatientDashboardState = {
   error: null,
 }
 
-// Async thunk to fetch user by ID
+// Async thunk to fetch patient dashboard by logId
 export const fetchPatientDashboard = createAsyncThunk(
-  'users/fetchPatientDashboard',
-  async (userId: string, { rejectWithValue }) => {
+  'patientDashboard/fetchPatientDashboard',
+  async (logId: string, { rejectWithValue }) => {
     try {
-      const response = await PatientDashboardService.getPatientDashboardDetails()
+      const response = await PatientDashboardService.getPatientDashboardDetails(logId)
       return response.data
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>
       return rejectWithValue(
-        axiosError?.response?.data?.message || 'Failed to fetch user details'
+        axiosError?.response?.data?.message || 'Failed to fetch patient dashboard details'
       )
     }
   }

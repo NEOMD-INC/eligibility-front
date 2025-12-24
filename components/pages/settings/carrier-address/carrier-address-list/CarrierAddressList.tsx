@@ -15,11 +15,21 @@ import {
 } from '@/redux/slices/settings/carrier-addresses/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function CarrierAddressList() {
   const dispatch = useDispatch<AppDispatch>()
   const { carrierAddresses, loading, error, totalItems, currentPage, itemsPerPage, deleteLoading } =
     useSelector((state: RootState) => state.carrierAddresses)
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    id: string | null
+    carrierAddressName: string | null
+  }>({
+    isOpen: false,
+    id: null,
+    carrierAddressName: null,
+  })
 
   // Fetch carrier addresses on mount and when page changes
   useEffect(() => {
@@ -28,12 +38,21 @@ export default function CarrierAddressList() {
   }, [dispatch, currentPage])
 
   const handleDeleteClick = (id: string, carrierAddressName: string) => {
-    if (confirm(`Are you sure you want to delete carrier address "${carrierAddressName}"?`)) {
-      dispatch(deleteCarrierAddress(id)).then(() => {
-        // Refetch the list after deletion
-        dispatch(fetchAllCarrierAddresses(currentPage))
-      })
-    }
+    setDeleteModal({
+      isOpen: true,
+      id,
+      carrierAddressName,
+    })
+  }
+
+  const handleDeleteConfirm = () => {
+    if (!deleteModal.id) return
+
+    dispatch(deleteCarrierAddress(deleteModal.id)).then(() => {
+      // Refetch the list after deletion
+      dispatch(fetchAllCarrierAddresses(currentPage))
+      setDeleteModal({ isOpen: false, id: null, carrierAddressName: null })
+    })
   }
 
   const columns = CarrierAddressListColumns({ onDeleteClick: handleDeleteClick })
@@ -44,7 +63,7 @@ export default function CarrierAddressList() {
 
   return (
     <PageTransition>
-      <div className="p-6">
+      <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
             <h1
@@ -96,6 +115,19 @@ export default function CarrierAddressList() {
             className="shadow-none rounded-none"
           />
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal.isOpen}
+          onClose={() => setDeleteModal({ isOpen: false, id: null, carrierAddressName: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Carrier Address"
+          message={`Are you sure you want to delete carrier address "${deleteModal.carrierAddressName}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

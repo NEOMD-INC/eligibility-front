@@ -58,7 +58,6 @@ export default function EligibilityHistoryColumns({
       width: '12%',
       align: 'left' as const,
       render: (value: any, record: any) => {
-        // Handle if subscriber is an object
         if (record.subscriber && typeof record.subscriber === 'object') {
           return (
             <div className="text-gray-900 truncate">
@@ -83,7 +82,6 @@ export default function EligibilityHistoryColumns({
       width: '12%',
       align: 'left' as const,
       render: (value: any, record: any) => {
-        // Handle if provider is an object
         if (record.provider && typeof record.provider === 'object') {
           const providerName = record.provider.name || record.provider.provider_name || ''
           const providerNpi = record.provider.npi || ''
@@ -188,14 +186,14 @@ export default function EligibilityHistoryColumns({
       width: '12%',
       align: 'center' as const,
       render: (value: any, record: any) => {
-        const historyId = record.eligibility_id || record.id || record.uuid
+        const historyId = record.eligibility_id
         return (
           <div className="flex justify-center items-center w-full">
             <GridActionButtons
               data={{ ...record, id: historyId }}
               from="id"
               editBtnPath={historyId ? `/eligibility/indivitual?logId=${historyId}` : '#'}
-              showBtnPath={`/patient-dashboard`}
+              showBtnPath={`/patient-dashboard?logId=${historyId}`}
               retryResourceId={
                 onRetryClick && historyId
                   ? (id: string) => {
@@ -208,16 +206,31 @@ export default function EligibilityHistoryColumns({
               editDrawerId=""
               showDrawerId=""
               viewPermission={
-                record.status === 'rejected' ? false : record.status === 'pending' ? false : true
+                record.status === 'rejected'
+                  ? false
+                  : record.status === 'pending' || record.status === 'in_process'
+                    ? false
+                    : true
               }
               updatePermission={
-                record.status === 'completed' ? false : record.status === 'pending' ? false : true
+                record.status === 'completed'
+                  ? false
+                  : record.status === 'pending' || record.status === 'in_process'
+                    ? false
+                    : true
               }
               deletePermission={false}
               retryPermission={
-                record.status === 'completed' ? false : record.status === 'pending' ? false : true
+                record.status === 'completed'
+                  ? false
+                  : record.status === 'pending' || record.status === 'in_process'
+                    ? false
+                    : true
               }
               isUser={false}
+              isPending={
+                record.status === 'pending' || record.status === 'in_process' ? true : false
+              }
             />
           </div>
         )

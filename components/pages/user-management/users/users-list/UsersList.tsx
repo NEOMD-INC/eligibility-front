@@ -17,6 +17,7 @@ import {
 import { AppDispatch, RootState } from '@/redux/store'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { getFilterOptions } from './components/users-list.config'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function UsersList() {
   const dispatch = useDispatch<AppDispatch>()
@@ -27,6 +28,15 @@ export default function UsersList() {
   const [roleFilter, setRoleFilter] = useState('allrole')
   const [appliedSearch, setAppliedSearch] = useState('')
   const [appliedRole, setAppliedRole] = useState('allrole')
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    id: string | null
+    userName: string | null
+  }>({
+    isOpen: false,
+    id: null,
+    userName: null,
+  })
   const itemsPerPage = 8
 
   useEffect(() => {
@@ -40,20 +50,31 @@ export default function UsersList() {
     dispatch(fetchAllUsers({ page: currentPage, filters }))
   }, [dispatch, currentPage, appliedSearch, appliedRole])
 
-  const handleDeleteClick = async (id: string, userName: string) => {
-    if (confirm(`Are you sure you want to delete user "${userName}"?`)) {
-      dispatch(clearUsersError())
-      const result = await dispatch(deleteUser(id))
-      if (deleteUser.fulfilled.match(result)) {
-        const filters: { search?: string; role?: string } = {}
-        if (appliedSearch.trim()) {
-          filters.search = appliedSearch.trim()
-        }
-        if (appliedRole && appliedRole !== 'allrole') {
-          filters.role = appliedRole
-        }
-        dispatch(fetchAllUsers({ page: currentPage, filters }))
+  const handleDeleteClick = (id: string, userName: string) => {
+    setDeleteModal({
+      isOpen: true,
+      id,
+      userName,
+    })
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.id) return
+
+    dispatch(clearUsersError())
+    const result = await dispatch(deleteUser(deleteModal.id))
+    if (deleteUser.fulfilled.match(result)) {
+      const filters: { search?: string; role?: string } = {}
+      if (appliedSearch.trim()) {
+        filters.search = appliedSearch.trim()
       }
+      if (appliedRole && appliedRole !== 'allrole') {
+        filters.role = appliedRole
+      }
+      dispatch(fetchAllUsers({ page: currentPage, filters }))
+      setDeleteModal({ isOpen: false, id: null, userName: null })
+    } else {
+      setDeleteModal({ isOpen: false, id: null, userName: null })
     }
   }
 
@@ -94,7 +115,7 @@ export default function UsersList() {
 
   return (
     <PageTransition>
-      <div className="p-6">
+      <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
             <h1
@@ -150,6 +171,19 @@ export default function UsersList() {
             </div>
           )}
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal.isOpen}
+          onClose={() => setDeleteModal({ isOpen: false, id: null, userName: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Delete User"
+          message={`Are you sure you want to delete user "${deleteModal.userName}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

@@ -100,32 +100,6 @@ export default function EligibilityLogListColumns({
         )
       },
     },
-    // {
-    //   key: 'responseMessage',
-    //   label: 'Response Message',
-    //   width: '15%',
-    //   align: 'left' as const,
-    //   render: (value: any, log: any) => {
-    //     // Handle nested responseMessage object or array
-    //     let message = log.responseMessage || log.response_message || value
-    //     if (message && typeof message === 'object') {
-    //       if (Array.isArray(message)) {
-    //         message = message.join(', ')
-    //       } else {
-    //         message = JSON.stringify(message)
-    //       }
-    //     }
-    //     const displayMessage = message || 'N/A'
-    //     return (
-    //       <div
-    //         className="text-gray-900 truncate"
-    //         title={typeof displayMessage === 'string' ? displayMessage : ''}
-    //       >
-    //         {displayMessage}
-    //       </div>
-    //     )
-    //   },
-    // },
     {
       key: 'created',
       label: 'Created',
@@ -161,16 +135,29 @@ export default function EligibilityLogListColumns({
             editDrawerId=""
             showDrawerId=""
             viewPermission={
-              log.status === 'rejected' ? false : log.status === 'pending' ? false : true
+              log.status === 'rejected'
+                ? false
+                : log.status === 'pending' || log.status === 'in_process'
+                  ? false
+                  : true
             }
             updatePermission={
-              log.status === 'completed' ? false : log.status === 'pending' ? false : true
+              log.status === 'completed'
+                ? false
+                : log.status === 'pending' || log.status === 'in_process'
+                  ? false
+                  : true
             }
             deletePermission={false}
             retryPermission={
-              log.status === 'completed' ? false : log.status === 'pending' ? false : true
+              log.status === 'completed'
+                ? false
+                : log.status === 'pending' || log.status === 'in_process'
+                  ? false
+                  : true
             }
             isUser={false}
+            isPending={log.status === 'pending' || log.status === 'in_process' ? true : false}
           />
         </div>
       ),

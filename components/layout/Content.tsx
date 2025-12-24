@@ -1,14 +1,21 @@
-// Theme colors - Tailwind classes like bg-gray-100 use theme colors via CSS variables
-import { themeColors } from '@/theme'
+import React from 'react'
 
-const Content = ({
+export interface ContentProps {
+  children: React.ReactNode
+  containerType?: 'none' | 'fixed' | 'fluid'
+  padding?: string
+  background?: string
+  isSidebarExpanded?: boolean
+}
+
+const Content: React.FC<ContentProps> = ({
   children,
-  containerType = 'none', // 'none' | 'fixed' | 'fluid'
+  containerType = 'none',
   padding = 'p-6',
   background = 'bg-gray-100',
-  isSidebarExpanded = false, // Add this prop
+  isSidebarExpanded = false,
 }) => {
-  const getContainerClass = () => {
+  const getContainerClass = (): string => {
     switch (containerType) {
       case 'fixed':
         return 'container mx-auto px-4 max-w-7xl'
@@ -24,7 +31,7 @@ const Content = ({
       className={`
         flex-1 overflow-x-hidden overflow-y-auto min-h-0
         transition-all duration-500 ease-in-out
-        ${isSidebarExpanded ? 'ml-72' : 'ml-0'} // Dynamic margin based on sidebar state
+        ${isSidebarExpanded ? 'ml-72' : 'ml-0'}
         ${background}
         ${padding}
       `.trim()}

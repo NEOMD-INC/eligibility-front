@@ -12,6 +12,8 @@ import {
 import { AppDispatch, RootState } from '@/redux/store'
 import { getCarrierSetupDetails } from './helper/helper'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+import { useState } from 'react'
 
 export default function CarrierSetupDetail() {
   const router = useRouter()
@@ -22,6 +24,7 @@ export default function CarrierSetupDetail() {
   const { currentCarrierSetup, fetchCarrierSetupLoading, deleteLoading, error } = useSelector(
     (state: RootState) => state.carrierSetups
   )
+  const [deleteModal, setDeleteModal] = useState(false)
 
   useEffect(() => {
     if (carrierSetupId) {
@@ -33,17 +36,21 @@ export default function CarrierSetupDetail() {
     }
   }, [dispatch, carrierSetupId])
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    if (!carrierSetupId) return
+    setDeleteModal(true)
+  }
+
+  const handleDeleteConfirm = async () => {
     if (!carrierSetupId) return
 
-    if (confirm('Are you sure you want to delete this carrier setup?')) {
-      dispatch(clearCarrierSetupsError())
-      try {
-        await dispatch(deleteCarrierSetup(carrierSetupId)).unwrap()
-        router.push('/settings/carrier-setup')
-      } catch (err: any) {
-        alert(err || 'Failed to delete carrier setup')
-      }
+    dispatch(clearCarrierSetupsError())
+    try {
+      await dispatch(deleteCarrierSetup(carrierSetupId)).unwrap()
+      router.push('/settings/carrier-setup')
+    } catch (err: any) {
+      setDeleteModal(false)
+      alert(err || 'Failed to delete carrier setup')
     }
   }
 
@@ -79,7 +86,7 @@ export default function CarrierSetupDetail() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
+      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6 relative">
         {/* Main Detail Card */}
         <div className="w-full bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-4 pb-3">Carrier Setup Details</h1>
@@ -124,6 +131,19 @@ export default function CarrierSetupDetail() {
             </button>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal}
+          onClose={() => setDeleteModal(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Carrier Setup"
+          message="Are you sure you want to delete this carrier setup?"
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

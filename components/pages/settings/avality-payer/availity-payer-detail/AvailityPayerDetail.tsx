@@ -12,6 +12,8 @@ import {
 import { AppDispatch, RootState } from '@/redux/store'
 import { getPayerDetails } from './helper/helper'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+import { useState } from 'react'
 
 export default function AvailityPayerDetail() {
   const router = useRouter()
@@ -22,6 +24,7 @@ export default function AvailityPayerDetail() {
   const { currentAvailityPayer, fetchAvailityPayerLoading, deleteLoading, error } = useSelector(
     (state: RootState) => state.availityPayers
   )
+  const [deleteModal, setDeleteModal] = useState(false)
 
   // Fetch payer data on mount
   useEffect(() => {
@@ -34,17 +37,21 @@ export default function AvailityPayerDetail() {
     }
   }, [dispatch, payerId])
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    if (!payerId) return
+    setDeleteModal(true)
+  }
+
+  const handleDeleteConfirm = async () => {
     if (!payerId) return
 
-    if (confirm('Are you sure you want to delete this payer?')) {
-      dispatch(clearAvailityPayersError())
-      try {
-        await dispatch(deleteAvailityPayer(payerId)).unwrap()
-        router.push('/settings/availity-payer')
-      } catch (err: any) {
-        alert(err || 'Failed to delete payer')
-      }
+    dispatch(clearAvailityPayersError())
+    try {
+      await dispatch(deleteAvailityPayer(payerId)).unwrap()
+      router.push('/settings/availity-payer')
+    } catch (err: any) {
+      setDeleteModal(false)
+      alert(err || 'Failed to delete payer')
     }
   }
 
@@ -80,7 +87,7 @@ export default function AvailityPayerDetail() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
+      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6 relative">
         {/* Main Detail Card */}
         <div className="w-full bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-4 pb-3">Availity Payer Details</h1>
@@ -125,6 +132,19 @@ export default function AvailityPayerDetail() {
             </button>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal}
+          onClose={() => setDeleteModal(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Payer"
+          message="Are you sure you want to delete this payer?"
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

@@ -78,7 +78,6 @@ export default function LoginPage() {
           <span>{errorMsg}</span>
         </div>
 
-        {/* EMAIL */}
         <div className="mb-6">
           <label className="block text-sm font-semibold text-gray-800 mb-1">Email</label>
           <input
@@ -101,7 +100,6 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* PASSWORD */}
         <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-800 mb-1">Password</label>
           <input
@@ -124,7 +122,6 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* FORGOT PASSWORD */}
         <div className="flex justify-end mb-6">
           <Link href="/register" className="text-blue-600 text-sm mr-3">
             Register
@@ -134,7 +131,6 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        {/* SUBMIT */}
         <div className="w-full">
           <SubmitButton
             type="submit"

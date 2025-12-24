@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/redux/store'
@@ -14,6 +14,8 @@ import {
 import { getServiceTypeLabel } from '@/utils/constants/service-types'
 import { getRelationshipCodeLabel } from '@/utils/constants/relationship-codes'
 import { getPlaceOfServiceLabel } from '@/utils/constants/place-of-service'
+import { Copy, Check } from 'lucide-react'
+import { toastManager } from '@/utils/toast'
 
 export default function EligibilityLogDetail() {
   const router = useRouter()
@@ -23,6 +25,8 @@ export default function EligibilityLogDetail() {
   const { currentLog, fetchLogLoading, error } = useSelector(
     (state: RootState) => state.eligibilityLogs
   )
+  const [copiedRequest, setCopiedRequest] = useState(false)
+  const [copiedResponse, setCopiedResponse] = useState(false)
 
   useEffect(() => {
     if (logId && logId !== 'undefined') {
@@ -34,7 +38,6 @@ export default function EligibilityLogDetail() {
     }
   }, [dispatch, logId])
 
-  // Show error if ID is missing or invalid
   if (!logId || logId === 'undefined') {
     return (
       <PageTransition>
@@ -86,7 +89,6 @@ export default function EligibilityLogDetail() {
     )
   }
 
-  // Helper function to safely get nested values
   const getValue = (obj: any, ...keys: string[]) => {
     for (const key of keys) {
       if (obj?.[key] !== undefined && obj?.[key] !== null) {
@@ -136,7 +138,6 @@ export default function EligibilityLogDetail() {
     )
   }
 
-  // Extract values from currentLog, handling nested objects based on actual API response
   const log = currentLog
   const queueStatus = getValue(log, 'queueStatus', 'queue_status', 'status') || 'N/A'
   const eligibilityStatus =
@@ -145,7 +146,6 @@ export default function EligibilityLogDetail() {
     getValue(log, 'neoReferenceId', 'neo_reference_id', 'neoRef', 'neo_ref') || 'N/A'
   const createdAt = getValue(log, 'createdAt', 'created_at', 'created') || null
 
-  // Handle nested subscriber object (from API response)
   const subscriber = log.subscriber
   const subscriberId =
     typeof subscriber === 'object' && subscriber !== null
@@ -164,7 +164,6 @@ export default function EligibilityLogDetail() {
       ? getValue(subscriber, 'gender', 'sex')
       : null
 
-  // Handle patient object (from API response) - may have more complete info
   const patient = log.patient
   const patientName =
     typeof patient === 'object' && patient !== null ? getValue(patient, 'name') : subscriberName
@@ -185,7 +184,6 @@ export default function EligibilityLogDetail() {
   const patientZip =
     typeof patient === 'object' && patient !== null ? getValue(patient, 'zip') : null
 
-  // Handle nested provider object (from API response)
   const provider = log.provider
   const providerName =
     typeof provider === 'object' && provider !== null
@@ -196,14 +194,12 @@ export default function EligibilityLogDetail() {
       ? getValue(provider, 'npi', 'national_provider_id')
       : getValue(log, 'npi', 'national_provider_id')
 
-  // Handle payer object (from API response)
   const payer = log.payer
   const payerName =
     typeof payer === 'object' && payer !== null ? getValue(payer, 'name', 'payer_name') : null
   const payerId =
     typeof payer === 'object' && payer !== null ? getValue(payer, 'payer_id', 'id') : null
 
-  // Handle coverage object (from API response)
   const coverage = log.coverage
   const relationshipCode =
     typeof coverage === 'object' && coverage !== null
@@ -229,16 +225,45 @@ export default function EligibilityLogDetail() {
     'service_type'
   )
 
-  // Place of service - check if it exists in the log
   const placeOfServiceCode = getValue(log, 'placeOfService', 'place_of_service', 'pos')
 
   const request270 = log['270_edi_request']
   const response271 = log['271_edi_response']
 
-  // Extract response messages - check multiple possible locations
+  const handleCopyRequest = async () => {
+    if (!request270) return
+
+    const textToCopy =
+      typeof request270 === 'object' ? JSON.stringify(request270, null, 2) : String(request270)
+
+    try {
+      await navigator.clipboard.writeText(textToCopy)
+      setCopiedRequest(true)
+      toastManager.success('Request 270 copied to clipboard')
+      setTimeout(() => setCopiedRequest(false), 2000)
+    } catch (err) {
+      toastManager.error('Failed to copy request')
+    }
+  }
+
+  const handleCopyResponse = async () => {
+    if (!response271) return
+
+    const textToCopy =
+      typeof response271 === 'object' ? JSON.stringify(response271, null, 2) : String(response271)
+
+    try {
+      await navigator.clipboard.writeText(textToCopy)
+      setCopiedResponse(true)
+      toastManager.success('Response 271 copied to clipboard')
+      setTimeout(() => setCopiedResponse(false), 2000)
+    } catch (err) {
+      toastManager.error('Failed to copy response')
+    }
+  }
+
   let responseMessage: string | null = null
-  
-  // First try direct response message fields
+
   const directMessage = getValue(log, 'responseMessage', 'response_message')
   if (directMessage) {
     if (typeof directMessage === 'string') {
@@ -253,26 +278,20 @@ export default function EligibilityLogDetail() {
       responseMessage = String(directMessage)
     }
   }
-  
-  // If no direct message, check global_messages array
+
   if (!responseMessage && Array.isArray(log.global_messages) && log.global_messages.length > 0) {
     responseMessage = log.global_messages
       .filter((msg: any) => msg && typeof msg === 'string')
       .join('\n')
   }
-  
-  // If still no message, check messages array
+
   if (!responseMessage && Array.isArray(log.messages) && log.messages.length > 0) {
-    responseMessage = log.messages
-      .filter((msg: any) => msg && typeof msg === 'string')
-      .join('\n')
+    responseMessage = log.messages.filter((msg: any) => msg && typeof msg === 'string').join('\n')
   }
-  
-  // Check if there are messages in benefits object
+
   if (!responseMessage && log.benefits) {
     const benefitsMessages: string[] = []
-    
-    // Check in_network benefits
+
     if (Array.isArray(log.benefits.in_network)) {
       log.benefits.in_network.forEach((benefit: any) => {
         if (Array.isArray(benefit.messages)) {
@@ -280,8 +299,7 @@ export default function EligibilityLogDetail() {
         }
       })
     }
-    
-    // Check both_networks benefits
+
     if (Array.isArray(log.benefits.both_networks)) {
       log.benefits.both_networks.forEach((benefit: any) => {
         if (Array.isArray(benefit.messages)) {
@@ -289,7 +307,7 @@ export default function EligibilityLogDetail() {
         }
       })
     }
-    
+
     if (benefitsMessages.length > 0) {
       responseMessage = [...new Set(benefitsMessages)].join('\n')
     }
@@ -319,7 +337,6 @@ export default function EligibilityLogDetail() {
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          {/* Status Section */}
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -337,7 +354,6 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
-          {/* Request Information Section */}
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Request Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -354,7 +370,6 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
-          {/* Service Information Section */}
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Service Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -375,7 +390,6 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
-          {/* Subscriber Info Section */}
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Subscriber Info</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -419,7 +433,6 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
-          {/* Provider Info Section */}
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Provider Info</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -444,11 +457,8 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
-          {/* Response and Information Section */}
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Response and Information
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Response and Information</h2>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -469,12 +479,31 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
-          {/* Request 270 and Response 271 Section */}
           <div className="px-6 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Request 270 Box */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Request 270</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Request 270</h2>
+                  {request270 && (
+                    <button
+                      onClick={handleCopyRequest}
+                      className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      title="Copy Request 270"
+                    >
+                      {copiedRequest ? (
+                        <>
+                          <Check size={16} />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={16} />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
                 <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 min-h-[200px]">
                   {request270 ? (
                     <div className="space-y-2">
@@ -502,9 +531,29 @@ export default function EligibilityLogDetail() {
                 </div>
               </div>
 
-              {/* Response 271 Box */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Response 271</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Response 271</h2>
+                  {response271 && (
+                    <button
+                      onClick={handleCopyResponse}
+                      className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      title="Copy Response 271"
+                    >
+                      {copiedResponse ? (
+                        <>
+                          <Check size={16} />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={16} />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
                 <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 min-h-[200px]">
                   {response271 ? (
                     <div className="space-y-2">

@@ -16,6 +16,7 @@ import {
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function CarrierGroupList() {
   const dispatch = useDispatch<AppDispatch>()
@@ -26,6 +27,15 @@ export default function CarrierGroupList() {
   const [searchCode, setSearchCode] = useState('')
   const [searchFillingIndicator, setSearchFillingIndicator] = useState('')
   const [searchStatus, setSearchStatus] = useState('all')
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    id: string | null
+    carrierGroupName: string | null
+  }>({
+    isOpen: false,
+    id: null,
+    carrierGroupName: null,
+  })
 
   const buildFilters = () => {
     const filters: {
@@ -58,12 +68,21 @@ export default function CarrierGroupList() {
   }, [dispatch, currentPage])
 
   const handleDeleteClick = (id: string, carrierGroupName: string) => {
-    if (confirm(`Are you sure you want to delete carrier group "${carrierGroupName}"?`)) {
-      dispatch(deleteCarrierGroup(id)).then(() => {
-        const filters = buildFilters()
-        dispatch(fetchAllCarrierGroups({ page: currentPage, filters }))
-      })
-    }
+    setDeleteModal({
+      isOpen: true,
+      id,
+      carrierGroupName,
+    })
+  }
+
+  const handleDeleteConfirm = () => {
+    if (!deleteModal.id) return
+
+    dispatch(deleteCarrierGroup(deleteModal.id)).then(() => {
+      const filters = buildFilters()
+      dispatch(fetchAllCarrierGroups({ page: currentPage, filters }))
+      setDeleteModal({ isOpen: false, id: null, carrierGroupName: null })
+    })
   }
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -148,7 +167,7 @@ export default function CarrierGroupList() {
 
   return (
     <PageTransition>
-      <div className="p-6">
+      <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
             <h1
@@ -205,6 +224,19 @@ export default function CarrierGroupList() {
             className="shadow-none rounded-none"
           />
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal.isOpen}
+          onClose={() => setDeleteModal({ isOpen: false, id: null, carrierGroupName: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Carrier Group"
+          message={`Are you sure you want to delete carrier group "${deleteModal.carrierGroupName}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

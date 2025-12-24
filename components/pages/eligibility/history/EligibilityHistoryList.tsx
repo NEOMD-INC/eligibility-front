@@ -20,6 +20,7 @@ import {
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { toastManager } from '@/utils/toast'
 import { getFilterFields } from './components/eligibility-history-list.config'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function EligibilityHistoryList() {
   const router = useRouter()
@@ -28,6 +29,13 @@ export default function EligibilityHistoryList() {
     (state: RootState) => state.eligibilityHistory
   )
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [retryModal, setRetryModal] = useState<{
+    isOpen: boolean
+    eligibilityId: string | null
+  }>({
+    isOpen: false,
+    eligibilityId: null,
+  })
 
   const hasPendingHistory = history.some((item: any) => {
     const status = (item.status || '').toLowerCase()
@@ -89,23 +97,32 @@ export default function EligibilityHistoryList() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleRetryClick = async (eligibilityId: string) => {
-    if (confirm('Are you sure you want to retry this eligibility check?')) {
-      try {
-        const result = await dispatch(retryEligibilitySubmission(eligibilityId))
-        if (retryEligibilitySubmission.fulfilled.match(result)) {
-          toastManager.success('Eligibility submission retried successfully')
-          dispatch(fetchEligibilityHistory({ page: currentPage, filters, itemsPerPage }))
-        } else {
-          const errorMessage =
-            (result.payload as string) || 'Failed to retry eligibility submission'
-          toastManager.error(errorMessage)
-        }
-      } catch (error: any) {
-        toastManager.error(
-          error?.message || 'An error occurred while retrying eligibility submission'
-        )
+  const handleRetryClick = (eligibilityId: string) => {
+    setRetryModal({
+      isOpen: true,
+      eligibilityId,
+    })
+  }
+
+  const handleRetryConfirm = async () => {
+    if (!retryModal.eligibilityId) return
+
+    try {
+      const result = await dispatch(retryEligibilitySubmission(retryModal.eligibilityId))
+      if (retryEligibilitySubmission.fulfilled.match(result)) {
+        toastManager.success('Eligibility submission retried successfully')
+        dispatch(fetchEligibilityHistory({ page: currentPage, filters, itemsPerPage }))
+        setRetryModal({ isOpen: false, eligibilityId: null })
+      } else {
+        const errorMessage = (result.payload as string) || 'Failed to retry eligibility submission'
+        toastManager.error(errorMessage)
+        setRetryModal({ isOpen: false, eligibilityId: null })
       }
+    } catch (error: any) {
+      toastManager.error(
+        error?.message || 'An error occurred while retrying eligibility submission'
+      )
+      setRetryModal({ isOpen: false, eligibilityId: null })
     }
   }
 
@@ -119,7 +136,7 @@ export default function EligibilityHistoryList() {
 
   return (
     <PageTransition>
-      <div className="p-6">
+      <div className="p-6 relative">
         <div className="flex justify-between items-center max-w-auto rounded bg-white p-6 mb-[-5px]">
           <div>
             <h1
@@ -142,7 +159,6 @@ export default function EligibilityHistoryList() {
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          {/* Filter Dropdown Button - Right Side */}
           <div className="px-6 py-4 border-b border-gray-200 flex justify-end">
             <button
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
@@ -157,7 +173,6 @@ export default function EligibilityHistoryList() {
             </button>
           </div>
 
-          {/* Filters Dropdown Content */}
           {isFiltersOpen && (
             <div className="border-b border-gray-200 bg-gray-50">
               <Filters
@@ -169,7 +184,6 @@ export default function EligibilityHistoryList() {
             </div>
           )}
 
-          {/* DataTable */}
           <DataTable
             columns={columns}
             data={history}
@@ -186,6 +200,17 @@ export default function EligibilityHistoryList() {
             }
           />
         </div>
+
+        <ConfirmationModal
+          isOpen={retryModal.isOpen}
+          onClose={() => setRetryModal({ isOpen: false, eligibilityId: null })}
+          onConfirm={handleRetryConfirm}
+          title="Retry Eligibility Check"
+          message="Are you sure you want to retry this eligibility check?"
+          confirmText="Retry"
+          cancelText="Cancel"
+          confirmButtonClass="bg-blue-600 hover:bg-blue-700"
+        />
       </div>
     </PageTransition>
   )

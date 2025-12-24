@@ -12,6 +12,8 @@ import {
 import { AppDispatch, RootState } from '@/redux/store'
 import { getCarrierGroupDetails } from './helper/helper'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+import { useState } from 'react'
 
 export default function CarrierGroupDetail() {
   const router = useRouter()
@@ -22,6 +24,7 @@ export default function CarrierGroupDetail() {
   const { currentCarrierGroup, fetchCarrierGroupLoading, deleteLoading, error } = useSelector(
     (state: RootState) => state.carrierGroups
   )
+  const [deleteModal, setDeleteModal] = useState(false)
 
   useEffect(() => {
     if (carrierGroupId) {
@@ -33,17 +36,21 @@ export default function CarrierGroupDetail() {
     }
   }, [dispatch, carrierGroupId])
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    if (!carrierGroupId) return
+    setDeleteModal(true)
+  }
+
+  const handleDeleteConfirm = async () => {
     if (!carrierGroupId) return
 
-    if (confirm('Are you sure you want to delete this carrier group?')) {
-      dispatch(clearCarrierGroupsError())
-      try {
-        await dispatch(deleteCarrierGroup(carrierGroupId)).unwrap()
-        router.push('/settings/carrier-group')
-      } catch (err: any) {
-        alert(err || 'Failed to delete carrier group')
-      }
+    dispatch(clearCarrierGroupsError())
+    try {
+      await dispatch(deleteCarrierGroup(carrierGroupId)).unwrap()
+      router.push('/settings/carrier-group')
+    } catch (err: any) {
+      setDeleteModal(false)
+      alert(err || 'Failed to delete carrier group')
     }
   }
 
@@ -79,7 +86,7 @@ export default function CarrierGroupDetail() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
+      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6 relative">
         <div className="w-full bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-4 pb-3">Carrier Group Details</h1>
 
@@ -122,6 +129,19 @@ export default function CarrierGroupDetail() {
             </button>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={deleteModal}
+          onClose={() => setDeleteModal(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Carrier Group"
+          message="Are you sure you want to delete this carrier group?"
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          isLoading={deleteLoading}
+        />
       </div>
     </PageTransition>
   )

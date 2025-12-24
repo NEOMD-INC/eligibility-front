@@ -28,6 +28,9 @@ import { useRouter } from 'next/navigation'
 import { IndividualEligibilityValues } from './types/type'
 import { getGenderOptions } from '@/utils/constants/gender-options'
 import { getDOBMaxDate, getServiceDateMinMax, splitName } from './helper/helper'
+import { RotateCw } from 'lucide-react'
+import { EligibilityIndivitualService } from '@/services/eligibility/indivitual/indivitual.service'
+import { toastManager } from '@/utils/toast'
 
 export default function IndividualEligibilityForm() {
   const dispatch = useDispatch<AppDispatch>()
@@ -65,6 +68,7 @@ export default function IndividualEligibilityForm() {
   const [errorMsg, setErrorMsg] = useState('')
   const [reuseError, setReuseError] = useState(false)
   const [reuseErrorMsg, setReuseErrorMsg] = useState('')
+  const [verifyingNpi, setVerifyingNpi] = useState(false)
   const hasMappedLogData = useRef(false)
 
   const serviceDateRestrictions = getServiceDateMinMax()
@@ -304,6 +308,80 @@ export default function IndividualEligibilityForm() {
     }
   }
 
+  const handleResetPractice = () => {
+    formik.setFieldValue('npi', '')
+    formik.setFieldValue('practiceLastName', '')
+    formik.setFieldValue('practiceFirstName', '')
+    formik.setFieldTouched('npi', false)
+    formik.setFieldTouched('practiceLastName', false)
+    formik.setFieldTouched('practiceFirstName', false)
+    setReuseError(false)
+    setReuseErrorMsg('')
+  }
+
+  const handleVerifyNpi = async () => {
+    const npi = formik.values.npi?.trim()
+    
+    if (!npi) {
+      toastManager.error('Please enter an NPI number')
+      return
+    }
+
+    if (!/^\d+$/.test(npi)) {
+      toastManager.error('NPI must contain only numbers')
+      return
+    }
+
+    setVerifyingNpi(true)
+    try {
+      const response = await EligibilityIndivitualService.verifyNpiNumber(npi)
+      const data = response.data?.data || response.data
+      
+      if (data) {
+        // Handle different response formats
+        let practiceFirstName = ''
+        let practiceLastName = ''
+        
+        // Format 1: Direct first_name and last_name fields
+        if (data.first_name || data.last_name) {
+          practiceFirstName = data.first_name || ''
+          practiceLastName = data.last_name || ''
+        }
+        // Format 2: Practice-specific field names
+        else if (data.practice_first_name || data.practice_last_name) {
+          practiceFirstName = data.practice_first_name || ''
+          practiceLastName = data.practice_last_name || ''
+        }
+        // Format 3: Combined name field that needs to be split
+        else if (data.name || data.practice_name || data.full_name || data.organization_name) {
+          const practiceName = data.name || data.practice_name || data.full_name || data.organization_name || ''
+          if (practiceName) {
+            const nameParts = splitName(practiceName)
+            practiceFirstName = nameParts.firstName
+            practiceLastName = nameParts.lastName
+          }
+        }
+        
+        if (practiceFirstName || practiceLastName) {
+          formik.setFieldValue('practiceFirstName', practiceFirstName)
+          formik.setFieldValue('practiceLastName', practiceLastName)
+          toastManager.success('NPI verified successfully')
+        } else {
+          toastManager.error('No practice name found for this NPI')
+        }
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        'Failed to verify NPI. Please try again.'
+      toastManager.error(errorMessage)
+    } finally {
+      setVerifyingNpi(false)
+    }
+  }
+
   if (logId && fetchLogLoading) {
     return <ComponentLoader component="eligibility log data" />
   }
@@ -330,7 +408,9 @@ export default function IndividualEligibilityForm() {
             <div className="mb-8 pb-6 border-b">
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Payer</h2>
               <div className="mb-6 max-w-md">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">Payer ID</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Payer ID <span className="text-red-500">*</span>
+                </label>
                 <SearchableSelectPayer
                   name="payerId"
                   value={formik.values.payerId}
@@ -360,21 +440,42 @@ export default function IndividualEligibilityForm() {
               )}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">NPI</label>
-                  <input
-                    type="text"
-                    name="npi"
-                    placeholder="NPI"
-                    autoComplete="off"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.npi}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.npi && formik.errors.npi
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
-                  />
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                    NPI <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="npi"
+                      placeholder="NPI"
+                      autoComplete="off"
+                      onChange={(e) => {
+                        // Only allow numbers
+                        const value = e.target.value.replace(/\D/g, '')
+                        formik.setFieldValue('npi', value)
+                      }}
+                      onBlur={formik.handleBlur}
+                      value={formik.values.npi}
+                      className={`w-full px-4 py-2 pr-24 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
+                        formik.touched.npi && formik.errors.npi
+                          ? 'border-red-500 focus:ring-red-400'
+                          : 'border-gray-300 focus:ring-blue-400'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyNpi}
+                      disabled={verifyingNpi || !formik.values.npi}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Verify NPI"
+                    >
+                      {verifyingNpi ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        'Verify'
+                      )}
+                    </button>
+                  </div>
                   {formik.touched.npi && formik.errors.npi && (
                     <p className="text-red-600 text-sm mt-1">{formik.errors.npi}</p>
                   )}
@@ -382,7 +483,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Practice Last Name
+                    Practice Last Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -426,12 +527,20 @@ export default function IndividualEligibilityForm() {
                   )}
                 </div>
 
-                <div className="flex items-end">
+                <div className="flex items-end gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResetPractice}
+                    className="flex items-center justify-center px-3 py-[12px] bg-red-600 text-white rounded-md hover:bg-red-700 transition focus:outline-none focus:ring-2 focus:ring-red-500"
+                    title="Reset Practice Fields"
+                  >
+                    <RotateCw size={16} />
+                  </button>
                   <button
                     type="button"
                     onClick={handleReuse}
                     disabled={updateLoading}
-                    className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {updateLoading ? (
                       <>
@@ -455,7 +564,7 @@ export default function IndividualEligibilityForm() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Subscriber ID
+                    Subscriber ID <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -478,7 +587,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Last Name
+                    Last Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -501,7 +610,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    First Name
+                    First Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -524,7 +633,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Date of Birth (DOB)
+                    Date of Birth (DOB) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -545,7 +654,9 @@ export default function IndividualEligibilityForm() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">Gender</label>
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                    Gender <span className="text-red-500">*</span>
+                  </label>
                   <SearchableSelect
                     name="gender"
                     value={formik.values.gender}
@@ -563,7 +674,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Relationship Code
+                    Relationship Code <span className="text-red-500">*</span>
                   </label>
                   <SearchableSelect
                     name="relationshipCode"
@@ -582,7 +693,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Service Date
+                    Service Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -608,7 +719,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Service Type
+                    Service Type <span className="text-red-500">*</span>
                   </label>
                   <SearchableSelect
                     name="serviceType"
@@ -627,7 +738,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Place of Service
+                    Place of Service <span className="text-red-500">*</span>
                   </label>
                   <SearchableSelect
                     name="placeOfService"

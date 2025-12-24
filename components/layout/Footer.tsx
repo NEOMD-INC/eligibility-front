@@ -1,12 +1,27 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-// Theme colors - Tailwind classes like text-gray-800, hover:text-blue-600 use theme colors via CSS variables
 import { themeColors } from '@/theme'
 
-const Footer = ({ config = {} }) => {
-  // Default footer configuration if no config is provided
-  const footerConfig = {
+export interface FooterConfig {
+  display?: boolean
+  containerClass?: string
+  fixed?: {
+    desktop?: boolean
+    mobile?: boolean
+  }
+}
+
+export interface FooterProps {
+  config?: {
+    app?: {
+      footer?: FooterConfig
+    }
+  }
+}
+
+const Footer: React.FC<FooterProps> = ({ config = {} }) => {
+  const footerConfig: FooterConfig = {
     display: true,
     containerClass: '',
     fixed: {
@@ -16,10 +31,8 @@ const Footer = ({ config = {} }) => {
     ...config?.app?.footer,
   }
 
-  // Use state for year to prevent hydration mismatch
-  const [currentYear, setCurrentYear] = useState('')
+  const [currentYear, setCurrentYear] = useState<string>('')
 
-  // Set year only on client side to prevent hydration mismatch
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setCurrentYear(new Date().getFullYear().toString())
@@ -27,13 +40,11 @@ const Footer = ({ config = {} }) => {
   }, [])
 
   useEffect(() => {
-    // Only update DOM on client side
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       updateDOM(footerConfig)
     }
   }, [footerConfig])
 
-  // Return null if footer should not be displayed
   if (!footerConfig.display) {
     return null
   }
@@ -72,16 +83,13 @@ const Footer = ({ config = {} }) => {
   )
 }
 
-const updateDOM = config => {
-  // Guard against server-side execution
+const updateDOM = (config: FooterConfig): void => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return
   }
 
-  // Remove existing classes
   document.body.classList.remove('data-kt-app-footer-fixed', 'data-kt-app-footer-fixed-mobile')
 
-  // Add classes based on configuration
   if (config.fixed?.desktop) {
     document.body.classList.add('data-kt-app-footer-fixed')
   }
