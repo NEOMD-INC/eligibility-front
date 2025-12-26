@@ -1,12 +1,11 @@
 // Re-export all actions and thunks from the reducer
 export {
+  clearCurrentPermission,
+  clearPermissionsError,
+  createPermission,
+  deletePermission,
   fetchAllPermissions,
   fetchPermissionById,
-  createPermission,
-  updatePermission,
-  deletePermission,
-  clearPermissionsError,
-  clearCurrentPermission,
   setCurrentPage,
+  updatePermission,
 } from './reducer'
-

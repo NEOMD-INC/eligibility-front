@@ -1,9 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
+
+import {
+  fetchAllAvailityPayers,
+  searchAvailityPayers,
+} from '@/redux/slices/settings/availity-payers/actions'
 import { AppDispatch } from '@/redux/store'
-import { searchAvailityPayers, fetchAllAvailityPayers } from '@/redux/slices/settings/availity-payers/actions'
 import type { AvailityPayer } from '@/types'
 
 export interface SearchableSelectPayerProps {
@@ -55,14 +59,17 @@ export default function SearchableSelectPayer({
   const hasMore = options.length > 6
 
   // Debounced API search
-  const performSearch = useCallback((term: string) => {
-    if (term.length > 3) {
-      dispatch(searchAvailityPayers(term))
-    } else if (term.length === 0) {
-      // If search is cleared, fetch original list
-      dispatch(fetchAllAvailityPayers())
-    }
-  }, [dispatch])
+  const performSearch = useCallback(
+    (term: string) => {
+      if (term.length > 3) {
+        dispatch(searchAvailityPayers(term))
+      } else if (term.length === 0) {
+        // If search is cleared, fetch original list
+        dispatch(fetchAllAvailityPayers())
+      }
+    },
+    [dispatch]
+  )
 
   // Handle search input change with debouncing
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,9 +164,7 @@ export default function SearchableSelectPayer({
       <div
         onClick={handleToggle}
         className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 cursor-pointer ${
-          error
-            ? 'border-red-500 focus:ring-red-400'
-            : 'border-gray-300 focus:ring-blue-400'
+          error ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
         } ${disabled ? 'bg-gray-100 cursor-not-allowed opacity-50' : ''} ${className}`}
       >
         <div className="flex items-center justify-between">
@@ -194,28 +199,29 @@ export default function SearchableSelectPayer({
             />
             {searchTerm.length > 0 && searchTerm.length <= 3 && (
               <p className="text-xs text-gray-500 mt-1">
-                Type {4 - searchTerm.length} more character{4 - searchTerm.length > 1 ? 's' : ''} to search
+                Type {4 - searchTerm.length} more character{4 - searchTerm.length > 1 ? 's' : ''} to
+                search
               </p>
             )}
           </div>
 
           {/* Options list - shows only 6 items, scrollable for the rest */}
-          <div 
+          <div
             className="overflow-y-auto"
-            style={{ 
+            style={{
               maxHeight: '192px', // Approximately 6 items (32px per item: py-2 = 8px top + 8px bottom + 16px text)
               scrollbarWidth: 'thin',
               scrollbarColor: '#cbd5e0 #f1f5f9',
-              WebkitOverflowScrolling: 'touch'
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             {loading ? (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                Searching...
-              </div>
+              <div className="px-4 py-3 text-sm text-gray-500 text-center">Searching...</div>
             ) : options.length === 0 ? (
               <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                {searchTerm.length > 3 ? 'No payers found' : 'Type at least 4 characters to search...'}
+                {searchTerm.length > 3
+                  ? 'No payers found'
+                  : 'Type at least 4 characters to search...'}
               </div>
             ) : (
               <>
@@ -238,4 +244,3 @@ export default function SearchableSelectPayer({
     </div>
   )
 }
-

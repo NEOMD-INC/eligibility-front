@@ -1,26 +1,27 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { ChevronDown, Filter, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/redux/store'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
 import Filters from '@/components/ui/filters/Filters'
-import EligibilityHistoryColumns from './components/columns'
-import { themeColors } from '@/theme'
-import { Filter, ChevronDown, Plus } from 'lucide-react'
-
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
+  clearFilters,
   fetchEligibilityHistory,
   retryEligibilitySubmission,
   setCurrentPage,
   setFilters,
-  clearFilters,
 } from '@/redux/slices/eligibility/history/actions'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 import { toastManager } from '@/utils/toast'
+
+import EligibilityHistoryColumns from './components/columns'
 import { getFilterFields } from './components/eligibility-history-list.config'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function EligibilityHistoryList() {
   const router = useRouter()
@@ -36,6 +37,8 @@ export default function EligibilityHistoryList() {
     isOpen: false,
     eligibilityId: null,
   })
+
+  console.log('history', history)
 
   const hasPendingHistory = history.some((item: any) => {
     const status = (item.status || '').toLowerCase()

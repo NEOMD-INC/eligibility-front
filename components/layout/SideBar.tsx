@@ -1,18 +1,19 @@
 'use client'
-import { useState, useEffect } from 'react'
+import {
+  ChevronDown,
+  ClipboardClock,
+  ClipboardList,
+  Dot,
+  HeartPulse,
+  House,
+  LucideIcon,
+  Receipt,
+  UserRound,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  ClipboardClock,
-  Receipt,
-  ClipboardList,
-  ChevronDown,
-  Dot,
-  House,
-  UserRound,
-  HeartPulse,
-  LucideIcon,
-} from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
 import { themeColors } from '@/theme'
 
 interface MenuItemBase {
@@ -22,11 +23,6 @@ interface MenuItemBase {
 
 interface LinkMenuItem extends MenuItemBase {
   type: 'link'
-  path: string
-}
-
-interface NestedMenuItem {
-  name: string
   path: string
 }
 
@@ -89,9 +85,12 @@ const Sidebar: React.FC = () => {
     }))
   }
 
-  const isActiveLink = (path: string): boolean => {
-    return location === path || location.startsWith(path + '/')
-  }
+  const isActiveLink = useCallback(
+    (path: string): boolean => {
+      return location === path || location.startsWith(path + '/')
+    },
+    [location]
+  )
 
   const isMenuActive = (item: MenuItem): boolean => {
     if (item.type === 'link') {
@@ -108,7 +107,8 @@ const Sidebar: React.FC = () => {
     return false
   }
 
-  const menuItems: MenuItem[] = [
+  const menuItems: MenuItem[] = useMemo(
+    () => [
     {
       name: 'Patient Dashboard',
       icon: House,
@@ -145,7 +145,9 @@ const Sidebar: React.FC = () => {
       path: '/account/patients',
       type: 'link',
     },
-  ]
+  ],
+    []
+  )
 
   useEffect(() => {
     const newOpenMenus: OpenMenus = {}
@@ -174,7 +176,7 @@ const Sidebar: React.FC = () => {
 
     setOpenMenus(prev => ({ ...prev, ...newOpenMenus }))
     setOpenNestedMenus(prev => ({ ...prev, ...newOpenNestedMenus }))
-  }, [location])
+  }, [location, isActiveLink, menuItems])
 
   return (
     <>

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
 
 interface EligibilityHistoryColumnsProps {
@@ -13,6 +14,7 @@ export default function EligibilityHistoryColumns({
     try {
       const date = new Date(dateString)
       return date.toLocaleDateString('en-US', {
+        timeZone: 'America/New_York',
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -45,7 +47,7 @@ export default function EligibilityHistoryColumns({
       width: '12%',
       align: 'left' as const,
       render: (value: any, record: any) => (
-        <Link href={`/eligibility/history/${record.id || record.uuid}`}>
+        <Link href={`#`}>
           <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
             {record.neo_reference_id || 'N/A'}
           </div>
@@ -79,7 +81,7 @@ export default function EligibilityHistoryColumns({
     {
       key: 'provider',
       label: 'Provider',
-      width: '12%',
+      width: '20%',
       align: 'left' as const,
       render: (value: any, record: any) => {
         if (record.provider && typeof record.provider === 'object') {
@@ -91,7 +93,7 @@ export default function EligibilityHistoryColumns({
               : providerName
             : providerNpi || 'N/A'
           return (
-            <div className="text-gray-900 truncate" title={displayText}>
+            <div className="text-gray-900" title={displayText}>
               {displayText}
             </div>
           )
@@ -125,11 +127,11 @@ export default function EligibilityHistoryColumns({
       render: (value: any, record: any) => {
         const status = record.status || record.queueStatus || record.queue_status || 'N/A'
         const statusColor =
-          status === 'success' || status === 'completed'
+          status === 'completed'
             ? 'bg-green-100 text-green-800'
-            : status === 'failed' || status === 'error'
+            : status === 'rejected' || status === 'error'
               ? 'bg-red-100 text-red-800'
-              : status === 'pending'
+              : status === 'in_process'
                 ? 'bg-yellow-100 text-yellow-800'
                 : status === 'processing'
                   ? 'bg-blue-100 text-blue-800'
@@ -147,11 +149,12 @@ export default function EligibilityHistoryColumns({
       width: '15%',
       align: 'left' as const,
       render: (value: any, record: any) => {
-        const resp = record.has_response
-        const respColor = resp === true ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        const resp = record.status
+        const respColor =
+          resp === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         return (
           <span className={`px-2 py-1 text-xs font-semibold rounded-full ${respColor}`}>
-            {resp === true ? 'Success' : 'Failed'}
+            {resp === 'completed' ? 'Success' : 'Failed'}
           </span>
         )
       },
@@ -159,10 +162,10 @@ export default function EligibilityHistoryColumns({
     {
       key: 'responseReceivedAt',
       label: 'Response Received At',
-      width: '12%',
+      width: '18%',
       align: 'left' as const,
       render: (value: any, record: any) => (
-        <div className="text-gray-900 truncate">
+        <div className="text-gray-900">
           {formatDate(
             record.responseReceivedAt || record.response_received_at || record.responseReceivedAt
           )}
@@ -172,10 +175,10 @@ export default function EligibilityHistoryColumns({
     {
       key: 'createdAt',
       label: 'Created At',
-      width: '12%',
+      width: '18%',
       align: 'left' as const,
       render: (value: any, record: any) => (
-        <div className="text-gray-900 truncate">
+        <div className="text-gray-900">
           {formatDate(record.createdAt || record.created_at || record.created)}
         </div>
       ),

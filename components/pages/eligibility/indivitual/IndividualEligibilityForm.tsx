@@ -1,36 +1,38 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
+import { RotateCw } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-import {
-  fetchEligibilityIndivitualNpiPractice,
-  saveEligibilityIndivitualNpiPractice,
-  submitEligibilityCheck,
-  clearEligibilityIndivitualError,
-} from '@/redux/slices/eligibility/indivitual/actions'
-import { AppDispatch, RootState } from '@/redux/store'
-import { fetchAllAvailityPayers } from '@/redux/slices/settings/availity-payers/actions'
-import { fetchLogById } from '@/redux/slices/logs/eligibility-logs/actions'
-import { SERVICE_TYPES } from '@/utils/constants/service-types'
-import { RELATIONSHIP_CODES } from '@/utils/constants/relationship-codes'
-import { PLACE_OF_SERVICE_CODES } from '@/utils/constants/place-of-service'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import SearchableSelect, {
   SearchableSelectOption,
 } from '@/components/ui/select/searchable-select/SearchableSelect'
 import SearchableSelectPayer from '@/components/ui/select/searchable-select-payer/SearchableSelectPayer'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
-import { useRouter } from 'next/navigation'
-import { IndividualEligibilityValues } from './types/type'
-import { getGenderOptions } from '@/utils/constants/gender-options'
-import { getDOBMaxDate, getServiceDateMinMax, splitName } from './helper/helper'
-import { RotateCw } from 'lucide-react'
+import {
+  clearEligibilityIndivitualError,
+  fetchEligibilityIndivitualNpiPractice,
+  saveEligibilityIndivitualNpiPractice,
+  submitEligibilityCheck,
+} from '@/redux/slices/eligibility/indivitual/actions'
+import { fetchLogById } from '@/redux/slices/logs/eligibility-logs/actions'
+import { fetchAllAvailityPayers } from '@/redux/slices/settings/availity-payers/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 import { EligibilityIndivitualService } from '@/services/eligibility/indivitual/indivitual.service'
+import { getGenderOptions } from '@/utils/constants/gender-options'
+import { PLACE_OF_SERVICE_CODES } from '@/utils/constants/place-of-service'
+import { RELATIONSHIP_CODES } from '@/utils/constants/relationship-codes'
+import { SERVICE_TYPES } from '@/utils/constants/service-types'
 import { toastManager } from '@/utils/toast'
+
+import { getDOBMaxDate, getServiceDateMinMax, splitName } from './helper/helper'
+import { IndividualEligibilityValues } from './types/type'
 
 export default function IndividualEligibilityForm() {
   const dispatch = useDispatch<AppDispatch>()
@@ -83,13 +85,13 @@ export default function IndividualEligibilityForm() {
     dob: Yup.date()
       .required('Date of birth is required')
       .max(new Date(), 'Date of birth cannot be today or in the future'),
-    gender: Yup.string().required('Gender is required'),
-    relationshipCode: Yup.string().required('Relationship code is required'),
+    gender: Yup.string(),
+    relationshipCode: Yup.string(),
     serviceDate: Yup.date()
       .required('Service date is required')
       .min(new Date(serviceDateRestrictions.min), 'Service date must be within the allowed range')
       .max(new Date(serviceDateRestrictions.max), 'Service date must be within the allowed range'),
-    serviceType: Yup.string().required('Service type is required'),
+    serviceType: Yup.string(),
     placeOfService: Yup.string().required('Place of service is required'),
   })
 
@@ -104,10 +106,10 @@ export default function IndividualEligibilityForm() {
       firstName: '',
       dob: '',
       gender: '',
-      relationshipCode: '',
+      relationshipCode: '18', // Default to "Self"
       serviceDate: '',
-      serviceType: '',
-      placeOfService: '',
+      serviceType: '30', // Default to 30
+      placeOfService: '11', // Default to "Office"
     },
     validationSchema,
     onSubmit: async values => {
@@ -321,7 +323,7 @@ export default function IndividualEligibilityForm() {
 
   const handleVerifyNpi = async () => {
     const npi = formik.values.npi?.trim()
-    
+
     if (!npi) {
       toastManager.error('Please enter an NPI number')
       return
@@ -336,32 +338,27 @@ export default function IndividualEligibilityForm() {
     try {
       const response = await EligibilityIndivitualService.verifyNpiNumber(npi)
       const data = response.data?.data || response.data
-      
+
       if (data) {
-        // Handle different response formats
         let practiceFirstName = ''
         let practiceLastName = ''
-        
-        // Format 1: Direct first_name and last_name fields
+
         if (data.first_name || data.last_name) {
           practiceFirstName = data.first_name || ''
           practiceLastName = data.last_name || ''
-        }
-        // Format 2: Practice-specific field names
-        else if (data.practice_first_name || data.practice_last_name) {
+        } else if (data.practice_first_name || data.practice_last_name) {
           practiceFirstName = data.practice_first_name || ''
           practiceLastName = data.practice_last_name || ''
-        }
-        // Format 3: Combined name field that needs to be split
-        else if (data.name || data.practice_name || data.full_name || data.organization_name) {
-          const practiceName = data.name || data.practice_name || data.full_name || data.organization_name || ''
+        } else if (data.name || data.practice_name || data.full_name || data.organization_name) {
+          const practiceName =
+            data.name || data.practice_name || data.full_name || data.organization_name || ''
           if (practiceName) {
             const nameParts = splitName(practiceName)
             practiceFirstName = nameParts.firstName
             practiceLastName = nameParts.lastName
           }
         }
-        
+
         if (practiceFirstName || practiceLastName) {
           formik.setFieldValue('practiceFirstName', practiceFirstName)
           formik.setFieldValue('practiceLastName', practiceLastName)
@@ -449,8 +446,7 @@ export default function IndividualEligibilityForm() {
                       name="npi"
                       placeholder="NPI"
                       autoComplete="off"
-                      onChange={(e) => {
-                        // Only allow numbers
+                      onChange={e => {
                         const value = e.target.value.replace(/\D/g, '')
                         formik.setFieldValue('npi', value)
                       }}
@@ -655,7 +651,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Gender <span className="text-red-500">*</span>
+                    Gender
                   </label>
                   <SearchableSelect
                     name="gender"
@@ -674,7 +670,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Relationship Code <span className="text-red-500">*</span>
+                    Relationship Code
                   </label>
                   <SearchableSelect
                     name="relationshipCode"
@@ -719,7 +715,7 @@ export default function IndividualEligibilityForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Service Type <span className="text-red-500">*</span>
+                    Service Type
                   </label>
                   <SearchableSelect
                     name="serviceType"

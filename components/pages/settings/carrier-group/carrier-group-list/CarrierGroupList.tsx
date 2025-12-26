@@ -1,22 +1,24 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import DataTable from '@/components/ui/data-table/DataTable'
-import CarrierGroupListColumns from './components/columns'
-import Filters, { FilterField } from '@/components/ui/filters/Filters'
-import { themeColors } from '@/theme'
-import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import DataTable from '@/components/ui/data-table/DataTable'
+import Filters, { FilterField } from '@/components/ui/filters/Filters'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
-  fetchAllCarrierGroups,
-  deleteCarrierGroup,
-  setCurrentPage,
   clearCarrierGroupsError,
+  deleteCarrierGroup,
+  fetchAllCarrierGroups,
+  setCurrentPage,
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+import { themeColors } from '@/theme'
+
+import CarrierGroupListColumns from './components/columns'
 
 export default function CarrierGroupList() {
   const dispatch = useDispatch<AppDispatch>()

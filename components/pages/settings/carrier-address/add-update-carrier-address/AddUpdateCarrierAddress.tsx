@@ -1,21 +1,22 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
-import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import {
-  fetchCarrierAddressById,
-  createCarrierAddress,
-  updateCarrierAddress,
-  clearCurrentCarrierAddress,
   clearCarrierAddressesError,
+  clearCurrentCarrierAddress,
+  createCarrierAddress,
+  fetchCarrierAddressById,
+  updateCarrierAddress,
 } from '@/redux/slices/settings/carrier-addresses/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { CarrierAddressFormValues } from '@/types'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function AddUpdateCarrierAddress() {
   const router = useRouter()
@@ -93,7 +94,6 @@ export default function AddUpdateCarrierAddress() {
     return () => {
       dispatch(clearCurrentCarrierAddress())
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isEditMode, carrierAddressId])
 
   // Update form values when carrier address data is loaded

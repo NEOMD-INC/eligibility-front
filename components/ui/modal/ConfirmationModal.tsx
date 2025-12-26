@@ -1,8 +1,8 @@
 'use client'
 
-import React from 'react'
-import { X } from 'lucide-react'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
+import { X } from 'lucide-react'
+import React from 'react'
 
 const modalVariants: Variants = {
   hidden: {
@@ -77,50 +77,50 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           className="absolute inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm transition-opacity"
           onClick={handleBackdropClick}
         >
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <X size={20} />
-            </button>
-          </div>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <button
+                onClick={onClose}
+                disabled={isLoading}
+                className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-          {/* Body */}
-          <div className="p-6">
-            <p className="text-gray-700">{message}</p>
-          </div>
+            {/* Body */}
+            <div className="p-6">
+              <p className="text-gray-700">{message}</p>
+            </div>
 
-          {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {cancelText}
-            </button>
-            <button
-              onClick={handleConfirm}
-              disabled={isLoading}
-              className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${confirmButtonClass}`}
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Processing...
-                </span>
-              ) : (
-                confirmText
-              )}
-            </button>
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
+              <button
+                onClick={onClose}
+                disabled={isLoading}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {cancelText}
+              </button>
+              <button
+                onClick={handleConfirm}
+                disabled={isLoading}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${confirmButtonClass}`}
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Processing...
+                  </span>
+                ) : (
+                  confirmText
+                )}
+              </button>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
       )}
     </AnimatePresence>
   )

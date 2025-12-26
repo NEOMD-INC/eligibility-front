@@ -1,23 +1,25 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import DataTable from '@/components/ui/data-table/DataTable'
-import UsersListColumns from './components/columns'
-import Filters, { FilterField } from '@/components/ui/filters/Filters'
-import { themeColors } from '@/theme'
-import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import DataTable from '@/components/ui/data-table/DataTable'
+import Filters, { FilterField } from '@/components/ui/filters/Filters'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
-  fetchAllUsers,
-  deleteUser,
-  setCurrentPage,
   clearUsersError,
+  deleteUser,
+  fetchAllUsers,
+  setCurrentPage,
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { themeColors } from '@/theme'
+
+import UsersListColumns from './components/columns'
 import { getFilterOptions } from './components/users-list.config'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 
 export default function UsersList() {
   const dispatch = useDispatch<AppDispatch>()

@@ -213,4 +213,3 @@ export const formatServiceType = (value: string): string => {
   const serviceType = SERVICE_TYPES.find(st => st.value === value)
   return serviceType ? `${serviceType.value} - ${serviceType.label}` : value
 }
-

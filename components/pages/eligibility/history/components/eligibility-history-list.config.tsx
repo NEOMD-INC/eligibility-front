@@ -1,6 +1,6 @@
-import { SERVICE_TYPES } from '@/utils/constants/service-types'
-import { RELATIONSHIP_CODES } from '@/utils/constants/relationship-codes'
 import type { FilterField } from '@/components/ui/filters/Filters'
+import { RELATIONSHIP_CODES } from '@/utils/constants/relationship-codes'
+import { SERVICE_TYPES } from '@/utils/constants/service-types'
 
 export const getFilterFields: (params: {
   filters: any

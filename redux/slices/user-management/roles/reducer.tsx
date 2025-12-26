@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { rolesService } from '@/services/user-management/roles/roles.service'
 import type { Role, RolesState } from '@/types'
 
@@ -33,9 +34,7 @@ export const fetchAllRoles = createAsyncThunk(
       const response = await rolesService.getAllRoles(params.page, params.filters)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch roles'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch roles')
     }
   }
 )
@@ -48,9 +47,7 @@ export const fetchRoleById = createAsyncThunk(
       const response = await rolesService.getRoleById(roleId)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch role details'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch role details')
     }
   }
 )
@@ -63,9 +60,7 @@ export const createRole = createAsyncThunk(
       const response = await rolesService.createRole(roleData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to create role'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to create role')
     }
   }
 )
@@ -73,17 +68,12 @@ export const createRole = createAsyncThunk(
 // Async thunk to update role
 export const updateRole = createAsyncThunk(
   'roles/updateRole',
-  async (
-    params: { roleId: string; roleData: {} },
-    { rejectWithValue }
-  ) => {
+  async (params: { roleId: string; roleData: {} }, { rejectWithValue }) => {
     try {
       const response = await rolesService.updateRole(params.roleId, params.roleData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to update role'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to update role')
     }
   }
 )
@@ -96,9 +86,7 @@ export const deleteRole = createAsyncThunk(
       const response = await rolesService.deleteRole(roleId)
       return { roleId, data: response.data }
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to delete role'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to delete role')
     }
   }
 )
@@ -133,12 +121,12 @@ const rolesSlice = createSlice({
         // - { data: { data: [...], total: 100 } } (nested)
         // - [...] (direct array)
         const payload = action.payload
-        
+
         // Check for nested data structure: { data: { data: [...] }, meta: { pagination: {...} } }
         if (payload?.data?.data && Array.isArray(payload.data.data)) {
           const dataArray = payload.data.data
           state.roles = payload.data.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -163,7 +151,7 @@ const rolesSlice = createSlice({
         } else if (payload?.data && Array.isArray(payload.data)) {
           const dataArray = payload.data
           state.roles = payload.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -208,8 +196,7 @@ const rolesSlice = createSlice({
       })
       .addCase(fetchRoleById.fulfilled, (state, action) => {
         state.fetchRoleLoading = false
-        state.currentRole =
-          action.payload?.data || action.payload || null
+        state.currentRole = action.payload?.data || action.payload || null
         state.error = null
       })
       .addCase(fetchRoleById.rejected, (state, action) => {
@@ -286,7 +273,5 @@ const rolesSlice = createSlice({
   },
 })
 
-export const { clearRolesError, clearCurrentRole, setCurrentPage } =
-  rolesSlice.actions
+export const { clearRolesError, clearCurrentRole, setCurrentPage } = rolesSlice.actions
 export default rolesSlice.reducer
-

@@ -31,4 +31,3 @@ export interface RoleFormValues {
   roleName: string
   permissions: string[]
 }
-

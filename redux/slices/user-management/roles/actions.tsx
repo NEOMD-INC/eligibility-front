@@ -1,12 +1,11 @@
 // Re-export all actions and thunks from the reducer
 export {
+  clearCurrentRole,
+  clearRolesError,
+  createRole,
+  deleteRole,
   fetchAllRoles,
   fetchRoleById,
-  createRole,
-  updateRole,
-  deleteRole,
-  clearRolesError,
-  clearCurrentRole,
   setCurrentPage,
+  updateRole,
 } from './reducer'
-

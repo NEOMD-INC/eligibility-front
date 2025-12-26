@@ -1,4 +1,5 @@
 import Link from 'next/link'
+
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
 
 interface EligibilityLogListColumnsProps {
@@ -13,6 +14,7 @@ export default function EligibilityLogListColumns({
     try {
       const date = new Date(dateString)
       return date.toLocaleDateString('en-US', {
+        timeZone: 'America/New_York',
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -32,7 +34,7 @@ export default function EligibilityLogListColumns({
       align: 'left' as const,
       render: (value: any, log: any) => (
         <Link href={`/logs/${log.id || log.uuid}`}>
-          <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
+          <div className="text-gray-900 font-semibold hover:text-blue-600">
             {log.neoReferenceId || log.neo_reference_id || 'N/A'}
           </div>
         </Link>
@@ -41,7 +43,7 @@ export default function EligibilityLogListColumns({
     {
       key: 'subscriber',
       label: 'Subscriber',
-      width: '12%',
+      width: '15%',
       align: 'left' as const,
       render: (value: any, log: any) => {
         // Handle nested subscriber object
@@ -50,13 +52,13 @@ export default function EligibilityLogListColumns({
           subscriberValue =
             subscriberValue.name || subscriberValue.member_id || subscriberValue.id || 'N/A'
         }
-        return <div className="text-gray-900 truncate">{subscriberValue || 'N/A'}</div>
+        return <div className="text-gray-900 ">{subscriberValue || 'N/A'}</div>
       },
     },
     {
       key: 'provider',
       label: 'Provider',
-      width: '12%',
+      width: '15%',
       align: 'left' as const,
       render: (value: any, log: any) => {
         // Handle nested provider object
@@ -64,7 +66,7 @@ export default function EligibilityLogListColumns({
         if (providerValue && typeof providerValue === 'object') {
           providerValue = providerValue.name || providerValue.npi || providerValue.id || 'N/A'
         }
-        return <div className="text-gray-900 truncate">{providerValue || 'N/A'}</div>
+        return <div className="text-gray-900">{providerValue || 'N/A'}</div>
       },
     },
     {
@@ -73,9 +75,7 @@ export default function EligibilityLogListColumns({
       width: '12%',
       align: 'left' as const,
       render: (value: any, log: any) => (
-        <div className="text-gray-900 truncate">
-          {formatDate(log.serviceDate || log.service_date)}
-        </div>
+        <div className="text-gray-900">{log.serviceDate || log.service_date}</div>
       ),
     },
     {
@@ -86,11 +86,11 @@ export default function EligibilityLogListColumns({
       render: (value: any, log: any) => {
         const status = log.status || log.queueStatus || log.queue_status || 'N/A'
         const statusColor =
-          status === 'success' || status === 'completed'
+          status === 'completed'
             ? 'bg-green-100 text-green-800'
-            : status === 'failed' || status === 'error'
+            : status === 'rejected'
               ? 'bg-red-100 text-red-800'
-              : status === 'pending'
+              : status === 'in_process'
                 ? 'bg-yellow-100 text-yellow-800'
                 : 'bg-gray-100 text-gray-800'
         return (
@@ -101,14 +101,49 @@ export default function EligibilityLogListColumns({
       },
     },
     {
-      key: 'created',
-      label: 'Created',
+      key: 'response message',
+      label: 'Response Message',
+      width: '12%',
+      align: 'left' as const,
+      render: (value: any, log: any) => {
+        const responseMessage = log.response_message || 'N/A'
+        return (
+          <div
+            className="text-gray-900 truncate cursor-help block"
+            style={{ minWidth: 0 }}
+            title={responseMessage !== 'N/A' ? responseMessage : undefined}
+          >
+            {responseMessage}
+          </div>
+        )
+      },
+    },
+    {
+      key: 'sentAt',
+      label: 'Sent At',
+      width: '18%',
+      align: 'left' as const,
+      render: (value: any, log: any) => (
+        <div className="text-gray-900">{formatDate(log.request_sent_at)}</div>
+      ),
+    },
+    {
+      key: 'responseReceivedAt',
+      label: 'Response Received At',
+      width: '18%',
+      align: 'left' as const,
+      render: (value: any, log: any) => (
+        <div className="text-gray-900">{formatDate(log.response_received_at)}</div>
+      ),
+    },
+    {
+      key: 'totalTime',
+      label: 'Total Time',
       width: '12%',
       align: 'left' as const,
       render: (value: any, log: any) => (
-        <div className="text-gray-900 truncate">
-          {formatDate(log.created || log.createdAt || log.created_at)}
-        </div>
+        // converstion for secs and mins
+        <div className="text-gray-900">{log.response_time.time}</div>
       ),
     },
     {

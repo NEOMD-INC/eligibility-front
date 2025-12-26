@@ -24,4 +24,3 @@ export interface CarrierGroupFormValues {
   fillingIndicator: string
   isActive: boolean
 }
-

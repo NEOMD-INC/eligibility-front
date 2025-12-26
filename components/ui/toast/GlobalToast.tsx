@@ -1,8 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+
+import { Toast, toastManager } from '@/utils/toast'
+
 import ToastContainer from './ToastContainer'
-import { toastManager, Toast } from '@/utils/toast'
 
 const GlobalToast: React.FC = () => {
   const [toasts, setToasts] = useState<Toast[]>([])

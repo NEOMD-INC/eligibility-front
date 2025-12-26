@@ -1,8 +1,9 @@
 'use client'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import { themeColors } from '@/theme'
+
 import ProfileInfoForm from './components/forms/ProfileInfoForm'
 import UpdatePasswordForm from './components/forms/UpdatePassword'
-import { themeColors } from '@/theme'
 
 export default function UserProfile() {
   return (

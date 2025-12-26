@@ -1,19 +1,21 @@
 'use client'
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
-  fetchCarrierSetupById,
-  deleteCarrierSetup,
-  clearCurrentCarrierSetup,
   clearCarrierSetupsError,
+  clearCurrentCarrierSetup,
+  deleteCarrierSetup,
+  fetchCarrierSetupById,
 } from '@/redux/slices/settings/carrier-setups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+
 import { getCarrierSetupDetails } from './helper/helper'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
-import { useState } from 'react'
 
 export default function CarrierSetupDetail() {
   const router = useRouter()

@@ -1,5 +1,6 @@
-import { ImageProps, UserProfileImageProps } from '@/types/ui/image'
 import Image from 'next/image'
+
+import { ImageProps, UserProfileImageProps } from '@/types/ui/image'
 
 const DefaultImage = ({ gender }: ImageProps) => {
   const imageSource =

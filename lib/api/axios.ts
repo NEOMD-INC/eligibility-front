@@ -1,10 +1,11 @@
 // services/api.ts
 import axios, {
-  AxiosRequestConfig,
-  InternalAxiosRequestConfig,
-  AxiosResponse,
   AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
 } from 'axios'
+
 import { getCookie } from '@/lib/cookies/cookies'
 import { toastManager } from '@/utils/toast'
 
@@ -28,12 +29,12 @@ api.interceptors.request.use(
       // Set Authorization header with Bearer token
       config.headers['Authorization'] = `Bearer ${token}`
     }
-    
+
     // If FormData is being sent, let axios set Content-Type automatically (with boundary)
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type']
     }
-    
+
     return config
   },
   error => {
@@ -62,41 +63,71 @@ api.interceptors.response.use(
 
     // Show error toast for POST and PUT requests (unless skipToast is set)
     if ((method === 'post' || method === 'put') && !skipToast) {
-      // Extract error message from various possible response structures
-      let message = 'Something went wrong. Please try again.'
-      
       if (error.response?.data) {
         const data = error.response.data as any
-        const rawMessage =
-          data?.message ||
-          data?.msg ||
-          data?.error ||
-          (typeof data === 'string' ? data : null) ||
-          (data?.errors && typeof data.errors === 'object' 
-            ? Object.values(data.errors).flat().join(', ') 
-            : null)
-        
-        // Filter out technical backend error messages and show user-friendly ones
-        if (rawMessage) {
-          // Check if it's a technical PHP/Laravel error
-          if (
-            rawMessage.includes('Argument #') ||
-            rawMessage.includes('must be of type') ||
-            rawMessage.includes('given') ||
-            rawMessage.includes('BaseApiController') ||
-            rawMessage.includes('EligibilityController')
-          ) {
-            // Show a user-friendly message for backend errors
-            message = 'An error occurred while processing your request. Please try again or contact support.'
-          } else {
-            message = rawMessage
+
+        // Check if there's an errors object with multiple validation errors
+        if (data?.errors && typeof data.errors === 'object' && !Array.isArray(data.errors)) {
+          // Loop through each field and show each error message
+          const errorEntries = Object.entries(data.errors) as [string, string[]][]
+          
+          errorEntries.forEach(([field, messages]) => {
+            // Handle both array of messages and single message
+            const errorMessages = Array.isArray(messages) ? messages : [messages]
+            
+            errorMessages.forEach((errorMsg: string) => {
+              // Filter out technical backend error messages
+              if (
+                errorMsg.includes('Argument #') ||
+                errorMsg.includes('must be of type') ||
+                errorMsg.includes('given') ||
+                errorMsg.includes('BaseApiController') ||
+                errorMsg.includes('EligibilityController')
+              ) {
+                toastManager.error(
+                  'An error occurred while processing your request. Please try again or contact support.'
+                )
+              } else {
+                // Show field name with error message for better context
+                const displayMessage = errorMsg
+                toastManager.error(displayMessage)
+              }
+            })
+          })
+        } else {
+          // Single error message handling
+          let message = 'Something went wrong. Please try again.'
+          const rawMessage =
+            data?.message ||
+            data?.msg ||
+            data?.error ||
+            (typeof data === 'string' ? data : null)
+
+          // Filter out technical backend error messages and show user-friendly ones
+          if (rawMessage) {
+            // Check if it's a technical PHP/Laravel error
+            if (
+              rawMessage.includes('Argument #') ||
+              rawMessage.includes('must be of type') ||
+              rawMessage.includes('given') ||
+              rawMessage.includes('BaseApiController') ||
+              rawMessage.includes('EligibilityController')
+            ) {
+              // Show a user-friendly message for backend errors
+              message =
+                'An error occurred while processing your request. Please try again or contact support.'
+            } else {
+              message = rawMessage
+            }
           }
+
+          toastManager.error(message)
         }
       } else if (error.message && !error.message.includes('Network Error')) {
-        message = error.message
+        toastManager.error(error.message)
+      } else {
+        toastManager.error('Something went wrong. Please try again.')
       }
-      
-      toastManager.error(message)
     }
 
     return Promise.reject(error)

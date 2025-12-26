@@ -1,21 +1,22 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+import * as Yup from 'yup'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import {
-  createUser,
-  updateUser,
-  fetchUserById,
-  clearUsersError,
   clearCurrentUser,
+  clearUsersError,
+  createUser,
+  fetchUserById,
+  updateUser,
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { rolesService } from '@/services/user-management/roles/roles.service'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 type UserFormValues = {
   fullName: string
@@ -152,8 +153,8 @@ export default function AddUpdateUser() {
   // Unified Formik instance
   const formik = useFormik<UserFormValues>({
     initialValues: {
-      fullName: (isEditMode && currentUser) ? (currentUser.name || currentUser.full_name || '') : '',
-      email: (isEditMode && currentUser) ? (currentUser.email || '') : '',
+      fullName: isEditMode && currentUser ? currentUser.name || currentUser.full_name || '' : '',
+      email: isEditMode && currentUser ? currentUser.email || '' : '',
       password: '',
       confirmPassword: '',
       newPassword: '',
@@ -178,7 +179,11 @@ export default function AddUpdateUser() {
             userData.password_confirmation = values.confirmNewPassword?.trim() || ''
           }
           // Preserve existing roles
-          if (currentUser?.roles && Array.isArray(currentUser.roles) && currentUser.roles.length > 0) {
+          if (
+            currentUser?.roles &&
+            Array.isArray(currentUser.roles) &&
+            currentUser.roles.length > 0
+          ) {
             const firstRole = currentUser.roles[0]
             if (firstRole && (firstRole.id || firstRole)) {
               userData.roles = [firstRole.id || firstRole]

@@ -1,22 +1,24 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import DataTable from '@/components/ui/data-table/DataTable'
-import PermissionsListColumns from './components/columns'
-import Filters, { FilterField } from '@/components/ui/filters/Filters'
-import { themeColors } from '@/theme'
-import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import DataTable from '@/components/ui/data-table/DataTable'
+import Filters, { FilterField } from '@/components/ui/filters/Filters'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
-  fetchAllPermissions,
-  deletePermission,
-  setCurrentPage,
   clearPermissionsError,
+  deletePermission,
+  fetchAllPermissions,
+  setCurrentPage,
 } from '@/redux/slices/user-management/permissions/actions'
 import { AppDispatch, RootState } from '@/redux/store'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+import { themeColors } from '@/theme'
+
+import PermissionsListColumns from './components/columns'
 
 export default function PermissionsList() {
   const dispatch = useDispatch<AppDispatch>()

@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+
 import InfoCard from '../../../../../../../../ui/cards/InfoCard/InfoCard'
 import ProgressCard from '../../../../../../../../ui/cards/ProgressCard/ProgressCard'
 import LimitationsCard from './components/LimitationsCard'
@@ -24,7 +25,7 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
     if (typeof benefit.copays === 'object') {
       const copayValues = Object.values(benefit.copays)
         .filter(value => value !== null && value !== undefined && value !== 0)
-        .map(value => typeof value === 'number' ? formatCurrency(String(value)) : value)
+        .map(value => (typeof value === 'number' ? formatCurrency(String(value)) : value))
       return copayValues.length > 0 ? copayValues.join(', ') : 'N/A'
     }
     return formatCurrency(String(benefit.copays))
@@ -200,7 +201,13 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
         )}
 
         {/* Limitations Card (spans remaining columns) */}
-        <div className={benefit.out_of_pocket !== null && benefit.out_of_pocket !== undefined ? 'md:col-span-2' : 'md:col-span-3'}>
+        <div
+          className={
+            benefit.out_of_pocket !== null && benefit.out_of_pocket !== undefined
+              ? 'md:col-span-2'
+              : 'md:col-span-3'
+          }
+        >
           <LimitationsCard
             key={`limitations-${benefit.service_type_code}-${benefit.coverage_level_code}`}
             {...limitationsData}

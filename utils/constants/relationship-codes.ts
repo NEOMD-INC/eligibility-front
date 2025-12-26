@@ -35,4 +35,3 @@ export const formatRelationshipCode = (value: string): string => {
   const relationshipCode = RELATIONSHIP_CODES.find(rc => rc.value === value)
   return relationshipCode ? `${relationshipCode.value} - ${relationshipCode.label}` : value
 }
-

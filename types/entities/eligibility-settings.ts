@@ -83,4 +83,3 @@ export interface ISASettingsFormValues {
   usageIndicator: string
   componentElementSeparator: string
 }
-

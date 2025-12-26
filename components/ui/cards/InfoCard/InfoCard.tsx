@@ -68,4 +68,3 @@ export default function InfoCard({ title, value, subtitle, footer, additionalInf
     </div>
   )
 }
-

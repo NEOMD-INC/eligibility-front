@@ -4,14 +4,14 @@
 
 import { BaseListState } from '../common'
 import {
-  CarrierGroup,
-  CarrierAddress,
-  CarrierSetup,
   AvailityPayer,
+  CarrierAddress,
+  CarrierGroup,
+  CarrierSetup,
   EligibilitySettings,
-  User,
-  Role,
   Permission,
+  Role,
+  User,
 } from '../entities'
 
 // Carrier Groups State
@@ -79,4 +79,3 @@ export interface EligibilityBulkState {
   error: string | null
   submitLoading: boolean
 }
-

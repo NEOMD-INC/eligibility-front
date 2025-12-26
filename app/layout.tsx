@@ -1,6 +1,8 @@
+import './globals.css'
+
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import './globals.css'
+
 import ReduxProvider from '@/components/providers/redux-provider/Provider'
 import GlobalToast from '@/components/ui/toast/GlobalToast'
 

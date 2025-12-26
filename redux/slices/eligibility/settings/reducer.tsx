@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { EligibilitySettingsService } from '@/services/eligibility/settings/settings.service'
 import type { EligibilitySettingsState } from '@/types'
 

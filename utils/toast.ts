@@ -19,7 +19,7 @@ class ToastManager {
     this.listeners.push(listener)
     // Return initial state
     listener([...this.toasts])
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== listener)
@@ -33,7 +33,7 @@ class ToastManager {
   show(message: string, type: ToastType, duration: number = 5000) {
     const id = `toast-${Date.now()}-${Math.random()}`
     const toast: Toast = { id, message, type, duration }
-    
+
     this.toasts.push(toast)
     this.notify()
 
@@ -67,4 +67,3 @@ class ToastManager {
 }
 
 export const toastManager = new ToastManager()
-

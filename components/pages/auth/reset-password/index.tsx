@@ -1,13 +1,14 @@
 'use client'
-import { useState } from 'react'
-import Link from 'next/link'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { authService } from '@/services/auth.service'
 import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import * as Yup from 'yup'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import { authService } from '@/services/auth.service'
 
 export default function ResetPage() {
   const router = useRouter()

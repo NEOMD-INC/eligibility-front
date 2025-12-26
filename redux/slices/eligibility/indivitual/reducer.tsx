@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { EligibilityIndivitualService } from '@/services/eligibility/indivitual/indivitual.service'
 
 const initialState: any = {
@@ -74,10 +75,14 @@ const mapEligibilityFormToApi = (formData: {
 // Async thunk to save/update practice data
 export const saveEligibilityIndivitualNpiPractice = createAsyncThunk(
   'eligibilityIndivitual/saveEligibilityIndivitualNpiPractice',
-  async (practiceData: { npi: string; practiceLastName: string; practiceFirstName: string }, { rejectWithValue }) => {
+  async (
+    practiceData: { npi: string; practiceLastName: string; practiceFirstName: string },
+    { rejectWithValue }
+  ) => {
     try {
       const apiData = mapPracticeFormToApi(practiceData)
-      const response = await EligibilityIndivitualService.updateEligibilityIndivitualNpiPractice(apiData)
+      const response =
+        await EligibilityIndivitualService.updateEligibilityIndivitualNpiPractice(apiData)
       return response.data
     } catch (error: any) {
       return rejectWithValue(
@@ -90,29 +95,31 @@ export const saveEligibilityIndivitualNpiPractice = createAsyncThunk(
 // Async thunk to submit eligibility check
 export const submitEligibilityCheck = createAsyncThunk(
   'eligibilityIndivitual/submitEligibilityCheck',
-  async (formData: {
-    payerId: string
-    npi: string
-    practiceLastName: string
-    practiceFirstName: string
-    subscriberId: string
-    lastName: string
-    firstName: string
-    dob: string
-    gender: string
-    relationshipCode: string
-    serviceDate: string
-    serviceType: string
-    placeOfService: string
-  }, { rejectWithValue }) => {
+  async (
+    formData: {
+      payerId: string
+      npi: string
+      practiceLastName: string
+      practiceFirstName: string
+      subscriberId: string
+      lastName: string
+      firstName: string
+      dob: string
+      gender: string
+      relationshipCode: string
+      serviceDate: string
+      serviceType: string
+      placeOfService: string
+    },
+    { rejectWithValue }
+  ) => {
     try {
       const apiData = mapEligibilityFormToApi(formData)
-      const response = await EligibilityIndivitualService.addEligibilityIndivitualNpiPractice(apiData)
+      const response =
+        await EligibilityIndivitualService.addEligibilityIndivitualNpiPractice(apiData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to submit eligibility check'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to submit eligibility check')
     }
   }
 )

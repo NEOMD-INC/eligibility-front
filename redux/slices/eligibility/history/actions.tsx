@@ -1,10 +1,9 @@
 // Re-export all actions and thunks from the reducer
 export {
+  clearEligibilityHistoryError,
+  clearFilters,
   fetchEligibilityHistory,
   retryEligibilitySubmission,
-  clearEligibilityHistoryError,
   setCurrentPage,
   setFilters,
-  clearFilters,
 } from './reducer'
-

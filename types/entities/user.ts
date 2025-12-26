@@ -35,4 +35,3 @@ export interface EditUserFormValues {
   newPassword: string
   confirmNewPassword: string
 }
-

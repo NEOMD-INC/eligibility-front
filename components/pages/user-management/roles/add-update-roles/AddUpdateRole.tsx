@@ -1,22 +1,23 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+import * as Yup from 'yup'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-import {
-  createRole,
-  updateRole,
-  fetchRoleById,
-  clearRolesError,
-  clearCurrentRole,
-} from '@/redux/slices/user-management/roles/actions'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import { fetchAllPermissions } from '@/redux/slices/user-management/permissions/actions'
+import {
+  clearCurrentRole,
+  clearRolesError,
+  createRole,
+  fetchRoleById,
+  updateRole,
+} from '@/redux/slices/user-management/roles/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { RoleFormValues } from '@/types'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function AddUpdateRole() {
   const router = useRouter()

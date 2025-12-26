@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { CarrierGroupService } from '@/services/settings/carrier-groups/carrierGroups.service'
 import type { CarrierGroup, CarrierGroupsState } from '@/types'
 
@@ -67,9 +68,7 @@ export const fetchAllCarrierGroups = createAsyncThunk(
       const response = await CarrierGroupService.getAllCarrierGroups(params.page, params.filters)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch carrier groups'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch carrier groups')
     }
   }
 )
@@ -99,9 +98,7 @@ export const createCarrierGroup = createAsyncThunk(
       const response = await CarrierGroupService.createCarrierGroups(apiData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to create carrier group'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to create carrier group')
     }
   }
 )
@@ -109,22 +106,14 @@ export const createCarrierGroup = createAsyncThunk(
 // Async thunk to update carrier group
 export const updateCarrierGroup = createAsyncThunk(
   'carrierGroups/updateCarrierGroup',
-  async (
-    params: { carrierGroupId: string; carrierGroupData: {} },
-    { rejectWithValue }
-  ) => {
+  async (params: { carrierGroupId: string; carrierGroupData: {} }, { rejectWithValue }) => {
     try {
       // Map form fields to API field names
       const apiData = mapFormToApi(params.carrierGroupData)
-      const response = await CarrierGroupService.updateCarrierGroups(
-        params.carrierGroupId,
-        apiData
-      )
+      const response = await CarrierGroupService.updateCarrierGroups(params.carrierGroupId, apiData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to update carrier group'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to update carrier group')
     }
   }
 )
@@ -137,9 +126,7 @@ export const deleteCarrierGroup = createAsyncThunk(
       const response = await CarrierGroupService.deleteCarrierGroups(carrierGroupId)
       return { carrierGroupId, data: response.data }
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to delete carrier group'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to delete carrier group')
     }
   }
 )
@@ -175,7 +162,7 @@ const carrierGroupsSlice = createSlice({
           // Structure: { data: [...], meta: { pagination: {...} } }
           dataArray = payload.data
           state.carrierGroups = payload.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -201,7 +188,7 @@ const carrierGroupsSlice = createSlice({
           // Nested structure: { data: { data: [...] }, meta: { pagination: {...} } }
           dataArray = payload.data.data
           state.carrierGroups = payload.data.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -248,8 +235,7 @@ const carrierGroupsSlice = createSlice({
       })
       .addCase(fetchCarrierGroupById.fulfilled, (state, action) => {
         state.fetchCarrierGroupLoading = false
-        state.currentCarrierGroup =
-          action.payload?.data || action.payload || null
+        state.currentCarrierGroup = action.payload?.data || action.payload || null
         state.error = null
       })
       .addCase(fetchCarrierGroupById.rejected, (state, action) => {
@@ -289,17 +275,12 @@ const carrierGroupsSlice = createSlice({
         const updatedCarrierGroup = action.payload?.data || action.payload
         if (updatedCarrierGroup?.id || updatedCarrierGroup?.uuid) {
           const id = updatedCarrierGroup.id || updatedCarrierGroup.uuid
-          const index = state.carrierGroups.findIndex(
-            cg => (cg.id === id) || (cg.uuid === id)
-          )
+          const index = state.carrierGroups.findIndex(cg => cg.id === id || cg.uuid === id)
           if (index !== -1) {
             state.carrierGroups[index] = updatedCarrierGroup
           }
           // Update current carrier group if it's the same
-          if (
-            state.currentCarrierGroup?.id === id ||
-            state.currentCarrierGroup?.uuid === id
-          ) {
+          if (state.currentCarrierGroup?.id === id || state.currentCarrierGroup?.uuid === id) {
             state.currentCarrierGroup = updatedCarrierGroup
           }
         }
@@ -322,8 +303,7 @@ const carrierGroupsSlice = createSlice({
         if (action.payload?.carrierGroupId) {
           state.carrierGroups = state.carrierGroups.filter(
             cg =>
-              cg.id !== action.payload.carrierGroupId &&
-              cg.uuid !== action.payload.carrierGroupId
+              cg.id !== action.payload.carrierGroupId && cg.uuid !== action.payload.carrierGroupId
           )
           state.totalItems = Math.max(0, state.totalItems - 1)
         }
@@ -336,10 +316,6 @@ const carrierGroupsSlice = createSlice({
   },
 })
 
-export const {
-  clearCarrierGroupsError,
-  clearCurrentCarrierGroup,
-  setCurrentPage,
-} = carrierGroupsSlice.actions
+export const { clearCarrierGroupsError, clearCurrentCarrierGroup, setCurrentPage } =
+  carrierGroupsSlice.actions
 export default carrierGroupsSlice.reducer
-

@@ -1,12 +1,11 @@
 // Re-export all actions and thunks from the reducer
 export {
+  clearCurrentUser,
+  clearUsersError,
+  createUser,
+  deleteUser,
   fetchAllUsers,
   fetchUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-  clearUsersError,
-  clearCurrentUser,
   setCurrentPage,
+  updateUser,
 } from './reducer'
-

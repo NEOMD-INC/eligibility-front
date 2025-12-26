@@ -1,12 +1,12 @@
 import {
   Building2,
-  MapPin,
-  Wrench,
-  CreditCard,
-  UserCheck,
-  Upload,
-  History,
   Cog,
+  CreditCard,
+  History,
+  MapPin,
+  Upload,
+  UserCheck,
+  Wrench,
 } from 'lucide-react'
 
 export const getCategories = () => [
@@ -27,13 +27,15 @@ export const getCategories = () => [
       },
       {
         name: 'Carrier Setup',
-        path: '/settings/carrier-setup',
+        // path: '/settings/carrier-setup',
+        path: '#',
         icon: <Wrench size={24} />,
         description: 'Configure carrier setups',
       },
       {
         name: 'Availity Payer',
-        path: '/settings/availity-payer',
+        // path: '/settings/availity-payer',
+        path: '#',
         icon: <CreditCard size={24} />,
         description: 'Manage Availity payers',
       },
@@ -62,7 +64,8 @@ export const getCategories = () => [
       },
       {
         name: 'Eligibility Settings',
-        path: '/eligibility/settings',
+        // path: '/eligibility/settings',
+        path: '#',
         icon: <Cog size={24} />,
         description: 'Configure eligibility settings',
       },

@@ -1,24 +1,26 @@
 'use client'
-import React, { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { useDispatch, useSelector } from 'react-redux'
 import { Check } from 'lucide-react'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+import { useParams, useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import {
-  fetchRoleById,
-  clearRolesError,
   clearCurrentRole,
+  clearRolesError,
+  fetchRoleById,
 } from '@/redux/slices/user-management/roles/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+
 import { userWithSameRoleColumns } from './components/columns'
 import {
-  getnormalizedUsers,
-  getRoleInfo,
   getNormalizedPermissions,
+  getnormalizedUsers,
   getPermissionsGrouped,
+  getRoleInfo,
 } from './helper/helper'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function RolesDetail() {
   const router = useRouter()

@@ -1,10 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { TitleTransitionButton } from '@/components/providers/title-transition-provider/TittleTransitionProvider'
-import { QuickLinkCategory } from './types/type'
+
 import { getCategories } from './components/quick-link-dashboard.config'
+import { QuickLinkCategory } from './types/type'
 
 export default function QuickLinkDashboard() {
   const router = useRouter()

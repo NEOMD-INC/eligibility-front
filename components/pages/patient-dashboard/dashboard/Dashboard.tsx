@@ -1,19 +1,21 @@
 'use client'
 
-import React, { useEffect, useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import CoverageAndBenefits from './components/tabs/coverage-and-benefits/CoverageAndBenefits'
-import Copay from './components/tabs/copay/Copay'
-import Deductible from './components/tabs/deductible/Deductible'
-import Coinsurance from './components/tabs/coinsurance/Coinsurance'
-import OutOfPocket from './components/tabs/out-of-pocket/OutOfPocket'
-import { AppDispatch, RootState } from '@/redux/store'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchPatientDashboard } from '@/redux/slices/patient-dashboard/actions'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { TabTransition } from '@/components/providers/tab-transition-provider/TabTransitionProvider'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import { TitleTransitionButton } from '@/components/providers/title-transition-provider/TittleTransitionProvider'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+import { fetchPatientDashboard } from '@/redux/slices/patient-dashboard/actions'
+import { AppDispatch, RootState } from '@/redux/store'
+
+import Coinsurance from './components/tabs/coinsurance/Coinsurance'
+import Copay from './components/tabs/copay/Copay'
+import CoverageAndBenefits from './components/tabs/coverage-and-benefits/CoverageAndBenefits'
+import Deductible from './components/tabs/deductible/Deductible'
+import OutOfPocket from './components/tabs/out-of-pocket/OutOfPocket'
 
 export default function Dashboard() {
   const searchParams = useSearchParams()
@@ -241,8 +243,9 @@ export default function Dashboard() {
   return (
     <PageTransition>
       <div className="w-full bg-gray-50 p-6 space-y-6">
-        <div className="bg-white shadow rounded-lg p-6 flex justify-between items-start">
-          <div className="space-y-2">
+        <div className="bg-white shadow rounded-lg p-6 flex justify-between items-start relative">
+          <div className="absolute left-0 top-0 bottom-0 w-5 bg-green-600" />
+          <div className="space-y-2 pl-2">
             <h1 className="text-2xl font-semibold text-green-700 flex items-center gap-2">
               {patientInformation.name || 'Jane Doe'}
               <span className="text-green-600">☂️</span>

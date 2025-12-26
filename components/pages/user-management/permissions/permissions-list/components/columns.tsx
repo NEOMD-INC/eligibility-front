@@ -1,5 +1,6 @@
-import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
 import Link from 'next/link'
+
+import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
 
 interface PermissionsListColumnsProps {
   onDeleteClick?: (id: string, permissionName: string) => void

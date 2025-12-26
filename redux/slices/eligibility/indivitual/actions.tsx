@@ -1,6 +1,6 @@
 export {
+  clearEligibilityIndivitualError,
   fetchEligibilityIndivitualNpiPractice,
   saveEligibilityIndivitualNpiPractice,
   submitEligibilityCheck,
-  clearEligibilityIndivitualError,
 } from './reducer'

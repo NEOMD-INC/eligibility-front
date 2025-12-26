@@ -33,4 +33,3 @@ export type RemoveFileHandler = (
   formik: FormikProps<FileUploadFormValues>,
   setUploadedFile: Dispatch<SetStateAction<File | null>>
 ) => void
-

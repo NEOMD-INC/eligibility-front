@@ -1,28 +1,28 @@
 /**
  * Theme Helper Utilities
- * 
+ *
  * This file provides helper functions for using theme colors in components
  */
 
-import { themeColors } from '@/theme';
+import { themeColors } from '@/theme'
 
 /**
  * Get a theme color value for inline styles
  */
 export const getThemeColor = (path: string): string => {
-  const keys = path.split('.');
-  let value: any = themeColors;
-  
+  const keys = path.split('.')
+  let value: any = themeColors
+
   for (const key of keys) {
-    value = value[key];
+    value = value[key]
     if (value === undefined) {
-      console.warn(`Color path "${path}" not found in theme`);
-      return '#000000';
+      console.warn(`Color path "${path}" not found in theme`)
+      return '#000000'
     }
   }
-  
-  return typeof value === 'string' ? value : '#000000';
-};
+
+  return typeof value === 'string' ? value : '#000000'
+}
 
 /**
  * Common theme color shortcuts for inline styles
@@ -35,7 +35,7 @@ export const theme = {
     white: themeColors.white,
     black: themeColors.black,
   },
-  
+
   // Text
   text: {
     primary: themeColors.text.primary,
@@ -45,7 +45,7 @@ export const theme = {
     error: themeColors.text.error,
     white: themeColors.white,
   },
-  
+
   // Buttons
   button: {
     primary: themeColors.blue[600],
@@ -53,14 +53,14 @@ export const theme = {
     error: themeColors.red[500],
     errorHover: themeColors.red[600],
   },
-  
+
   // Borders
   border: {
     default: themeColors.border.default,
     error: themeColors.border.error,
     focus: themeColors.border.focus,
   },
-  
+
   // Alerts
   alert: {
     info: themeColors.blue[100],
@@ -68,5 +68,4 @@ export const theme = {
     error: themeColors.red[100],
     errorText: themeColors.red[700],
   },
-};
-
+}

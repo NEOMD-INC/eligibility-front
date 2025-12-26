@@ -73,4 +73,3 @@ export default function LimitationsCard({ coverageLevel, serviceLevelDates }: Pr
     </div>
   )
 }
-

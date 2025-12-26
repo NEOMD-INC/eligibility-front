@@ -48,7 +48,6 @@ export default function ProgressCard({ title, value, used, total, footer, additi
             {footer && (
               <tr>
                 <td className="text-gray-700 font-semibold py-2 pr-4 align-top w-32"></td>
-                <td className="text-gray-600 py-2 text-xs">{footer}</td>
               </tr>
             )}
           </tbody>

@@ -1,12 +1,14 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
-import { MenuItems } from './MenuItem'
-import { themeColors } from '@/theme'
 import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import { RootState } from '@/redux/store'
-import { TitleTransitionButton } from '../providers/title-transition-provider/TittleTransitionProvider'
+import { themeColors } from '@/theme'
+
 import { PageTransition } from '../providers/page-transition-provider/PageTransitionProvider'
+import { TitleTransitionButton } from '../providers/title-transition-provider/TittleTransitionProvider'
+import { MenuItems } from './MenuItem'
 
 const Header = () => {
   const [eligibilityOpen, setEligibilityOpen] = useState(false)
@@ -112,16 +114,10 @@ const Header = () => {
                   >
                     Bulk
                   </Link>
-                  {/* <Link
-                  className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  href="/eligibility/history"
-                  onClick={() => setEligibilityOpen(!eligibilityOpen)}
-                >
-                  History
-                </Link> */}
                   <Link
                     className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    href="/eligibility/settings"
+                    // href="/eligibility/settings"
+                    href="#"
                     onClick={() => setEligibilityOpen(!eligibilityOpen)}
                   >
                     Settings
@@ -160,14 +156,16 @@ const Header = () => {
                   </Link>
                   <Link
                     className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    href="/settings/carrier-setup"
+                    // href="/settings/carrier-setup"
+                    href="#"
                     onClick={() => setSettingsOpen(!settingsOpen)}
                   >
                     Carrier Setup
                   </Link>
                   <Link
                     className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    href="/settings/availity-payer"
+                    // href="/settings/availity-payer"
+                    href="#"
                     onClick={() => setSettingsOpen(!settingsOpen)}
                   >
                     Availity Payer

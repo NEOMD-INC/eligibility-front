@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { CarrierSetupsService } from '@/services/settings/carrier-setup/carrierSetups.service'
 import type { CarrierSetup, CarrierSetupsState } from '@/types'
 
@@ -63,9 +64,7 @@ export const fetchAllCarrierSetups = createAsyncThunk(
       const response = await CarrierSetupsService.getAllCarrierSetups(page)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch carrier setups'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch carrier setups')
     }
   }
 )
@@ -94,9 +93,7 @@ export const createCarrierSetup = createAsyncThunk(
       const response = await CarrierSetupsService.createCarrierSetups(apiData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to create carrier setup'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to create carrier setup')
     }
   }
 )
@@ -104,10 +101,7 @@ export const createCarrierSetup = createAsyncThunk(
 // Async thunk to update carrier setup
 export const updateCarrierSetup = createAsyncThunk(
   'carrierSetups/updateCarrierSetup',
-  async (
-    params: { carrierSetupId: string; carrierSetupData: {} },
-    { rejectWithValue }
-  ) => {
+  async (params: { carrierSetupId: string; carrierSetupData: {} }, { rejectWithValue }) => {
     try {
       const apiData = mapFormToApi(params.carrierSetupData)
       const response = await CarrierSetupsService.updateCarrierSetups(
@@ -116,9 +110,7 @@ export const updateCarrierSetup = createAsyncThunk(
       )
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to update carrier setup'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to update carrier setup')
     }
   }
 )
@@ -131,9 +123,7 @@ export const deleteCarrierSetup = createAsyncThunk(
       const response = await CarrierSetupsService.deleteCarrierSetups(carrierSetupId)
       return { carrierSetupId, data: response.data }
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to delete carrier setup'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to delete carrier setup')
     }
   }
 )
@@ -168,7 +158,7 @@ const carrierSetupsSlice = createSlice({
         if (payload?.data?.data && Array.isArray(payload.data.data)) {
           dataArray = payload.data.data
           state.carrierSetups = payload.data.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -193,7 +183,7 @@ const carrierSetupsSlice = createSlice({
         } else if (payload?.data && Array.isArray(payload.data)) {
           dataArray = payload.data
           state.carrierSetups = payload.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -275,16 +265,11 @@ const carrierSetupsSlice = createSlice({
         const updatedCarrierSetup = action.payload?.data || action.payload
         if (updatedCarrierSetup?.id || updatedCarrierSetup?.uuid) {
           const id = updatedCarrierSetup.id || updatedCarrierSetup.uuid
-          const index = state.carrierSetups.findIndex(
-            cs => cs.id === id || cs.uuid === id
-          )
+          const index = state.carrierSetups.findIndex(cs => cs.id === id || cs.uuid === id)
           if (index !== -1) {
             state.carrierSetups[index] = updatedCarrierSetup
           }
-          if (
-            state.currentCarrierSetup?.id === id ||
-            state.currentCarrierSetup?.uuid === id
-          ) {
+          if (state.currentCarrierSetup?.id === id || state.currentCarrierSetup?.uuid === id) {
             state.currentCarrierSetup = updatedCarrierSetup
           }
         }
@@ -306,8 +291,7 @@ const carrierSetupsSlice = createSlice({
         if (action.payload?.carrierSetupId) {
           state.carrierSetups = state.carrierSetups.filter(
             cs =>
-              cs.id !== action.payload.carrierSetupId &&
-              cs.uuid !== action.payload.carrierSetupId
+              cs.id !== action.payload.carrierSetupId && cs.uuid !== action.payload.carrierSetupId
           )
           state.totalItems = Math.max(0, state.totalItems - 1)
         }
@@ -323,4 +307,3 @@ const carrierSetupsSlice = createSlice({
 export const { clearCarrierSetupsError, clearCurrentCarrierSetup, setCurrentPage } =
   carrierSetupsSlice.actions
 export default carrierSetupsSlice.reducer
-

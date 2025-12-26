@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { EligibilityHistoryService } from '@/services/eligibility/history/history.service'
 
 interface EligibilityHistoryItem {
@@ -236,11 +237,6 @@ const eligibilityHistorySlice = createSlice({
   },
 })
 
-export const {
-  clearEligibilityHistoryError,
-  setCurrentPage,
-  setFilters,
-  clearFilters,
-} = eligibilityHistorySlice.actions
+export const { clearEligibilityHistoryError, setCurrentPage, setFilters, clearFilters } =
+  eligibilityHistorySlice.actions
 export default eligibilityHistorySlice.reducer
-

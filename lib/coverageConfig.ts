@@ -100,10 +100,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',
@@ -174,10 +171,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',
@@ -248,10 +242,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',
@@ -261,7 +252,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
     },
   },
 
-  'Chiropractic': {
+  Chiropractic: {
     planInfo: {
       insurance: 'Aetna',
       insuranceType: 'HMO',
@@ -322,10 +313,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',
@@ -335,7 +323,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
     },
   },
 
-  'Hospital': {
+  Hospital: {
     planInfo: {
       insurance: 'Aetna',
       insuranceType: 'HMO',
@@ -396,10 +384,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',
@@ -470,10 +455,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',
@@ -544,10 +526,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',
@@ -618,10 +597,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',
@@ -692,10 +668,7 @@ export const coverageConfig: Record<string, CoverageConfig> = {
       },
     ],
     limitations: {
-      coverageLevel: [
-        '0 - Beneficiary insured due to age OASI',
-        'PCP OV Cost Share For Any PCP',
-      ],
+      coverageLevel: ['0 - Beneficiary insured due to age OASI', 'PCP OV Cost Share For Any PCP'],
       serviceLevelDates: {
         addedDate: '01/01/2023',
         admissionBegin: '01/01/2023',

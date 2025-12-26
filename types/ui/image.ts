@@ -10,4 +10,3 @@ export interface UserProfileImageProps {
   width?: string | number
   square?: boolean
 }
-

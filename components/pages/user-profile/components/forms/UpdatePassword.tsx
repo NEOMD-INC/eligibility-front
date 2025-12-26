@@ -1,10 +1,11 @@
 'use client'
-import { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import * as Yup from 'yup'
+
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-import { updateUserPassword, clearPasswordError } from '@/redux/slices/user-profile/reducer'
+import { clearPasswordError, updateUserPassword } from '@/redux/slices/user-profile/reducer'
 import { AppDispatch, RootState } from '@/redux/store'
 import { themeColors } from '@/theme'
 

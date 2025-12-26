@@ -1,20 +1,21 @@
 'use client'
+import { Check, Copy } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { useRouter, useParams } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/redux/store'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
-import { themeColors } from '@/theme'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import {
-  fetchLogById,
   clearCurrentLog,
   clearEligibilityLogsError,
+  fetchLogById,
 } from '@/redux/slices/logs/eligibility-logs/actions'
-import { getServiceTypeLabel } from '@/utils/constants/service-types'
-import { getRelationshipCodeLabel } from '@/utils/constants/relationship-codes'
+import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 import { getPlaceOfServiceLabel } from '@/utils/constants/place-of-service'
-import { Copy, Check } from 'lucide-react'
+import { getRelationshipCodeLabel } from '@/utils/constants/relationship-codes'
+import { getServiceTypeLabel } from '@/utils/constants/service-types'
 import { toastManager } from '@/utils/toast'
 
 export default function EligibilityLogDetail() {

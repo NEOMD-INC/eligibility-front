@@ -1,19 +1,21 @@
 'use client'
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
-  fetchCarrierGroupById,
-  deleteCarrierGroup,
-  clearCurrentCarrierGroup,
   clearCarrierGroupsError,
+  clearCurrentCarrierGroup,
+  deleteCarrierGroup,
+  fetchCarrierGroupById,
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+
 import { getCarrierGroupDetails } from './helper/helper'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
-import { useState } from 'react'
 
 export default function CarrierGroupDetail() {
   const router = useRouter()

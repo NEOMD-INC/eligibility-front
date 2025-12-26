@@ -1,11 +1,12 @@
 'use client'
-import { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import * as Yup from 'yup'
+
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-import { updateUserProfile, clearProfileError } from '@/redux/slices/user-profile/reducer'
 import { setUser } from '@/redux/slices/current-user/userSlice'
+import { clearProfileError, updateUserProfile } from '@/redux/slices/user-profile/reducer'
 import { AppDispatch, RootState } from '@/redux/store'
 // Theme colors - Tailwind classes like bg-blue-600, text-gray-800, etc. use theme colors via CSS variables
 import { themeColors } from '@/theme'

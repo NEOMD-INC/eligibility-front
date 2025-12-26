@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export interface SearchableSelectOption {
   value: string
@@ -49,9 +49,10 @@ export default function SearchableSelect({
       setFilteredOptions(options)
     } else {
       // When searching, show all matching results (they'll be scrollable)
-      const filtered = options.filter(option =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        option.value.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = options.filter(
+        option =>
+          option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          option.value.toLowerCase().includes(searchTerm.toLowerCase())
       )
       setFilteredOptions(filtered)
     }
@@ -124,9 +125,7 @@ export default function SearchableSelect({
       <div
         onClick={handleToggle}
         className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 cursor-pointer ${
-          error
-            ? 'border-red-500 focus:ring-red-400'
-            : 'border-gray-300 focus:ring-blue-400'
+          error ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
         } ${disabled ? 'bg-gray-100 cursor-not-allowed opacity-50' : ''} ${className}`}
       >
         <div className="flex items-center justify-between">
@@ -162,19 +161,17 @@ export default function SearchableSelect({
           </div>
 
           {/* Options list - shows only 6 items, scrollable for the rest */}
-          <div 
+          <div
             className="overflow-y-auto"
-            style={{ 
+            style={{
               maxHeight: '192px', // Approximately 6 items (32px per item: py-2 = 8px top + 8px bottom + 16px text)
               scrollbarWidth: 'thin',
               scrollbarColor: '#cbd5e0 #f1f5f9',
-              WebkitOverflowScrolling: 'touch'
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             {filteredOptions.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                No options found
-              </div>
+              <div className="px-4 py-3 text-sm text-gray-500 text-center">No options found</div>
             ) : (
               filteredOptions.map(option => (
                 <div
@@ -194,4 +191,3 @@ export default function SearchableSelect({
     </div>
   )
 }
-

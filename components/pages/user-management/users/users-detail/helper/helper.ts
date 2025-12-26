@@ -21,14 +21,14 @@ export const getUserDetails = (currentUser: any) => [
 
 export const getRoleDetails = (currentUser: any) => {
   if (!currentUser) return []
-  
+
   // Check for roles array first
   if (currentUser.roles && Array.isArray(currentUser.roles) && currentUser.roles.length > 0) {
     return currentUser.roles.map((role: any) => ({
       title: typeof role === 'string' ? role : role?.name || role?.title || 'N/A',
     }))
   }
-  
+
   // Check for single role object
   if (currentUser.role) {
     return [
@@ -40,7 +40,7 @@ export const getRoleDetails = (currentUser: any) => {
       },
     ]
   }
-  
+
   // Check for role_id and fetch role name if needed
   if (currentUser.role_id) {
     return [
@@ -49,7 +49,7 @@ export const getRoleDetails = (currentUser: any) => {
       },
     ]
   }
-  
+
   return []
 }
 

@@ -1,21 +1,16 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
-import { themeColors } from '@/theme'
-import { authService } from '@/services/auth.service'
-import { setCookie } from '@/lib/cookies/cookies'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { setUser } from '@/redux/slices/current-user/userSlice'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import * as Yup from 'yup'
 
-interface LoginValues {
-  email: string
-  password: string
-}
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import { setCookie } from '@/lib/cookies/cookies'
+import { setUser } from '@/redux/slices/current-user/userSlice'
+import { authService } from '@/services/auth.service'
 
 export default function LoginPage() {
   const router = useRouter()

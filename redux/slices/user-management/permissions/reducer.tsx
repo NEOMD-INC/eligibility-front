@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { permissionsService } from '@/services/user-management/permissions/permissions.service'
 
 interface Permission {
@@ -147,7 +148,7 @@ const permissionsSlice = createSlice({
         if (payload?.data?.data && Array.isArray(payload.data.data)) {
           const dataArray = payload.data.data
           state.permissions = payload.data.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -172,7 +173,7 @@ const permissionsSlice = createSlice({
         } else if (payload?.data && Array.isArray(payload.data)) {
           const dataArray = payload.data
           state.permissions = payload.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination

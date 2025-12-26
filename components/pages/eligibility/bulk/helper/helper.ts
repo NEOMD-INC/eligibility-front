@@ -1,18 +1,15 @@
-import {
-  FileChangeHandler,
-  DragHandler,
-  DropHandler,
-  RemoveFileHandler,
-  FileUploadFormValues,
-} from '@/types/ui/form'
 import { FormikProps } from 'formik'
 import { Dispatch, SetStateAction } from 'react'
 
-export const handleFileChange: FileChangeHandler = (
-  event,
-  formik,
-  setUploadedFile
-) => {
+import {
+  DragHandler,
+  DropHandler,
+  FileChangeHandler,
+  FileUploadFormValues,
+  RemoveFileHandler,
+} from '@/types/ui/form'
+
+export const handleFileChange: FileChangeHandler = (event, formik, setUploadedFile) => {
   const file = event.target.files?.[0]
   if (file) {
     formik.setFieldValue('file', file)

@@ -18,4 +18,3 @@ export interface Permission extends BaseEntity {
 export interface PermissionFormValues {
   permissionName: string
 }
-

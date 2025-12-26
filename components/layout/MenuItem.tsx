@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { deleteCookie } from '@/lib/cookies/cookies'
-import { authService } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
+
+import { deleteCookie } from '@/lib/cookies/cookies'
 import { clearUser } from '@/redux/slices/current-user/userSlice'
+import { authService } from '@/services/auth.service'
 
 const MenuItems = () => {
   const router = useRouter()

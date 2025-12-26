@@ -1,18 +1,19 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import {
+  clearEligibilitySettingsError,
   fetchEligibilitySettings,
   updateEligibilitySettings,
-  clearEligibilitySettingsError,
 } from '@/redux/slices/eligibility/settings/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { ISASettingsFormValues } from '@/types'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function ISASettingsForm() {
   const dispatch = useDispatch<AppDispatch>()

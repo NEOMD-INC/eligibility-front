@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+
 import { themeColors } from '@/theme'
 
 export interface FooterConfig {
@@ -21,15 +22,20 @@ export interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ config = {} }) => {
-  const footerConfig: FooterConfig = {
-    display: true,
-    containerClass: '',
-    fixed: {
-      desktop: false,
-      mobile: false,
-    },
-    ...config?.app?.footer,
-  }
+  const [hover, setHover] = useState(false)
+
+  const footerConfig: FooterConfig = useMemo(
+    () => ({
+      display: true,
+      containerClass: '',
+      fixed: {
+        desktop: false,
+        mobile: false,
+      },
+      ...config?.app?.footer,
+    }),
+    [config?.app?.footer]
+  )
 
   const [currentYear, setCurrentYear] = useState<string>('')
 
@@ -58,7 +64,10 @@ const Footer: React.FC<FooterProps> = ({ config = {} }) => {
         href="https://neomdinc.com/"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-gray-800 hover:text-blue-600 transition-colors duration-200"
+        className="transition-colors duration-200"
+        onMouseOver={() => setHover(true)}
+        onMouseOut={() => setHover(false)}
+        style={{ color: hover ? themeColors.blue[600] : themeColors.text.primary }}
       >
         NeoMD PMS
       </a>

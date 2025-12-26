@@ -1,17 +1,19 @@
 'use client'
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useRouter, useParams } from 'next/navigation'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { UserProfileImage } from '@/components/ui/image/Image'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import {
-  fetchUserById,
   clearCurrentUser,
   clearUsersError,
+  fetchUserById,
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+
 import { getRoleDetails, getUserDetails, groupPermissionsByPrefix } from './helper/helper'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function UsersDetail() {
   const router = useRouter()

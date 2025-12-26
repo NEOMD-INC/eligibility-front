@@ -1,6 +1,6 @@
 /**
  * Theme Colors Configuration
- * 
+ *
  * This file contains all color definitions used throughout the application.
  * Colors are organized by semantic meaning and purpose.
  */
@@ -91,7 +91,7 @@ export const themeColors = {
     white: '#ffffff',
     dark: '#09090b', // zinc-950
   },
-} as const;
+} as const
 
 /**
  * CSS Variable names mapping
@@ -156,24 +156,24 @@ export const cssVariableNames = {
   textMuted: '--color-text-muted',
   textLink: '--color-text-link',
   textError: '--color-text-error',
-} as const;
+} as const
 
 /**
  * Helper function to get color value
  */
 export function getThemeColor(path: string): string {
-  const keys = path.split('.');
-  let value: any = themeColors;
-  
+  const keys = path.split('.')
+  let value: any = themeColors
+
   for (const key of keys) {
-    value = value[key];
+    value = value[key]
     if (value === undefined) {
-      console.warn(`Color path "${path}" not found in theme`);
-      return '#000000';
+      console.warn(`Color path "${path}" not found in theme`)
+      return '#000000'
     }
   }
-  
-  return typeof value === 'string' ? value : '#000000';
+
+  return typeof value === 'string' ? value : '#000000'
 }
 
 /**
@@ -241,5 +241,4 @@ export const themeColorsFlat = {
   textMuted: themeColors.text.muted,
   textLink: themeColors.text.link,
   textError: themeColors.text.error,
-} as const;
-
+} as const

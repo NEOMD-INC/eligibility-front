@@ -1,21 +1,23 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import DataTable from '@/components/ui/data-table/DataTable'
-import CarrierSetupListColumns from './components/columns'
-import { themeColors } from '@/theme'
-import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
+import DataTable from '@/components/ui/data-table/DataTable'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
-  fetchAllCarrierSetups,
-  deleteCarrierSetup,
-  setCurrentPage,
   clearCarrierSetupsError,
+  deleteCarrierSetup,
+  fetchAllCarrierSetups,
+  setCurrentPage,
 } from '@/redux/slices/settings/carrier-setups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+import { themeColors } from '@/theme'
+
+import CarrierSetupListColumns from './components/columns'
 
 export default function CarrierSetupList() {
   const dispatch = useDispatch<AppDispatch>()

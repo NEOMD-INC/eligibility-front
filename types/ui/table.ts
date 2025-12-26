@@ -31,4 +31,3 @@ export interface TablePaginationProps {
   onPageChange: (page: number) => void
   pageSize: number
 }
-

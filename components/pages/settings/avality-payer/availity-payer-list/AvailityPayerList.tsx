@@ -1,21 +1,23 @@
 'use client'
 
+import { Plus } from 'lucide-react'
+import Link from 'next/link'
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
-import AvailityPayerListColumns from './components/columns'
-import { themeColors } from '@/theme'
-import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
-  fetchAllAvailityPayers,
-  deleteAvailityPayer,
-  setCurrentPage,
   clearAvailityPayersError,
+  deleteAvailityPayer,
+  fetchAllAvailityPayers,
+  setCurrentPage,
 } from '@/redux/slices/settings/availity-payers/actions'
 import { AppDispatch, RootState } from '@/redux/store'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+import { themeColors } from '@/theme'
+
+import AvailityPayerListColumns from './components/columns'
 
 export default function AvailityPayerList() {
   const dispatch = useDispatch<AppDispatch>()

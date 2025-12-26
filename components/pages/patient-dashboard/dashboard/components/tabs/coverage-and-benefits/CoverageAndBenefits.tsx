@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
-import CoverageSidebar from './components/coverage-sidebar/CoverageSidebar'
+import { useEffect, useMemo, useState } from 'react'
+
 import BenefitDetails from './components/benefit-details/BenefitDetails'
+import CoverageSidebar from './components/coverage-sidebar/CoverageSidebar'
 
 function CoverageAndBenefits({ benefits }: { benefits: any }) {
   const [networkType, setNetworkType] = useState<'In Network' | 'Out of Network'>('In Network')

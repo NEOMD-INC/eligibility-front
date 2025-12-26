@@ -1,23 +1,25 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { ChevronDown, Filter } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import DataTable from '@/components/ui/data-table/DataTable'
-import Filters from '@/components/ui/filters/Filters'
-import EligibilityLogListColumns from './components/columns'
-import { Filter, ChevronDown } from 'lucide-react'
-import type { FilterField } from '@/components/ui/filters/Filters'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import { AppDispatch, RootState } from '@/redux/store'
+import DataTable from '@/components/ui/data-table/DataTable'
+import type { FilterField } from '@/components/ui/filters/Filters'
+import Filters from '@/components/ui/filters/Filters'
+import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
+  clearFilters,
   fetchAllLogs,
   retryEligibilitySubmission,
   setCurrentPage,
   setFilters,
-  clearFilters,
 } from '@/redux/slices/logs/eligibility-logs/actions'
+import { AppDispatch, RootState } from '@/redux/store'
 import { toastManager } from '@/utils/toast'
-import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
+
+import EligibilityLogListColumns from './components/columns'
 
 export default function EligibilityLogsList() {
   const dispatch = useDispatch<AppDispatch>()

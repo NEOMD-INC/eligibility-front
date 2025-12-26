@@ -46,4 +46,3 @@ export interface AvailityPayerFormValues {
   isActive: boolean
   notes: string
 }
-

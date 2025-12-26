@@ -1,7 +1,6 @@
 // Re-export all actions and thunks from the reducer
 export {
+  clearEligibilitySettingsError,
   fetchEligibilitySettings,
   updateEligibilitySettings,
-  clearEligibilitySettingsError,
 } from './reducer'
-

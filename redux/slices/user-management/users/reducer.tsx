@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { userService } from '@/services/user-management/users/users.service'
 import type { User, UsersState } from '@/types'
 
@@ -33,9 +34,7 @@ export const fetchAllUsers = createAsyncThunk(
       const response = await userService.getAllUsers(params.page, params.filters)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch users'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch users')
     }
   }
 )
@@ -48,9 +47,7 @@ export const fetchUserById = createAsyncThunk(
       const response = await userService.getUserById(userId)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch user details'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch user details')
     }
   }
 )
@@ -63,9 +60,7 @@ export const createUser = createAsyncThunk(
       const response = await userService.createUser(userData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to create user'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to create user')
     }
   }
 )
@@ -73,17 +68,12 @@ export const createUser = createAsyncThunk(
 // Async thunk to update user
 export const updateUser = createAsyncThunk(
   'users/updateUser',
-  async (
-    params: { userId: string; userData: {} },
-    { rejectWithValue }
-  ) => {
+  async (params: { userId: string; userData: {} }, { rejectWithValue }) => {
     try {
       const response = await userService.updateUser(params.userId, params.userData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to update user'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to update user')
     }
   }
 )
@@ -96,9 +86,7 @@ export const deleteUser = createAsyncThunk(
       const response = await userService.deleteUser(userId)
       return { userId, data: response.data }
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to delete user'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to delete user')
     }
   }
 )
@@ -133,12 +121,12 @@ const usersSlice = createSlice({
         // - { data: { data: [...], total: 100 } } (nested)
         // - [...] (direct array)
         const payload = action.payload
-        
+
         // Check for nested data structure: { data: { data: [...] }, meta: { pagination: {...} } }
         if (payload?.data?.data && Array.isArray(payload.data.data)) {
           const dataArray = payload.data.data
           state.users = payload.data.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -163,7 +151,7 @@ const usersSlice = createSlice({
         } else if (payload?.data && Array.isArray(payload.data)) {
           const dataArray = payload.data
           state.users = payload.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -208,8 +196,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUserById.fulfilled, (state, action) => {
         state.fetchUserLoading = false
-        state.currentUser =
-          action.payload?.data || action.payload || null
+        state.currentUser = action.payload?.data || action.payload || null
         state.error = null
       })
       .addCase(fetchUserById.rejected, (state, action) => {
@@ -286,7 +273,5 @@ const usersSlice = createSlice({
   },
 })
 
-export const { clearUsersError, clearCurrentUser, setCurrentPage } =
-  usersSlice.actions
+export const { clearUsersError, clearCurrentUser, setCurrentPage } = usersSlice.actions
 export default usersSlice.reducer
-

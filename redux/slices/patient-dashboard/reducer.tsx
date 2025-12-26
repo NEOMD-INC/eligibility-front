@@ -1,7 +1,8 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { AxiosError } from 'axios'
+
 import { PatientDashboardService } from '@/services/patient-dashboard/patientDashboard.service'
 import { PatientDashboardState } from '@/types/entities/patient-dashboard'
-import { AxiosError } from 'axios'
 
 const initialState: PatientDashboardState = {
   patientData: null,

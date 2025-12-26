@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import { CarrierAddressesService } from '@/services/settings/carrier-addresses/carrierAddresses.service'
 import type { CarrierAddress, CarrierAddressesState } from '@/types'
 
@@ -63,9 +64,7 @@ export const fetchAllCarrierAddresses = createAsyncThunk(
       const response = await CarrierAddressesService.getAllCarrierAddresses(page)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to fetch carrier addresses'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch carrier addresses')
     }
   }
 )
@@ -95,9 +94,7 @@ export const createCarrierAddress = createAsyncThunk(
       const response = await CarrierAddressesService.createCarrierAddresses(apiData)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to create carrier address'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to create carrier address')
     }
   }
 )
@@ -105,10 +102,7 @@ export const createCarrierAddress = createAsyncThunk(
 // Async thunk to update carrier address
 export const updateCarrierAddress = createAsyncThunk(
   'carrierAddresses/updateCarrierAddress',
-  async (
-    params: { carrierAddressId: string; carrierAddressData: {} },
-    { rejectWithValue }
-  ) => {
+  async (params: { carrierAddressId: string; carrierAddressData: {} }, { rejectWithValue }) => {
     try {
       // Map form fields to API field names
       const apiData = mapFormToApi(params.carrierAddressData)
@@ -118,9 +112,7 @@ export const updateCarrierAddress = createAsyncThunk(
       )
       return response.data
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to update carrier address'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to update carrier address')
     }
   }
 )
@@ -133,9 +125,7 @@ export const deleteCarrierAddress = createAsyncThunk(
       const response = await CarrierAddressesService.deleteCarrierAddresses(carrierAddressId)
       return { carrierAddressId, data: response.data }
     } catch (error: any) {
-      return rejectWithValue(
-        error?.response?.data?.message || 'Failed to delete carrier address'
-      )
+      return rejectWithValue(error?.response?.data?.message || 'Failed to delete carrier address')
     }
   }
 )
@@ -171,7 +161,7 @@ const carrierAddressesSlice = createSlice({
         if (payload?.data?.data && Array.isArray(payload.data.data)) {
           dataArray = payload.data.data
           state.carrierAddresses = payload.data.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -196,7 +186,7 @@ const carrierAddressesSlice = createSlice({
         } else if (payload?.data && Array.isArray(payload.data)) {
           dataArray = payload.data
           state.carrierAddresses = payload.data
-          
+
           // Check meta.pagination for pagination info
           if (payload.meta?.pagination) {
             const pagination = payload.meta.pagination
@@ -240,8 +230,7 @@ const carrierAddressesSlice = createSlice({
       })
       .addCase(fetchCarrierAddressById.fulfilled, (state, action) => {
         state.fetchCarrierAddressLoading = false
-        state.currentCarrierAddress =
-          action.payload?.data || action.payload || null
+        state.currentCarrierAddress = action.payload?.data || action.payload || null
         state.error = null
       })
       .addCase(fetchCarrierAddressById.rejected, (state, action) => {
@@ -281,17 +270,12 @@ const carrierAddressesSlice = createSlice({
         const updatedCarrierAddress = action.payload?.data || action.payload
         if (updatedCarrierAddress?.id || updatedCarrierAddress?.uuid) {
           const id = updatedCarrierAddress.id || updatedCarrierAddress.uuid
-          const index = state.carrierAddresses.findIndex(
-            ca => ca.id === id || ca.uuid === id
-          )
+          const index = state.carrierAddresses.findIndex(ca => ca.id === id || ca.uuid === id)
           if (index !== -1) {
             state.carrierAddresses[index] = updatedCarrierAddress
           }
           // Update current carrier address if it's the same
-          if (
-            state.currentCarrierAddress?.id === id ||
-            state.currentCarrierAddress?.uuid === id
-          ) {
+          if (state.currentCarrierAddress?.id === id || state.currentCarrierAddress?.uuid === id) {
             state.currentCarrierAddress = updatedCarrierAddress
           }
         }
@@ -328,10 +312,6 @@ const carrierAddressesSlice = createSlice({
   },
 })
 
-export const {
-  clearCarrierAddressesError,
-  clearCurrentCarrierAddress,
-  setCurrentPage,
-} = carrierAddressesSlice.actions
+export const { clearCarrierAddressesError, clearCurrentCarrierAddress, setCurrentPage } =
+  carrierAddressesSlice.actions
 export default carrierAddressesSlice.reducer
-

@@ -1,6 +1,1 @@
-export {
-  submitBulkEligibility,
-  clearBulkError,
-  clearBulkData,
-} from './reducer'
-
+export { clearBulkData, clearBulkError, submitBulkEligibility } from './reducer'

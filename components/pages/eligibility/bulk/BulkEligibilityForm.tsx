@@ -1,24 +1,26 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import { Upload, File, X, CheckCircle2 } from 'lucide-react'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/redux/store'
-import {
-  submitBulkEligibility,
-  clearBulkError,
-  clearBulkData,
-} from '@/redux/slices/eligibility/bulk/actions'
+import { CheckCircle2, File, Upload, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import * as Yup from 'yup'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import {
-  handleFileChange,
-  getFileIcon,
+  clearBulkData,
+  clearBulkError,
+  submitBulkEligibility,
+} from '@/redux/slices/eligibility/bulk/actions'
+import { AppDispatch, RootState } from '@/redux/store'
+
+import {
   formatFileSize,
+  getFileIcon,
   handleDrag,
   handleDrop,
+  handleFileChange,
   removeFile,
 } from './helper/helper'
 
@@ -65,7 +67,9 @@ export default function BulkEligibilityForm() {
       try {
         await dispatch(submitBulkEligibility(values.file)).unwrap()
         router.push('/eligibility/history')
-      } catch (error) {}
+      } catch (error) {
+        console.log(error, 'Submission failed')
+      }
     },
   })
 

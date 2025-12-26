@@ -18,4 +18,3 @@ export interface DeleteBtnProps {
   selectedRowIds: string[] | number[]
   deleteBulkData: (ids: string[] | number[], selectedIds: string[] | number[]) => void
 }
-

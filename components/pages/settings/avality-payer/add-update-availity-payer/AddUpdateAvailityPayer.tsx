@@ -1,21 +1,22 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
-import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import {
-  fetchAvailityPayerById,
-  createAvailityPayer,
-  updateAvailityPayer,
-  clearCurrentAvailityPayer,
   clearAvailityPayersError,
+  clearCurrentAvailityPayer,
+  createAvailityPayer,
+  fetchAvailityPayerById,
+  updateAvailityPayer,
 } from '@/redux/slices/settings/availity-payers/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { AvailityPayerFormValues } from '@/types'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function AddUpdateAvailityPayer() {
   const router = useRouter()
@@ -96,7 +97,6 @@ export default function AddUpdateAvailityPayer() {
     return () => {
       dispatch(clearCurrentAvailityPayer())
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isEditMode, payerId])
 
   // Update form values when payer data is loaded

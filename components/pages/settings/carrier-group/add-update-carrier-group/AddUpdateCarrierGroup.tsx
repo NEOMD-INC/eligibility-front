@@ -1,21 +1,22 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
-import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
-import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
+
+import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
+import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import {
-  fetchCarrierGroupById,
-  createCarrierGroup,
-  updateCarrierGroup,
-  clearCurrentCarrierGroup,
   clearCarrierGroupsError,
+  clearCurrentCarrierGroup,
+  createCarrierGroup,
+  fetchCarrierGroupById,
+  updateCarrierGroup,
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import type { CarrierGroupFormValues } from '@/types'
-import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 
 export default function AddUpdateCarrierGroup() {
   const router = useRouter()
@@ -79,7 +80,6 @@ export default function AddUpdateCarrierGroup() {
     return () => {
       dispatch(clearCurrentCarrierGroup())
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isEditMode, carrierGroupId])
 
   // Update form values when carrier group data is loaded

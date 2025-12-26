@@ -1,5 +1,5 @@
-import React from 'react'
 import { Search } from 'lucide-react'
+import React from 'react'
 
 export interface FilterField {
   name: string
@@ -146,7 +146,7 @@ export default function Filters({
               </div>
             ))}
           </div>
-          
+
           {/* Buttons on next line if needed */}
           <div className="flex items-center gap-2 w-full justify-end mt-4">
             <button
@@ -178,7 +178,7 @@ export default function Filters({
               {renderField(field)}
             </div>
           ))}
-          
+
           {/* Inline buttons - close to search fields */}
           <div className="flex items-center gap-2">
             <button
@@ -210,7 +210,7 @@ export default function Filters({
               {renderField(field)}
             </div>
           ))}
-          
+
           {/* Inline buttons - close to search fields */}
           <div className="flex items-center gap-2">
             <button

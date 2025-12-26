@@ -1,5 +1,6 @@
-import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
 import Link from 'next/link'
+
+import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
 import { UserProfileImage } from '@/components/ui/image/Image'
 
 interface RolesListColumnsProps {
@@ -18,10 +19,7 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
         const roleId = role.id || role.uuid
 
         return (
-          <Link 
-            href={`/user-management/roles/role-detail/${roleId}`} 
-            className="block"
-          >
+          <Link href={`/user-management/roles/role-detail/${roleId}`} className="block">
             <div className="flex items-center">
               <div className="flex flex-col justify-start min-w-0">
                 <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
@@ -60,11 +58,12 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       render: (value: any, role: any) => {
         const permissions = role.permissions || role.permission_names || []
         // Handle both array of strings and array of objects
-        const permissionList = Array.isArray(permissions) 
-          ? permissions.map((perm: any) => 
-              typeof perm === 'string' ? perm : (perm.name || perm.permission_name || perm))
+        const permissionList = Array.isArray(permissions)
+          ? permissions.map((perm: any) =>
+              typeof perm === 'string' ? perm : perm.name || perm.permission_name || perm
+            )
           : []
-        
+
         return (
           <div className="flex justify-center">
             <div className="inline-flex items-center flex-wrap justify-center gap-1">

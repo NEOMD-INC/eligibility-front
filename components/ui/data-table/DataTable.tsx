@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+
 import { DataTableProps, TablePaginationProps } from '@/types/ui/table'
 
 type TableRow = Record<string, unknown>
@@ -60,19 +61,21 @@ const DataTable = <T extends TableRow = TableRow>({
   const DefaultTableRow = ({ row, index }: { row: T; index: number }) => {
     const renderCellValue = (value: unknown): React.ReactNode => {
       if (value === null || value === undefined) return 'N/A'
-      
+
       // Handle arrays
       if (Array.isArray(value)) {
         if (value.length === 0) return 'N/A'
         // If array contains objects, try to extract meaningful values
-        return value.map((item, idx) => {
-          if (typeof item === 'object' && item !== null) {
-            return item.name || item.id || item.member_id || JSON.stringify(item)
-          }
-          return String(item)
-        }).join(', ')
+        return value
+          .map((item, idx) => {
+            if (typeof item === 'object' && item !== null) {
+              return item.name || item.id || item.member_id || JSON.stringify(item)
+            }
+            return String(item)
+          })
+          .join(', ')
       }
-      
+
       // Handle objects
       if (typeof value === 'object') {
         // Try to find a meaningful string representation
@@ -94,7 +97,7 @@ const DataTable = <T extends TableRow = TableRow>({
         // Otherwise, return a safe string representation
         return '[Object]'
       }
-      
+
       return String(value)
     }
 
@@ -103,7 +106,7 @@ const DataTable = <T extends TableRow = TableRow>({
         {columns.map(column => {
           const cellValue = row[column.key]
           let renderedContent: React.ReactNode
-          
+
           if (column.render) {
             try {
               renderedContent = column.render(cellValue, row)
@@ -114,7 +117,7 @@ const DataTable = <T extends TableRow = TableRow>({
           } else {
             renderedContent = renderCellValue(cellValue)
           }
-          
+
           return (
             <td
               key={column.key}
@@ -161,7 +164,7 @@ const DataTable = <T extends TableRow = TableRow>({
   return (
     <div className={`bg-white shadow rounded-lg overflow-hidden ${className}`}>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm text-gray-700">
+        <table className="w-full border-collapse text-sm text-gray-700" style={{ tableLayout: 'fixed' }}>
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               {columns.map(column => {
@@ -250,7 +253,7 @@ const TablePagination: React.FC<TablePaginationProps> = ({
     const showPages = 5
 
     let startPage = Math.max(1, currentPage - Math.floor(showPages / 2))
-    let endPage = Math.min(totalPages, startPage + showPages - 1)
+    const endPage = Math.min(totalPages, startPage + showPages - 1)
 
     if (endPage - startPage + 1 < showPages) {
       startPage = Math.max(1, endPage - showPages + 1)

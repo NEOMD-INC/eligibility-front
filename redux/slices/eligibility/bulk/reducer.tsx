@@ -1,7 +1,8 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { AxiosError } from 'axios'
+
 import { BulkService } from '@/services/eligibility/bulk/bulk.service'
 import { EligibilityBulkState } from '@/types/redux'
-import { AxiosError } from 'axios'
 
 const initialState: EligibilityBulkState = {
   bulkData: null,

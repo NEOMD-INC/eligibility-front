@@ -1,7 +1,7 @@
 'use client'
 
+import { AlertCircle, CheckCircle, Info, X, XCircle } from 'lucide-react'
 import React, { useEffect } from 'react'
-import { X, CheckCircle, XCircle, AlertCircle, Info } from 'lucide-react'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
@@ -94,4 +94,3 @@ const ToastComponent: React.FC<ToastProps> = ({ toast, onRemove }) => {
 }
 
 export default ToastComponent
-

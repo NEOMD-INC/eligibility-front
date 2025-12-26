@@ -40,4 +40,3 @@ export interface CarrierSetupFormValues {
   correctedClaim: string
   enrollmentRequired: string
 }
-
