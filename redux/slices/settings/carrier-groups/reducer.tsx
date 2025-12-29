@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { CarrierGroupService } from '@/services/settings/carrier-groups/carrierGroups.service'
-import type { CarrierGroup, CarrierGroupsState } from '@/types'
+import type { CarrierGroupsState } from '@/types'
 
 const initialState: CarrierGroupsState = {
   carrierGroups: [],

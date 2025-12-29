@@ -2,20 +2,7 @@
 
 import InfoCard from '@/components/ui/cards/InfoCard/InfoCard'
 
-interface CoinsuranceItem {
-  benefit_type: string
-  service_type_code: string
-  coverage_level: string
-  coinsurance_value: number | string | null
-  coinsurance_percent?: number
-  coinsurance_time_period?: string
-  network?: string
-  messages?: string[]
-}
-
-interface CoinsuranceProps {
-  coinsuranceData: CoinsuranceItem[]
-}
+import { CoinsuranceItem, CoinsuranceProps } from './types/types'
 
 export default function Coinsurance({ coinsuranceData }: CoinsuranceProps) {
   const coinsuranceData1 =
@@ -28,7 +15,6 @@ export default function Coinsurance({ coinsuranceData }: CoinsuranceProps) {
       const allMessages =
         messages.length > 0 ? messages.join('; ') : 'Up to 30% of Hospital Charges'
 
-      // Get coinsurance value - prefer coinsurance_percent if available, otherwise use coinsurance_value
       const coinsurancePercent = item.coinsurance_percent ?? item.coinsurance_value
       const timePeriod = item.coinsurance_time_period || 'Calendar Year'
 

@@ -195,11 +195,11 @@ export default function EligibilityLogDetail() {
       ? getValue(provider, 'npi', 'national_provider_id')
       : getValue(log, 'npi', 'national_provider_id')
 
-  const payer = log.payer
-  const payerName =
-    typeof payer === 'object' && payer !== null ? getValue(payer, 'name', 'payer_name') : null
-  const payerId =
-    typeof payer === 'object' && payer !== null ? getValue(payer, 'payer_id', 'id') : null
+  // const payer = log.payer
+  // const payerName =
+  //   typeof payer === 'object' && payer !== null ? getValue(payer, 'name', 'payer_name') : null
+  // const payerId =
+  //   typeof payer === 'object' && payer !== null ? getValue(payer, 'payer_id', 'id') : null
 
   const coverage = log.coverage
   const relationshipCode =
@@ -243,6 +243,7 @@ export default function EligibilityLogDetail() {
       toastManager.success('Request 270 copied to clipboard')
       setTimeout(() => setCopiedRequest(false), 2000)
     } catch (err) {
+      console.log(err)
       toastManager.error('Failed to copy request')
     }
   }
@@ -259,6 +260,7 @@ export default function EligibilityLogDetail() {
       toastManager.success('Response 271 copied to clipboard')
       setTimeout(() => setCopiedResponse(false), 2000)
     } catch (err) {
+      console.log(err)
       toastManager.error('Failed to copy response')
     }
   }

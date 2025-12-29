@@ -38,7 +38,6 @@ export default function PermissionsList() {
   })
   const itemsPerPage = 8
 
-  // Fetch permissions on component mount and when applied filters/page change
   useEffect(() => {
     const filters: { search?: string } = {}
     if (appliedSearch.trim()) {
@@ -163,7 +162,6 @@ export default function PermissionsList() {
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
         <ConfirmationModal
           isOpen={deleteModal.isOpen}
           onClose={() => setDeleteModal({ isOpen: false, id: null, permissionName: null })}

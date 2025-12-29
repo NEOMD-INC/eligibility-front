@@ -70,11 +70,11 @@ api.interceptors.response.use(
         if (data?.errors && typeof data.errors === 'object' && !Array.isArray(data.errors)) {
           // Loop through each field and show each error message
           const errorEntries = Object.entries(data.errors) as [string, string[]][]
-          
-          errorEntries.forEach(([field, messages]) => {
+
+          errorEntries.forEach(([messages]) => {
             // Handle both array of messages and single message
             const errorMessages = Array.isArray(messages) ? messages : [messages]
-            
+
             errorMessages.forEach((errorMsg: string) => {
               // Filter out technical backend error messages
               if (
@@ -98,10 +98,7 @@ api.interceptors.response.use(
           // Single error message handling
           let message = 'Something went wrong. Please try again.'
           const rawMessage =
-            data?.message ||
-            data?.msg ||
-            data?.error ||
-            (typeof data === 'string' ? data : null)
+            data?.message || data?.msg || data?.error || (typeof data === 'string' ? data : null)
 
           // Filter out technical backend error messages and show user-friendly ones
           if (rawMessage) {

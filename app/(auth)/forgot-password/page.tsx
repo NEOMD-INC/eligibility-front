@@ -1,5 +1,5 @@
-// Theme colors - Tailwind classes use theme colors via CSS variables
 import Image from 'next/image'
+
 import ForgotPasswordPage from '@/components/pages/auth/forgot-password/index'
 import { themeColors } from '@/theme'
 
@@ -18,6 +18,7 @@ export default function ForgotPassword() {
               width={150}
               height={60}
               priority
+              unoptimized
               className="object-contain"
             />
           </div>

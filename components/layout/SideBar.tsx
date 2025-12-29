@@ -109,43 +109,43 @@ const Sidebar: React.FC = () => {
 
   const menuItems: MenuItem[] = useMemo(
     () => [
-    {
-      name: 'Patient Dashboard',
-      icon: House,
-      path: '/patient-dashboard',
-      type: 'link',
-    },
-    {
-      name: 'Appointments',
-      icon: UserRound,
-      path: '/appointments/create',
-      type: 'link',
-    },
-    {
-      name: 'Patients',
-      icon: ClipboardList,
-      type: 'link',
-      path: '/appointments/create',
-    },
-    {
-      name: 'Super Bill',
-      icon: Receipt,
-      type: 'link',
-      path: '/appointments/create',
-    },
-    {
-      name: 'Claim',
-      icon: ClipboardClock,
-      type: 'link',
-      path: '/appointments/create',
-    },
-    {
-      name: 'Accounts',
-      icon: HeartPulse,
-      path: '/account/patients',
-      type: 'link',
-    },
-  ],
+      {
+        name: 'Patient Dashboard',
+        icon: House,
+        path: '/patient-dashboard',
+        type: 'link',
+      },
+      {
+        name: 'Appointments',
+        icon: UserRound,
+        path: '/appointments/create',
+        type: 'link',
+      },
+      {
+        name: 'Patients',
+        icon: ClipboardList,
+        type: 'link',
+        path: '/appointments/create',
+      },
+      {
+        name: 'Super Bill',
+        icon: Receipt,
+        type: 'link',
+        path: '/appointments/create',
+      },
+      {
+        name: 'Claim',
+        icon: ClipboardClock,
+        type: 'link',
+        path: '/appointments/create',
+      },
+      {
+        name: 'Accounts',
+        icon: HeartPulse,
+        path: '/account/patients',
+        type: 'link',
+      },
+    ],
     []
   )
 

@@ -18,15 +18,7 @@ import {
 import { AppDispatch, RootState } from '@/redux/store'
 import { rolesService } from '@/services/user-management/roles/roles.service'
 
-type UserFormValues = {
-  fullName: string
-  email: string
-  password: string
-  confirmPassword: string
-  newPassword: string
-  confirmNewPassword: string
-  role: string
-}
+import { UserFormValues } from './types/types'
 
 export default function AddUpdateUser() {
   const router = useRouter()
@@ -42,7 +34,6 @@ export default function AddUpdateUser() {
   const [availableRoles, setAvailableRoles] = useState<any[]>([])
   const [rolesLoading, setRolesLoading] = useState(false)
 
-  // Fetch available roles from API
   useEffect(() => {
     const fetchRoles = async () => {
       setRolesLoading(true)
@@ -212,6 +203,7 @@ export default function AddUpdateUser() {
           }
         }
       } catch (err: any) {
+        console.log(err)
         // Error is handled by Redux state
       }
     },

@@ -1,12 +1,4 @@
-type Props = {
-  coverageLevel?: string[]
-  serviceLevelDates?: {
-    addedDate?: string
-    admissionBegin?: string
-    serviceEndDate?: string
-    admissionEnd?: string
-  }
-}
+import { Props } from './types/types'
 
 export default function LimitationsCard({ coverageLevel, serviceLevelDates }: Props) {
   return (

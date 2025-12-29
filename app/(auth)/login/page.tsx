@@ -1,5 +1,6 @@
 // Theme colors - Tailwind classes use theme colors via CSS variables
 import Image from 'next/image'
+
 import LoginPage from '@/components/pages/auth/login/index'
 import { themeColors } from '@/theme'
 
@@ -11,13 +12,14 @@ export default function Login() {
     >
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center">
-          <div className="mb-6">
+          <div className="mb-6 tracking-tight">
             <Image
               src="/logo/neoLogo.png"
               alt="NeoMD Logo"
               width={150}
               height={60}
               priority
+              unoptimized
               className="object-contain"
             />
           </div>

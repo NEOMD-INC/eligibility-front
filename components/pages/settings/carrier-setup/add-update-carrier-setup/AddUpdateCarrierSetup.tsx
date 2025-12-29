@@ -31,7 +31,6 @@ export default function AddUpdateCarrierSetup() {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Unified validation schema
   const validationSchema = Yup.object({
     carrierGroupCode: Yup.string().required('Carrier group code is required'),
     carrierGroupDescription: Yup.string().required('Carrier group description is required'),
@@ -45,7 +44,6 @@ export default function AddUpdateCarrierSetup() {
     enrollmentRequired: Yup.string().required('Enrollment required is required'),
   })
 
-  // Unified Formik instance
   const formik = useFormik<CarrierSetupFormValues>({
     initialValues: {
       carrierGroupCode: '',
@@ -83,7 +81,6 @@ export default function AddUpdateCarrierSetup() {
     },
   })
 
-  // Load carrier setup data in edit mode
   useEffect(() => {
     if (isEditMode && carrierSetupId) {
       dispatch(clearCarrierSetupsError())
@@ -94,7 +91,6 @@ export default function AddUpdateCarrierSetup() {
     }
   }, [dispatch, isEditMode, carrierSetupId])
 
-  // Update form values when carrier setup data is loaded
   useEffect(() => {
     if (isEditMode && currentCarrierSetup) {
       formik.setValues({
@@ -115,10 +111,8 @@ export default function AddUpdateCarrierSetup() {
         enrollmentRequired: currentCarrierSetup.enrollment_required || '',
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCarrierSetup, isEditMode])
 
-  // Update error message from Redux
   useEffect(() => {
     if (error) {
       setIsError(true)
@@ -126,7 +120,6 @@ export default function AddUpdateCarrierSetup() {
     }
   }, [error])
 
-  // Render field helper
   const renderField = (
     name: keyof CarrierSetupFormValues,
     label: string,

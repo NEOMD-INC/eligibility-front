@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
-import Filters, { FilterField } from '@/components/ui/filters/Filters'
+import Filters from '@/components/ui/filters/Filters'
 import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
   clearUsersError,

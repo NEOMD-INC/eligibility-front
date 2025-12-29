@@ -227,7 +227,6 @@ export default function CarrierGroupList() {
           />
         </div>
 
-        {/* Delete Confirmation Modal */}
         <ConfirmationModal
           isOpen={deleteModal.isOpen}
           onClose={() => setDeleteModal({ isOpen: false, id: null, carrierGroupName: null })}

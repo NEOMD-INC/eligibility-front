@@ -24,7 +24,7 @@ const Header = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const handleClickOutside = event => {
+    const handleClickOutside = (event: any) => {
       if (eligibilityRef.current && !eligibilityRef.current.contains(event.target))
         setEligibilityOpen(false)
 
@@ -116,8 +116,7 @@ const Header = () => {
                   </Link>
                   <Link
                     className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    // href="/eligibility/settings"
-                    href="#"
+                    href="/eligibility/settings"
                     onClick={() => setEligibilityOpen(!eligibilityOpen)}
                   >
                     Settings
@@ -156,16 +155,14 @@ const Header = () => {
                   </Link>
                   <Link
                     className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    // href="/settings/carrier-setup"
-                    href="#"
+                    href="/settings/carrier-setup"
                     onClick={() => setSettingsOpen(!settingsOpen)}
                   >
                     Carrier Setup
                   </Link>
                   <Link
                     className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    // href="/settings/availity-payer"
-                    href="#"
+                    href="/settings/availity-payer"
                     onClick={() => setSettingsOpen(!settingsOpen)}
                   >
                     Availity Payer

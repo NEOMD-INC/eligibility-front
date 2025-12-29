@@ -1,6 +1,6 @@
 type Props = {
   title: string
-  value: string
+  value: string | number
   subtitle?: string
   footer?: string
   additionalInfo?: {
@@ -10,6 +10,14 @@ type Props = {
 }
 
 export default function InfoCard({ title, value, subtitle, footer, additionalInfo }: Props) {
+  // Convert value to string to handle numbers and other types
+  const valueString = String(value || '')
+  // Check if value contains multiple lines (for copay entries with labels)
+  const isMultiline = valueString.includes('\n')
+  const valueClass = isMultiline
+    ? 'text-base font-semibold leading-relaxed whitespace-pre-line'
+    : 'text-3xl font-bold whitespace-pre-line'
+
   return (
     <div className="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
       <div className="bg-gray-100 px-6 py-3 border-b border-gray-300">
@@ -21,7 +29,7 @@ export default function InfoCard({ title, value, subtitle, footer, additionalInf
             <tr>
               <td className="text-gray-700 font-semibold py-2 pr-4 align-top w-32">Individual</td>
               <td className="text-gray-900 py-2">
-                <div className="text-3xl font-bold">{value}</div>
+                <div className={valueClass}>{valueString}</div>
               </td>
             </tr>
             {subtitle && (

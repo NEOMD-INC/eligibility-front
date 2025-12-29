@@ -178,7 +178,6 @@ export default function AddUpdateRole() {
         permissions: permissionIds,
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRole, isEditMode, allPermissions])
 
   // Fetch permissions on component mount

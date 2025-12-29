@@ -31,7 +31,6 @@ export default function AddUpdateCarrierGroup() {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Unified validation schema
   const validationSchema = Yup.object({
     description: Yup.string().required('Carrier group description is required'),
     code: Yup.string().required('Carrier group code is required'),
@@ -39,7 +38,6 @@ export default function AddUpdateCarrierGroup() {
     isActive: Yup.boolean(),
   })
 
-  // Unified Formik instance
   const formik = useFormik<CarrierGroupFormValues>({
     initialValues: {
       description: '',
@@ -71,7 +69,6 @@ export default function AddUpdateCarrierGroup() {
     },
   })
 
-  // Load carrier group data in edit mode
   useEffect(() => {
     if (isEditMode && carrierGroupId) {
       dispatch(clearCarrierGroupsError())
@@ -82,10 +79,8 @@ export default function AddUpdateCarrierGroup() {
     }
   }, [dispatch, isEditMode, carrierGroupId])
 
-  // Update form values when carrier group data is loaded
   useEffect(() => {
     if (isEditMode && currentCarrierGroup) {
-      // Determine isActive value from various possible status formats
       let isActiveValue = false
       if (typeof currentCarrierGroup.status === 'boolean') {
         isActiveValue = currentCarrierGroup.status
@@ -108,10 +103,8 @@ export default function AddUpdateCarrierGroup() {
         isActive: isActiveValue,
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCarrierGroup, isEditMode])
 
-  // Update error message from Redux
   useEffect(() => {
     if (error) {
       setIsError(true)
@@ -119,7 +112,6 @@ export default function AddUpdateCarrierGroup() {
     }
   }, [error])
 
-  // Render field helper
   const renderField = (
     name: 'description' | 'code' | 'fillingIndicator',
     label: string,

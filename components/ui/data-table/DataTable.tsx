@@ -17,7 +17,6 @@ const DataTable = <T extends TableRow = TableRow>({
   clientSidePagination = false,
   noDataMessage,
   renderRow,
-  onSort,
   className = '',
 }: DataTableProps<T>) => {
   const [internalPage, setInternalPage] = useState(1)
@@ -58,7 +57,7 @@ const DataTable = <T extends TableRow = TableRow>({
     }
   }
 
-  const DefaultTableRow = ({ row, index }: { row: T; index: number }) => {
+  const DefaultTableRow = ({ row }: { row: T; index: number }) => {
     const renderCellValue = (value: unknown): React.ReactNode => {
       if (value === null || value === undefined) return 'N/A'
 
@@ -67,7 +66,7 @@ const DataTable = <T extends TableRow = TableRow>({
         if (value.length === 0) return 'N/A'
         // If array contains objects, try to extract meaningful values
         return value
-          .map((item, idx) => {
+          .map(item => {
             if (typeof item === 'object' && item !== null) {
               return item.name || item.id || item.member_id || JSON.stringify(item)
             }
@@ -76,25 +75,18 @@ const DataTable = <T extends TableRow = TableRow>({
           .join(', ')
       }
 
-      // Handle objects
       if (typeof value === 'object') {
-        // Try to find a meaningful string representation
-        // For subscriber objects: {name, member_id, dob, gender, age, address, eligibility_date, id, id_qualifier}
         if (value.member_id) return String(value.member_id)
         if (value.name) {
-          // If there's also an npi, show both
           if (value.npi) return `${value.name} (${value.npi})`
           return String(value.name)
         }
         if (value.npi) return String(value.npi)
         if (value.id) return String(value.id)
         if (value.id_qualifier) return String(value.id_qualifier)
-        // For provider objects
         if (value.provider_name) return String(value.provider_name)
-        // For responseMessage objects, try to stringify safely
         if (value.responseMessage) return String(value.responseMessage)
         if (value.response_message) return String(value.response_message)
-        // Otherwise, return a safe string representation
         return '[Object]'
       }
 
@@ -111,7 +103,7 @@ const DataTable = <T extends TableRow = TableRow>({
             try {
               renderedContent = column.render(cellValue, row)
             } catch (error) {
-              // If render function fails (e.g., trying to render an object), fall back to renderCellValue
+              console.log(error)
               renderedContent = renderCellValue(cellValue)
             }
           } else {
@@ -164,7 +156,10 @@ const DataTable = <T extends TableRow = TableRow>({
   return (
     <div className={`bg-white shadow rounded-lg overflow-hidden ${className}`}>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm text-gray-700" style={{ tableLayout: 'fixed' }}>
+        <table
+          className="w-full border-collapse text-sm text-gray-700"
+          style={{ tableLayout: 'fixed' }}
+        >
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               {columns.map(column => {

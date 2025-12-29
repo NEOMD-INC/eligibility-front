@@ -132,7 +132,6 @@ export default function CarrierGroupDetail() {
           </div>
         </div>
 
-        {/* Delete Confirmation Modal */}
         <ConfirmationModal
           isOpen={deleteModal}
           onClose={() => setDeleteModal(false)}

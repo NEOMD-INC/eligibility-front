@@ -31,7 +31,6 @@ export default function AddUpdateAvailityPayer() {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Unified validation schema
   const validationSchema = Yup.object({
     payerId: Yup.string().required('Payer ID is required'),
     payerName: Yup.string().required('Payer name is required'),
@@ -48,7 +47,6 @@ export default function AddUpdateAvailityPayer() {
     notes: Yup.string(),
   })
 
-  // Unified Formik instance
   const formik = useFormik<AvailityPayerFormValues>({
     initialValues: {
       payerId: '',
@@ -88,7 +86,6 @@ export default function AddUpdateAvailityPayer() {
     },
   })
 
-  // Load payer data in edit mode
   useEffect(() => {
     if (isEditMode && payerId) {
       dispatch(clearAvailityPayersError())
@@ -99,7 +96,6 @@ export default function AddUpdateAvailityPayer() {
     }
   }, [dispatch, isEditMode, payerId])
 
-  // Update form values when payer data is loaded
   useEffect(() => {
     if (isEditMode && currentAvailityPayer) {
       formik.setValues({
@@ -125,10 +121,8 @@ export default function AddUpdateAvailityPayer() {
         notes: currentAvailityPayer.notes || '',
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentAvailityPayer, isEditMode])
 
-  // Update error message from Redux
   useEffect(() => {
     if (error) {
       setIsError(true)
@@ -136,7 +130,6 @@ export default function AddUpdateAvailityPayer() {
     }
   }, [error])
 
-  // Helper function to render form fields
   const renderField = (
     name: keyof AvailityPayerFormValues,
     label: string,

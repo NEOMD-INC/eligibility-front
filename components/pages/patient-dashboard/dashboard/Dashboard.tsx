@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -21,19 +22,16 @@ export default function Dashboard() {
   const searchParams = useSearchParams()
   const logId = searchParams?.get('logId')
   const dispatch = useDispatch<AppDispatch>()
-  const { patientData, loading, error } = useSelector((state: RootState) => state.patientDashboard)
+  const { patientData, loading } = useSelector((state: RootState) => state.patientDashboard)
   const [activeTab, setActiveTab] = useState('Coverage and Benefits')
   const patientInformation: any = patientData?.patient || {}
   const subscriber: any = patientData?.subscriber || {}
-  const managedCareOrganization: any = patientData?.mco || {}
   const coverages: any = patientData?.coverage || []
   const provider: any = patientData?.provider || {}
   const dates: any = patientData?.dates || {}
   const benefits: any = patientData?.benefits || {}
-  const primaryCareProvider: any = patientData?.primary_care_provider || {}
   const payer: any = patientData?.payer || {}
 
-  // Extract all benefits from all network types
   const allBenefits = useMemo(() => {
     const inNetwork = benefits?.in_network || []
     const outOfNetwork = benefits?.out_of_network || []
@@ -41,7 +39,6 @@ export default function Dashboard() {
     return [...inNetwork, ...outOfNetwork, ...bothNetworks]
   }, [benefits])
 
-  // Extract copays with benefit information
   const copaysData = useMemo(() => {
     const copays: Array<{
       benefit_type: string
@@ -74,7 +71,6 @@ export default function Dashboard() {
     return copays
   }, [allBenefits])
 
-  // Extract deductibles with benefit information
   const deductiblesData = useMemo(() => {
     const deductibles: Array<{
       benefit_type: string
@@ -101,7 +97,6 @@ export default function Dashboard() {
     return deductibles
   }, [allBenefits])
 
-  // Extract coinsurance with benefit information
   const coinsuranceData = useMemo(() => {
     const coinsurance: Array<{
       benefit_type: string
@@ -116,7 +111,6 @@ export default function Dashboard() {
 
     allBenefits.forEach((benefit: any) => {
       if (benefit.coinsurance !== null && benefit.coinsurance !== undefined) {
-        // Handle coinsurance as object with percent and time_period
         let coinsuranceValue: number | string | null = null
         let coinsurancePercent: number | undefined
         let coinsuranceTimePeriod: string | undefined
@@ -145,7 +139,6 @@ export default function Dashboard() {
     return coinsurance
   }, [allBenefits])
 
-  // Extract out of pocket with benefit information
   const outOfPocketData = useMemo(() => {
     const outOfPocket: Array<{
       benefit_type: string
@@ -178,7 +171,6 @@ export default function Dashboard() {
     }
   }, [dispatch, logId])
 
-  // Show error if logId is missing
   if (!logId) {
     return (
       <PageTransition>
@@ -196,7 +188,6 @@ export default function Dashboard() {
 
   const tabs = ['Coverage and Benefits', 'Copay', 'Deductible', 'Coinsurance', 'Out of Pocket']
 
-  // Check if all tabs have empty data
   const hasCoverageAndBenefitsData =
     (benefits?.in_network && benefits.in_network.length > 0) ||
     (benefits?.out_of_network && benefits.out_of_network.length > 0) ||
@@ -207,7 +198,6 @@ export default function Dashboard() {
   const hasCoinsuranceData = coinsuranceData.length > 0
   const hasOutOfPocketData = outOfPocketData.length > 0
 
-  // Check if ALL tabs are empty
   const allTabsEmpty =
     !hasCoverageAndBenefitsData &&
     !hasCopayData &&
@@ -244,7 +234,9 @@ export default function Dashboard() {
     <PageTransition>
       <div className="w-full bg-gray-50 p-6 space-y-6">
         <div className="bg-white shadow rounded-lg p-6 flex justify-between items-start relative">
-          <div className="absolute left-0 top-0 bottom-0 w-5 bg-green-600" />
+          <div
+            className={`absolute left-0 top-0 bottom-0 w-5 ${coverages.plan_status === 'active' ? 'bg-green-600' : 'bg-yellow-600'}`}
+          />
           <div className="space-y-2 pl-2">
             <h1 className="text-2xl font-semibold text-green-700 flex items-center gap-2">
               {patientInformation.name || 'Jane Doe'}
@@ -285,15 +277,25 @@ export default function Dashboard() {
           </div>
 
           <div className="text-right space-y-2">
+            <div className="flex justify-end">
+              <Image
+                src="/images/aetna.png"
+                alt="NeoMD Logo"
+                width={150}
+                height={60}
+                priority
+                unoptimized
+                className="object-contain"
+              />
+            </div>
             <p className="text-sm text-gray-600">verified on {dates?.transaction_date}</p>
-
             <p className="text-sm text-gray-600">
               Benefit effective from {dates?.eligibility_begin_date} - {dates?.eligibility_end_date}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white shadow rounded-lg p-6 space-y-3">
             <h2 className="text-lg font-semibold flex items-center gap-2">👤 Subscriber</h2>
 
@@ -329,26 +331,6 @@ export default function Dashboard() {
 
             <p className="text-sm text-gray-600">
               {formatAddress(provider.address, provider.city, provider.state, provider.zip)}
-            </p>
-          </div>
-
-          <div className="bg-white shadow rounded-lg p-6 space-y-3">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              🩺 Managed Care Organization
-            </h2>
-
-            <p className="text-sm">
-              <span className="font-medium">Name</span>
-              <span className="ml-2 text-gray-500">{payer.name}</span>
-            </p>
-
-            <p className="text-sm text-gray-600">
-              {formatAddress(
-                managedCareOrganization.address,
-                managedCareOrganization.city,
-                managedCareOrganization.state,
-                managedCareOrganization.zip
-              )}
             </p>
           </div>
         </div>

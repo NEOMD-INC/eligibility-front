@@ -56,7 +56,7 @@ export default function SearchableSelectPayer({
   const displayValue = selectedOption ? selectedOption.label : placeholder
 
   // Check if there are more than 6 items (for showing scroll indicator)
-  const hasMore = options.length > 6
+  // const hasMore = options.length > 6
 
   // Debounced API search
   const performSearch = useCallback(
@@ -168,7 +168,9 @@ export default function SearchableSelectPayer({
         } ${disabled ? 'bg-gray-100 cursor-not-allowed opacity-50' : ''} ${className}`}
       >
         <div className="flex items-center justify-between">
-          <span className={value ? 'text-gray-900' : 'text-gray-500'}>{displayValue}</span>
+          <span className={`text-sm ${value ? 'text-gray-900' : 'text-gray-500'}`}>
+            {displayValue}
+          </span>
           <svg
             className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
             fill="none"

@@ -40,7 +40,7 @@ export default function IndividualEligibilityForm() {
   const searchParams = useSearchParams()
   const logId = searchParams?.get('logId')
 
-  const { npiPractice, loading, updateLoading, submitLoading, error } = useSelector(
+  const { npiPractice, updateLoading, submitLoading, error } = useSelector(
     (state: RootState) => state.eligibilityIndivitual
   )
   const { availityPayers, loading: payersLoading } = useSelector(
@@ -106,10 +106,10 @@ export default function IndividualEligibilityForm() {
       firstName: '',
       dob: '',
       gender: '',
-      relationshipCode: '18', // Default to "Self"
+      relationshipCode: '18',
       serviceDate: '',
-      serviceType: '30', // Default to 30
-      placeOfService: '11', // Default to "Office"
+      serviceType: '30',
+      placeOfService: '11',
     },
     validationSchema,
     onSubmit: async values => {
@@ -340,27 +340,66 @@ export default function IndividualEligibilityForm() {
       const data = response.data?.data || response.data
 
       if (data) {
+        const npiType = data.npi_type || data.npiType
+
         let practiceFirstName = ''
         let practiceLastName = ''
 
-        if (data.first_name || data.last_name) {
-          practiceFirstName = data.first_name || ''
-          practiceLastName = data.last_name || ''
-        } else if (data.practice_first_name || data.practice_last_name) {
-          practiceFirstName = data.practice_first_name || ''
-          practiceLastName = data.practice_last_name || ''
-        } else if (data.name || data.practice_name || data.full_name || data.organization_name) {
-          const practiceName =
-            data.name || data.practice_name || data.full_name || data.organization_name || ''
-          if (practiceName) {
-            const nameParts = splitName(practiceName)
-            practiceFirstName = nameParts.firstName
-            practiceLastName = nameParts.lastName
+        if (npiType === 'NPI-1') {
+          if (data.first_name || data.last_name) {
+            practiceFirstName = data.first_name || ''
+            practiceLastName = data.last_name || ''
+          } else if (data.practice_first_name || data.practice_last_name) {
+            practiceFirstName = data.practice_first_name || ''
+            practiceLastName = data.practice_last_name || ''
+          } else if (data.name || data.practice_name || data.full_name) {
+            const practiceName = data.name || data.practice_name || data.full_name || ''
+            if (practiceName) {
+              const nameParts = splitName(practiceName)
+              practiceFirstName = nameParts.firstName
+              practiceLastName = nameParts.lastName
+            }
+          }
+        } else if (npiType === 'NPI-2') {
+          practiceFirstName = ''
+          if (data.organization_name) {
+            practiceLastName = data.organization_name
+          } else if (data.last_name) {
+            practiceLastName = data.last_name
+          } else if (data.name || data.practice_name || data.full_name) {
+            const practiceName = data.name || data.practice_name || data.full_name || ''
+            if (practiceName) {
+              practiceLastName = practiceName
+            }
+          }
+        } else {
+          if (data.first_name || data.last_name) {
+            practiceFirstName = data.first_name || ''
+            practiceLastName = data.last_name || ''
+          } else if (data.practice_first_name || data.practice_last_name) {
+            practiceFirstName = data.practice_first_name || ''
+            practiceLastName = data.practice_last_name || ''
+          } else if (data.organization_name) {
+            practiceFirstName = ''
+            practiceLastName = data.organization_name
+          } else if (data.name || data.practice_name || data.full_name) {
+            const practiceName = data.name || data.practice_name || data.full_name || ''
+            if (practiceName) {
+              const nameParts = splitName(practiceName)
+              practiceFirstName = nameParts.firstName
+              practiceLastName = nameParts.lastName
+            }
           }
         }
 
-        if (practiceFirstName || practiceLastName) {
-          formik.setFieldValue('practiceFirstName', practiceFirstName)
+        if (npiType === 'NPI-2') {
+          formik.setFieldValue('practiceFirstName', '')
+        }
+
+        if (practiceLastName || (practiceFirstName && npiType !== 'NPI-2')) {
+          if (npiType !== 'NPI-2') {
+            formik.setFieldValue('practiceFirstName', practiceFirstName)
+          }
           formik.setFieldValue('practiceLastName', practiceLastName)
           toastManager.success('NPI verified successfully')
         } else {
@@ -650,9 +689,7 @@ export default function IndividualEligibilityForm() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Gender
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-800 mb-1">Gender</label>
                   <SearchableSelect
                     name="gender"
                     value={formik.values.gender}

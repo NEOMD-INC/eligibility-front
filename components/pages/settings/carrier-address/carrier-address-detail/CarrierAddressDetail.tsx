@@ -28,7 +28,6 @@ export default function CarrierAddressDetail() {
   )
   const [deleteModal, setDeleteModal] = useState(false)
 
-  // Fetch carrier address data on mount
   useEffect(() => {
     if (carrierAddressId) {
       dispatch(clearCarrierAddressesError())
@@ -90,7 +89,6 @@ export default function CarrierAddressDetail() {
   return (
     <PageTransition>
       <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6 relative">
-        {/* Main Detail Card */}
         <div className="w-full bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-4 pb-3">Carrier Address Details</h1>
 
@@ -109,7 +107,6 @@ export default function CarrierAddressDetail() {
             ))}
           </div>
 
-          {/* Action Buttons */}
           <div className="flex justify-end gap-2 mt-3 pt-6">
             <button
               onClick={() => router.back()}
@@ -135,7 +132,6 @@ export default function CarrierAddressDetail() {
           </div>
         </div>
 
-        {/* Delete Confirmation Modal */}
         <ConfirmationModal
           isOpen={deleteModal}
           onClose={() => setDeleteModal(false)}

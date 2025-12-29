@@ -1,8 +1,4 @@
-type Props = {
-  selected: string
-  onSelect: (value: string) => void
-  menuOptions: any[]
-}
+import { Props } from './types/types'
 
 export default function CoverageSidebar({ menuOptions, selected, onSelect }: Props) {
   const getBenefitKey = (item: any) => {

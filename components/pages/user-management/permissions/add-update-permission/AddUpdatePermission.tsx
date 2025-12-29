@@ -30,12 +30,10 @@ export default function AddUpdatePermission() {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Unified validation schema
   const validationSchema = Yup.object({
     permissionName: Yup.string().required('Permission name is required'),
   })
 
-  // Unified Formik instance
   const formik = useFormik<PermissionFormValues>({
     initialValues: {
       permissionName: '',
@@ -84,7 +82,6 @@ export default function AddUpdatePermission() {
     },
   })
 
-  // Fetch permission data in edit mode
   useEffect(() => {
     if (isEditMode && permissionId) {
       dispatch(clearPermissionsError())
@@ -99,7 +96,6 @@ export default function AddUpdatePermission() {
     }
   }, [dispatch, isEditMode, permissionId])
 
-  // Populate form with permission data when it's loaded
   useEffect(() => {
     if (isEditMode && currentPermission) {
       const permissionName = currentPermission.name || ''
@@ -107,10 +103,8 @@ export default function AddUpdatePermission() {
         permissionName,
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPermission, isEditMode])
 
-  // Update error message from Redux state
   useEffect(() => {
     if (error) {
       setIsError(true)

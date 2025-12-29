@@ -46,7 +46,6 @@ export default function EligibilityLogListColumns({
       width: '15%',
       align: 'left' as const,
       render: (value: any, log: any) => {
-        // Handle nested subscriber object
         let subscriberValue = log.subscriber || log.subscriberId || log.subscriber_id
         if (subscriberValue && typeof subscriberValue === 'object') {
           subscriberValue =
@@ -61,7 +60,6 @@ export default function EligibilityLogListColumns({
       width: '15%',
       align: 'left' as const,
       render: (value: any, log: any) => {
-        // Handle nested provider object
         let providerValue = log.provider || log.providerName || log.provider_name
         if (providerValue && typeof providerValue === 'object') {
           providerValue = providerValue.name || providerValue.npi || providerValue.id || 'N/A'
@@ -142,7 +140,6 @@ export default function EligibilityLogListColumns({
       width: '12%',
       align: 'left' as const,
       render: (value: any, log: any) => (
-        // converstion for secs and mins
         <div className="text-gray-900">{log.response_time.time}</div>
       ),
     },

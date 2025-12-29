@@ -33,7 +33,6 @@ export default function CarrierSetupList() {
     carrierSetupName: null,
   })
 
-  // Fetch carrier setups on mount and when page changes
   useEffect(() => {
     dispatch(clearCarrierSetupsError())
     dispatch(fetchAllCarrierSetups(currentPage))
@@ -91,14 +90,12 @@ export default function CarrierSetupList() {
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          {/* Error Message */}
           {error && (
             <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
               <p className="text-sm font-medium">{error}</p>
             </div>
           )}
 
-          {/* DataTable */}
           <DataTable
             columns={columns}
             data={carrierSetups}
@@ -117,7 +114,6 @@ export default function CarrierSetupList() {
           />
         </div>
 
-        {/* Delete Confirmation Modal */}
         <ConfirmationModal
           isOpen={deleteModal.isOpen}
           onClose={() => setDeleteModal({ isOpen: false, id: null, carrierSetupName: null })}

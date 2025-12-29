@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { CarrierSetupsService } from '@/services/settings/carrier-setup/carrierSetups.service'
-import type { CarrierSetup, CarrierSetupsState } from '@/types'
+import type { CarrierSetupsState } from '@/types'
 
 const initialState: CarrierSetupsState = {
   carrierSetups: [],

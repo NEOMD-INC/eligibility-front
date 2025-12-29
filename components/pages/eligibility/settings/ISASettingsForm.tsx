@@ -34,7 +34,7 @@ export default function ISASettingsForm() {
       .test(
         'exact-length',
         'Authorization information must be exactly 15 characters',
-        value => value && value.length <= 15
+        (value: any) => value && value.length <= 15
       ),
     securityInformationQualifier: Yup.string().required(
       'Security information qualifier is required'
@@ -44,7 +44,7 @@ export default function ISASettingsForm() {
       .test(
         'exact-length',
         'Security information must be exactly 15 characters',
-        value => value && value.length <= 15
+        (value: any) => value && value.length <= 15
       ),
     senderQualifier: Yup.string().required('Sender qualifier is required'),
     senderId: Yup.string()

@@ -1,3 +1,1 @@
-import Dashboard from '@/components/pages/patient-dashboard/dashboard/Dashboard'
-
-export default Dashboard
+export { default } from '@/components/pages/patient-dashboard/dashboard/Dashboard'

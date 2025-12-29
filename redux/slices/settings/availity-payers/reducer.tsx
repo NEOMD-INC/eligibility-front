@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { AvailityPayerService } from '@/services/settings/avality-payer/avalityPayer.service'
-import type { AvailityPayer, AvailityPayersState } from '@/types'
+import type { AvailityPayersState } from '@/types'
 
 const initialState: AvailityPayersState = {
   availityPayers: [],

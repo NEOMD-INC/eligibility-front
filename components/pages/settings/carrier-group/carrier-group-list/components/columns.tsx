@@ -51,7 +51,6 @@ export default function CarrierGroupListColumns({
       width: '15%',
       align: 'center' as const,
       render: (value: any, carrierGroup: any) => {
-        // Handle status as boolean or string
         const statusValue =
           typeof carrierGroup.status === 'boolean'
             ? carrierGroup.status

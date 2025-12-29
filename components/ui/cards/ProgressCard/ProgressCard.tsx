@@ -11,8 +11,9 @@ type Props = {
 }
 
 export default function ProgressCard({ title, value, used, total, footer, additionalInfo }: Props) {
-  const percentage = Math.min(Math.round((used / total) * 100), 100)
   const remaining = total - used
+  // Calculate percentage based on remaining amount (bar fills as remaining increases)
+  const percentage = total > 0 ? Math.min(Math.round((remaining / total) * 100), 100) : 0
 
   return (
     <div className="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">

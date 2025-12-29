@@ -7,7 +7,6 @@ import * as Yup from 'yup'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import { clearPasswordError, updateUserPassword } from '@/redux/slices/user-profile/reducer'
 import { AppDispatch, RootState } from '@/redux/store'
-import { themeColors } from '@/theme'
 
 export default function UpdatePasswordForm() {
   const dispatch = useDispatch<AppDispatch>()

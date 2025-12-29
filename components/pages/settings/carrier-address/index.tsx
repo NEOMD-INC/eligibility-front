@@ -1,3 +1,1 @@
-import CarrierAddressList from './carrier-address-list/CarrierAddressList'
-
-export default CarrierAddressList
+export { default } from './carrier-address-list/CarrierAddressList'

@@ -121,24 +121,22 @@ export default function EligibilityHistoryColumns({
     },
     {
       key: 'status',
-      label: 'Status',
+      label: 'Coverage Eligibility',
       width: '10%',
       align: 'left' as const,
       render: (value: any, record: any) => {
-        const status = record.status || record.queueStatus || record.queue_status || 'N/A'
+        console.log(record, 'record is right here')
+        const status = record.coverage.plan_status || 'N/A'
         const statusColor =
-          status === 'completed'
+          status === 'active'
             ? 'bg-green-100 text-green-800'
-            : status === 'rejected' || status === 'error'
+            : status === 'in-active'
               ? 'bg-red-100 text-red-800'
-              : status === 'in_process'
-                ? 'bg-yellow-100 text-yellow-800'
-                : status === 'processing'
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'bg-gray-100 text-gray-800'
+              : 'bg-yellow-100 text-yellow-800'
+
         return (
           <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}>
-            {status}
+            {status ? status : '-'}
           </span>
         )
       },

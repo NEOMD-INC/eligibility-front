@@ -5,38 +5,109 @@ import { useMemo } from 'react'
 import InfoCard from '../../../../../../../../ui/cards/InfoCard/InfoCard'
 import ProgressCard from '../../../../../../../../ui/cards/ProgressCard/ProgressCard'
 import LimitationsCard from './components/LimitationsCard'
-
-type Props = {
-  benefit: any
-  networkType: string
-  setNetworkType: (type: 'In Network' | 'Out of Network') => void
-}
+import { Props } from './types/types'
 
 export default function BenefitDetails({ benefit, networkType, setNetworkType }: Props) {
-  // Transform benefit data to card format - memoized to update when benefit changes
   const formatCurrency = (value: string | null) => {
     if (!value) return 'N/A'
     return `$${parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
-  // Format copays object - show only price values
+  const formatCopayLabel = (key: string): string => {
+    const labelMap: { [key: string]: string } = {
+      urgent_care: 'Urgent Care',
+      emergency_room_physician: 'Emergency Room Physician',
+      emergency_room_facility: 'Emergency Room Facility',
+      office_visit: 'Office Visit',
+      specialist_visit: 'Specialist Visit',
+      primary_care: 'Primary Care',
+      specialist: 'Specialist',
+      copay: 'Copay',
+    }
+
+    if (labelMap[key]) {
+      return labelMap[key]
+    }
+    return key
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+  }
+
   const copayValue = useMemo(() => {
     if (!benefit || !benefit.copays) return 'N/A'
     if (typeof benefit.copays === 'object') {
-      const copayValues = Object.values(benefit.copays)
-        .filter(value => value !== null && value !== undefined && value !== 0)
-        .map(value => (typeof value === 'number' ? formatCurrency(String(value)) : value))
-      return copayValues.length > 0 ? copayValues.join(', ') : 'N/A'
+      const copayEntries = Object.entries(benefit.copays)
+        .filter(([value]) => {
+          if (value === null || value === undefined) return false
+          if (value === 0 || value === '0') return false
+          if (typeof value === 'string' && value.trim() === '') return false
+          if (Array.isArray(value) && value.length === 0) return false
+          return true
+        })
+        .map(([key, value]) => {
+          const label = formatCopayLabel(key)
+
+          let formattedValue: string
+          if (typeof value === 'number' && !isNaN(value)) {
+            formattedValue = formatCurrency(String(value))
+          } else if (typeof value === 'string' && value.trim() !== '') {
+            formattedValue = value
+          } else {
+            return null
+          }
+          return `${label}: ${formattedValue}`
+        })
+        .filter(entry => entry !== null)
+
+      return copayEntries.length > 0 ? copayEntries.join('\n') : 'N/A'
+    }
+
+    if (benefit.copays === null || benefit.copays === undefined || benefit.copays === 0) {
+      return 'N/A'
     }
     return formatCurrency(String(benefit.copays))
   }, [benefit])
 
-  const coinsuranceValue = useMemo(() => {
-    if (!benefit) return 'N/A'
-    if (benefit.coinsurance === null || benefit.coinsurance === undefined) return 'N/A'
-    return typeof benefit.coinsurance === 'string' && benefit.coinsurance.includes('%')
-      ? benefit.coinsurance
-      : `${benefit.coinsurance}%`
+  const coinsuranceData = useMemo(() => {
+    if (!benefit) {
+      return {
+        value: 'N/A',
+        additionalInfo: undefined,
+      }
+    }
+    if (benefit.coinsurance === null || benefit.coinsurance === undefined) {
+      return {
+        value: 'N/A',
+        additionalInfo: undefined,
+      }
+    }
+
+    let value: string
+    let timePeriod: string | undefined
+
+    if (typeof benefit.coinsurance === 'object' && benefit.coinsurance !== null) {
+      const percent = benefit.coinsurance.percent
+      timePeriod = benefit.coinsurance.time_period
+      if (percent !== null && percent !== undefined) {
+        value = `${percent}%`
+      } else {
+        value = 'N/A'
+      }
+    } else if (typeof benefit.coinsurance === 'string' && benefit.coinsurance.includes('%')) {
+      value = benefit.coinsurance
+    } else {
+      value = `${benefit.coinsurance}%`
+    }
+
+    return {
+      value,
+      additionalInfo: timePeriod
+        ? {
+            timePeriod,
+          }
+        : undefined,
+    }
   }, [benefit])
 
   const deductibleData = useMemo(() => {
@@ -49,15 +120,19 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
         additionalInfo: undefined,
       }
     }
+    const remaining = parseFloat(benefit.deductible.remaining || '0')
+    const total = parseFloat(benefit.deductible.total || '0')
+
+    const used = Math.max(0, total - remaining)
     return {
-      value: formatCurrency(String(benefit.deductible.remaining || '0')),
-      used: parseFloat(benefit.deductible.met || '0'),
-      total: parseFloat(benefit.deductible.total || '0'),
+      value: formatCurrency(String(remaining)),
+      used: used,
+      total: total,
       footer: benefit.deductible.reset_date
         ? `Resets on ${benefit.deductible.reset_date}`
         : undefined,
       additionalInfo: {
-        notes: `Remaining: ${formatCurrency(String(benefit.deductible.remaining || '0'))}`,
+        notes: `Remaining: ${formatCurrency(String(remaining))}`,
       },
     }
   }, [benefit])
@@ -72,15 +147,19 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
         additionalInfo: undefined,
       }
     }
+    const remaining = parseFloat(benefit.out_of_pocket.remaining || '0')
+    const total = parseFloat(benefit.out_of_pocket.total || '0')
+
+    const used = Math.max(0, total - remaining)
     return {
-      value: formatCurrency(String(benefit.out_of_pocket.remaining || '0')),
-      used: parseFloat(benefit.out_of_pocket.met || '0'),
-      total: parseFloat(benefit.out_of_pocket.total || '0'),
+      value: formatCurrency(String(remaining)),
+      used: used,
+      total: total,
       footer: benefit.out_of_pocket.reset_date
         ? `Resets on ${benefit.out_of_pocket.reset_date}`
         : undefined,
       additionalInfo: {
-        notes: `Remaining: ${formatCurrency(String(benefit.out_of_pocket.remaining || '0'))}`,
+        notes: `Remaining: ${formatCurrency(String(remaining))}`,
       },
     }
   }, [benefit])
@@ -113,14 +192,29 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
     )
   }
 
+  const getCoverageStatusBadge = (status: string | undefined) => {
+    if (!status) return null
+
+    const statusLower = status.toLowerCase()
+    const isActive = statusLower === 'active'
+    const bgColor = isActive ? 'bg-green-100' : 'bg-red-100'
+    const textColor = isActive ? 'text-green-700' : 'text-red-700'
+
+    return (
+      <span className={`ml-3 px-2 py-1 rounded text-sm font-medium ${bgColor} ${textColor}`}>
+        {status}
+      </span>
+    )
+  }
+
   return (
     <section className="flex-1 p-6 bg-gray-50">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold text-gray-900 flex items-center">
           {benefit.benefit_type} - {benefit.coverage_level}
+          {getCoverageStatusBadge(benefit.coverage_status)}
         </h1>
 
-        {/* Network Type Tabs */}
         <div className="flex border-b border-gray-300">
           <button
             onClick={() => setNetworkType('In Network')}
@@ -149,9 +243,7 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
         </div>
       </div>
 
-      {/* First Row: Copay, Deductible, Co-Insurance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Copay Card - Only show if copays is not null */}
         {benefit.copays !== null && benefit.copays !== undefined && (
           <InfoCard
             key={`copay-${benefit.service_type_code}-${benefit.coverage_level_code}`}
@@ -161,7 +253,6 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
           />
         )}
 
-        {/* Deductible Card - Only show if deductible is not null */}
         {benefit.deductible !== null && benefit.deductible !== undefined && (
           <ProgressCard
             key={`deductible-${benefit.service_type_code}-${benefit.coverage_level_code}`}
@@ -174,20 +265,18 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
           />
         )}
 
-        {/* Co-Insurance Card - Only show if coinsurance is not null */}
         {benefit.coinsurance !== null && benefit.coinsurance !== undefined && (
           <InfoCard
             key={`coinsurance-${benefit.service_type_code}-${benefit.coverage_level_code}`}
             title="Co-Insurance"
-            value={coinsuranceValue}
+            value={coinsuranceData.value}
             subtitle={benefit.coverage_level}
+            additionalInfo={coinsuranceData.additionalInfo}
           />
         )}
       </div>
 
-      {/* Second Row: Out of Pocket Maximum, Limitations */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Out of Pocket Maximum Card - Only show if out_of_pocket is not null */}
         {benefit.out_of_pocket !== null && benefit.out_of_pocket !== undefined && (
           <ProgressCard
             key={`outofpocket-${benefit.service_type_code}-${benefit.coverage_level_code}`}
@@ -200,7 +289,6 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
           />
         )}
 
-        {/* Limitations Card (spans remaining columns) */}
         <div
           className={
             benefit.out_of_pocket !== null && benefit.out_of_pocket !== undefined

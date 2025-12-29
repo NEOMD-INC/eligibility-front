@@ -8,8 +8,6 @@ import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import { setUser } from '@/redux/slices/current-user/userSlice'
 import { clearProfileError, updateUserProfile } from '@/redux/slices/user-profile/reducer'
 import { AppDispatch, RootState } from '@/redux/store'
-// Theme colors - Tailwind classes like bg-blue-600, text-gray-800, etc. use theme colors via CSS variables
-import { themeColors } from '@/theme'
 
 export default function ProfileInfoForm() {
   const dispatch = useDispatch<AppDispatch>()
@@ -35,11 +33,9 @@ export default function ProfileInfoForm() {
       setShowSuccess(false)
       const result = await dispatch(updateUserProfile({ name: values.name, email: values.email }))
       if (updateUserProfile.fulfilled.match(result)) {
-        // Update user data in current-user slice if response contains updated user data
         if (result.payload?.data) {
           dispatch(setUser({ ...user, ...result.payload.data }))
         } else {
-          // Otherwise update with the values we just submitted
           dispatch(setUser({ ...user, name: values.name, email: values.email }))
         }
         setShowSuccess(true)
@@ -48,7 +44,6 @@ export default function ProfileInfoForm() {
     },
   })
 
-  // Clear error when component unmounts or form is reset
   useEffect(() => {
     return () => {
       dispatch(clearProfileError())
@@ -58,14 +53,12 @@ export default function ProfileInfoForm() {
   return (
     <div>
       <form className="w-full" onSubmit={formik.handleSubmit}>
-        {/* Error message */}
         {updateProfileError && (
           <div className="mb-4 p-4 rounded-lg bg-red-100 text-red-700">
             <span>{updateProfileError}</span>
           </div>
         )}
 
-        {/* Success message */}
         {showSuccess && !updateProfileError && (
           <div className="mb-4 p-4 rounded-lg bg-green-100 text-green-700">
             <span>Profile updated successfully!</span>
@@ -73,7 +66,6 @@ export default function ProfileInfoForm() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Name field */}
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-1">Name</label>
             <input
@@ -97,7 +89,6 @@ export default function ProfileInfoForm() {
             )}
           </div>
 
-          {/* Email field */}
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-1">Email</label>
             <input

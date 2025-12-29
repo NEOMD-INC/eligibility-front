@@ -2,24 +2,7 @@
 
 import InfoCard from '@/components/ui/cards/InfoCard/InfoCard'
 
-interface CopayItem {
-  title: string
-  value: string | number | any
-  coverage_level: string | any
-  subtitle: string
-  footer: string
-  messages: string[] | string
-  additionalInfo: {
-    timePeriod: string
-    notes: string[] | string
-  }
-}
-interface RawCopayData {
-  benefit_type: string
-  copay_value: string | number
-  coverage_level: string | any
-  messages: (string | string[])[]
-}
+import { CopayItem, RawCopayData } from './types/types'
 
 export default function Copay({ copaysData }: any) {
   const copayData1: CopayItem[] =
@@ -47,7 +30,7 @@ export default function Copay({ copaysData }: any) {
             coverage_level={copay.coverage_level}
             subtitle={copay.subtitle}
             footer={copay.footer}
-            additionalInfo={copay.additionalInfo as {}}
+            additionalInfo={copay.additionalInfo as any}
           />
         ))}
       </div>

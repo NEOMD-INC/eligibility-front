@@ -33,7 +33,6 @@ export default function CarrierAddressList() {
     carrierAddressName: null,
   })
 
-  // Fetch carrier addresses on mount and when page changes
   useEffect(() => {
     dispatch(clearCarrierAddressesError())
     dispatch(fetchAllCarrierAddresses(currentPage))
@@ -51,7 +50,6 @@ export default function CarrierAddressList() {
     if (!deleteModal.id) return
 
     dispatch(deleteCarrierAddress(deleteModal.id)).then(() => {
-      // Refetch the list after deletion
       dispatch(fetchAllCarrierAddresses(currentPage))
       setDeleteModal({ isOpen: false, id: null, carrierAddressName: null })
     })
@@ -92,14 +90,12 @@ export default function CarrierAddressList() {
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          {/* Error Message */}
           {error && (
             <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
               <p className="text-sm font-medium">{error}</p>
             </div>
           )}
 
-          {/* DataTable */}
           <DataTable
             columns={columns}
             data={carrierAddresses}
@@ -118,7 +114,6 @@ export default function CarrierAddressList() {
           />
         </div>
 
-        {/* Delete Confirmation Modal */}
         <ConfirmationModal
           isOpen={deleteModal.isOpen}
           onClose={() => setDeleteModal({ isOpen: false, id: null, carrierAddressName: null })}

@@ -10,12 +10,7 @@ const DefaultImage = ({ gender }: ImageProps) => {
 }
 export default DefaultImage
 
-export const UserProfileImage = ({
-  profileImagePath,
-  gender,
-  width,
-  square,
-}: UserProfileImageProps) => {
+export const UserProfileImage = ({ profileImagePath, width, square }: UserProfileImageProps) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || ''
   const placeholderImage = '/images/profile.png'
   const hasImage = profileImagePath && profileImagePath.trim() !== ''
@@ -26,7 +21,7 @@ export const UserProfileImage = ({
   const imageClassName = square ? 'rounded' : 'rounded-circle'
   const isExternalUrl =
     profileImagePath?.startsWith('http://') || profileImagePath?.startsWith('https://')
-  const isLocalPath = !hasImage || (!isExternalUrl && !baseUrl)
+  // const isLocalPath = !hasImage || (!isExternalUrl && !baseUrl)
 
   if (hasImage && (isExternalUrl || baseUrl)) {
     return (
@@ -48,6 +43,7 @@ export const UserProfileImage = ({
       width={imageWidth}
       height={imageHeight}
       className={imageClassName}
+      unoptimized={imageSrc.endsWith('.png')}
     />
   )
 }

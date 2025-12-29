@@ -10,6 +10,7 @@ export default function Loading() {
           width={150}
           height={60}
           priority
+          unoptimized
           className="object-contain"
         />
       </div>

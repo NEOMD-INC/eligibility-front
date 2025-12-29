@@ -1,3 +1,1 @@
-import CarrierGroupList from './carrier-group-list/CarrierGroupList'
-
-export default CarrierGroupList
+export { default } from './carrier-group-list/CarrierGroupList'

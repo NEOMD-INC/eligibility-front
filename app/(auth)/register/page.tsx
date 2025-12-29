@@ -1,5 +1,6 @@
 // Theme colors - Tailwind classes use theme colors via CSS variables
 import Image from 'next/image'
+
 import RegisterPage from '@/components/pages/auth/register/index'
 import { themeColors } from '@/theme'
 
@@ -18,6 +19,7 @@ export default function Register() {
               width={150}
               height={60}
               priority
+              unoptimized
               className="object-contain"
             />
           </div>

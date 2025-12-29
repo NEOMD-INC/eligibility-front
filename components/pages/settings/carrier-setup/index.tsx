@@ -1,3 +1,1 @@
-import CarrierSetupList from './carrier-setup-list/CarrierSetupList'
-
-export default CarrierSetupList
+export { default } from './carrier-setup-list/CarrierSetupList'

@@ -6,14 +6,14 @@ export default function Deductible({ deductiblesData }: any) {
   const deductibleData1 =
     deductiblesData?.map((item: any) => {
       const messages = item.messages || []
-      const remaining = item.deductible?.remaining || 0
-      const met = item.deductible?.met || 0
-      const total = item.deductible?.total || 0
+      const remaining = parseFloat(item.deductible?.remaining || 0)
+      const total = parseFloat(item.deductible?.total || 0)
+      const used = Math.max(0, total - remaining)
 
       return {
         title: item.benefit_type,
         value: `$${remaining} Remaining`,
-        used: met,
+        used: used,
         total: total,
         footer: 'Resets on 12/31/2024',
         additionalInfo: {

@@ -1,7 +1,6 @@
 import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
-import { UserProfileImage } from '@/components/ui/image/Image'
 
 interface RolesListColumnsProps {
   onDeleteClick?: (id: string, userName: string) => void
