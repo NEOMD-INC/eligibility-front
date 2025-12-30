@@ -3,6 +3,25 @@ import { formatDate } from '@/utils/formatDate'
 export const getCarrierSetupDetails = (currentCarrierSetup: any) => {
   if (!currentCarrierSetup) return []
 
+  const isCliaValue =
+    currentCarrierSetup.is_clia === 1 ||
+    currentCarrierSetup.is_clia === '1' ||
+    currentCarrierSetup.is_clia === true
+      ? 'Yes'
+      : currentCarrierSetup.is_clia === 0 ||
+          currentCarrierSetup.is_clia === '0' ||
+          currentCarrierSetup.is_clia === false
+        ? 'No'
+        : 'N/A'
+
+  const enrollmentValue = currentCarrierSetup.enrollment
+  const enrollmentRequiredValue =
+    enrollmentValue === 1 || enrollmentValue === '1' || enrollmentValue === true
+      ? 'Required'
+      : enrollmentValue === 0 || enrollmentValue === '0' || enrollmentValue === false
+        ? 'Not Required'
+        : currentCarrierSetup.enrollment_required || 'N/A'
+
   return [
     {
       title: 'Carrier Group Code',
@@ -31,7 +50,7 @@ export const getCarrierSetupDetails = (currentCarrierSetup: any) => {
     },
     {
       title: 'Is CLIA',
-      value: currentCarrierSetup.is_clia === 0 ? 'false' : 'true' || 'N/A',
+      value: isCliaValue,
     },
     {
       title: 'COB',
@@ -43,7 +62,7 @@ export const getCarrierSetupDetails = (currentCarrierSetup: any) => {
     },
     {
       title: 'Enrollment Required',
-      value: currentCarrierSetup.enrollment_required || 'N/A',
+      value: enrollmentRequiredValue,
     },
     {
       title: 'Created At',

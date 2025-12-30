@@ -38,13 +38,13 @@ const mapFormToApi = (obj: any): any => {
       } else if (key === 'addressId') {
         apiObj.address_id = obj[key]
       } else if (key === 'addressLine1') {
-        apiObj.address_line1 = obj[key]
+        apiObj.address1 = obj[key]
       } else if (key === 'zipCode') {
         apiObj.zip_code = obj[key]
       } else if (key === 'phoneType') {
-        apiObj.phone_type = obj[key]
+        apiObj.insurance_phone_type1 = obj[key]
       } else if (key === 'phoneNumber') {
-        apiObj.phone_number = obj[key]
+        apiObj.insurance_phone_number1 = obj[key]
       } else if (key === 'insuranceDepartment') {
         apiObj.insurance_department = obj[key]
       } else {
@@ -87,7 +87,7 @@ export const fetchCarrierAddressById = createAsyncThunk(
 // Async thunk to create carrier address
 export const createCarrierAddress = createAsyncThunk(
   'carrierAddresses/createCarrierAddress',
-  async (carrierAddressData: {}, { rejectWithValue }) => {
+  async (carrierAddressData: any, { rejectWithValue }) => {
     try {
       // Map form fields to API field names
       const apiData = mapFormToApi(carrierAddressData)
@@ -102,7 +102,7 @@ export const createCarrierAddress = createAsyncThunk(
 // Async thunk to update carrier address
 export const updateCarrierAddress = createAsyncThunk(
   'carrierAddresses/updateCarrierAddress',
-  async (params: { carrierAddressId: string; carrierAddressData: {} }, { rejectWithValue }) => {
+  async (params: { carrierAddressId: string; carrierAddressData: any }, { rejectWithValue }) => {
     try {
       // Map form fields to API field names
       const apiData = mapFormToApi(params.carrierAddressData)

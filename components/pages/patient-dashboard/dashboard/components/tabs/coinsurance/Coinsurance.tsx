@@ -1,6 +1,7 @@
 'use client'
 
 import InfoCard from '@/components/ui/cards/InfoCard/InfoCard'
+import { themeColors } from '@/theme'
 
 import { CoinsuranceItem, CoinsuranceProps } from './types/types'
 
@@ -42,8 +43,10 @@ export default function Coinsurance({ coinsuranceData }: CoinsuranceProps) {
     }) || []
 
   return (
-    <div className="p-6 bg-gray-50 min-h-[500px]">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Coinsurance</h1>
+    <div className="p-6 min-h-[500px]" style={{ backgroundColor: themeColors.gray[50] }}>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text.primary }}>
+        Coinsurance
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {coinsuranceData1.length > 0
           ? coinsuranceData1.map((coinsurance, index) => (

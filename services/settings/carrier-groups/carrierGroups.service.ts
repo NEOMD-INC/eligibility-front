@@ -37,11 +37,11 @@ export const CarrierGroupService = {
     return api.get(`/carrier-groups/${userId}`)
   },
 
-  createCarrierGroups: (userData: {}) => {
+  createCarrierGroups: (userData: any) => {
     return api.post('/carrier-groups/store', userData)
   },
 
-  updateCarrierGroups: (userId: string, userData: {}) => {
+  updateCarrierGroups: (userId: string, userData: any) => {
     return api.put(`/carrier-groups/${userId}/update`, userData)
   },
 

@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
 import { UserProfileImage } from '@/components/ui/image/Image'
+import { themeColors } from '@/theme'
 
 interface UsersListColumnsProps {
   onDeleteClick?: (id: string, userName: string) => void
@@ -14,14 +15,17 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'User',
       width: '30%',
       align: 'left' as const,
-      render: (value: any, user: any) => {
+      render: (user: any) => {
         const userImage = user.profile_image_path || user.image || user.profile_image
         const userName = user.name || 'User'
 
         return (
           <Link href={`#`} className="block">
             <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0">
+              <div
+                className="w-10 h-10 rounded-full overflow-hidden mr-3 border flex-shrink-0"
+                style={{ borderColor: themeColors.border.default }}
+              >
                 <UserProfileImage
                   profileImagePath={userImage}
                   gender={user.gender as 'male' | 'female' | undefined}
@@ -29,11 +33,18 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
                 />
               </div>
               <div className="flex flex-col justify-start min-w-0">
-                <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
+                <div
+                  className="font-semibold truncate"
+                  style={{ color: themeColors.text.primary }}
+                  onMouseEnter={e => (e.currentTarget.style.color = themeColors.text.link)}
+                  onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.primary)}
+                >
                   {userName || 'N/A'}
                 </div>
                 {user.username && (
-                  <span className="text-gray-500 text-sm truncate">{user.username}</span>
+                  <span className="text-sm truncate" style={{ color: themeColors.text.muted }}>
+                    {user.username}
+                  </span>
                 )}
               </div>
             </div>
@@ -46,8 +57,10 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'Email',
       width: '25%',
       align: 'left' as const,
-      render: (value: any, user: any) => (
-        <div className="text-gray-900 truncate">{user.email || 'N/A'}</div>
+      render: (user: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
+          {user.email || 'N/A'}
+        </div>
       ),
     },
     {
@@ -55,7 +68,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'Roles',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, user: any) => {
+      render: (user: any) => {
         let roleDisplay = 'N/A'
 
         if (user.role) {
@@ -67,7 +80,10 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
 
         return (
           <div className="flex justify-center">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+            <span
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+              style={{ backgroundColor: themeColors.green[100], color: themeColors.green[600] }}
+            >
               {roleDisplay}
             </span>
           </div>
@@ -79,7 +95,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'Created',
       width: '15%',
       align: 'left' as const,
-      render: (value: any, user: any) => {
+      render: (user: any) => {
         const createdDate = user.created_at || user.created || user.createdAt
         if (!createdDate) return <span className="text-gray-500">N/A</span>
 
@@ -89,7 +105,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
           month: 'short',
           day: 'numeric',
         })
-        return <div className="text-gray-900">{formattedDate}</div>
+        return <div style={{ color: themeColors.text.primary }}>{formattedDate}</div>
       },
     },
     {
@@ -97,7 +113,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'Actions',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, user: any) => (
+      render: (user: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={user}

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
+import { themeColors } from '@/theme'
 
 interface EligibilityLogListColumnsProps {
   onRetryClick?: (id: string) => void
@@ -34,7 +35,12 @@ export default function EligibilityLogListColumns({
       align: 'left' as const,
       render: (value: any, log: any) => (
         <Link href={`/logs/${log.id || log.uuid}`}>
-          <div className="text-gray-900 font-semibold hover:text-blue-600">
+          <div
+            className="font-semibold"
+            style={{ color: themeColors.text.primary }}
+            onMouseEnter={e => (e.currentTarget.style.color = themeColors.text.link)}
+            onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.primary)}
+          >
             {log.neoReferenceId || log.neo_reference_id || 'N/A'}
           </div>
         </Link>
@@ -51,7 +57,7 @@ export default function EligibilityLogListColumns({
           subscriberValue =
             subscriberValue.name || subscriberValue.member_id || subscriberValue.id || 'N/A'
         }
-        return <div className="text-gray-900 ">{subscriberValue || 'N/A'}</div>
+        return <div style={{ color: themeColors.text.primary }}>{subscriberValue || 'N/A'}</div>
       },
     },
     {
@@ -64,7 +70,7 @@ export default function EligibilityLogListColumns({
         if (providerValue && typeof providerValue === 'object') {
           providerValue = providerValue.name || providerValue.npi || providerValue.id || 'N/A'
         }
-        return <div className="text-gray-900">{providerValue || 'N/A'}</div>
+        return <div style={{ color: themeColors.text.primary }}>{providerValue || 'N/A'}</div>
       },
     },
     {
@@ -73,7 +79,7 @@ export default function EligibilityLogListColumns({
       width: '12%',
       align: 'left' as const,
       render: (value: any, log: any) => (
-        <div className="text-gray-900">{log.serviceDate || log.service_date}</div>
+        <div style={{ color: themeColors.text.primary }}>{log.serviceDate || log.service_date}</div>
       ),
     },
     {
@@ -83,16 +89,26 @@ export default function EligibilityLogListColumns({
       align: 'left' as const,
       render: (value: any, log: any) => {
         const status = log.status || log.queueStatus || log.queue_status || 'N/A'
-        const statusColor =
-          status === 'completed'
-            ? 'bg-green-100 text-green-800'
-            : status === 'rejected'
-              ? 'bg-red-100 text-red-800'
-              : status === 'in_process'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-gray-100 text-gray-800'
+        let bgColor: string
+        let textColor: string
+        if (status === 'completed') {
+          bgColor = themeColors.green[100]
+          textColor = themeColors.green[600]
+        } else if (status === 'rejected') {
+          bgColor = themeColors.red[100]
+          textColor = themeColors.red[700]
+        } else if (status === 'in_process') {
+          bgColor = themeColors.yellow[500] ? '#fef3c7' : '#fef3c7' // yellow-100
+          textColor = themeColors.yellow[500] || '#92400e' // yellow-800
+        } else {
+          bgColor = themeColors.gray[100]
+          textColor = themeColors.gray[800]
+        }
         return (
-          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}>
+          <span
+            className="px-2 py-1 text-xs font-semibold rounded-full"
+            style={{ backgroundColor: bgColor, color: textColor }}
+          >
             {status}
           </span>
         )
@@ -107,8 +123,8 @@ export default function EligibilityLogListColumns({
         const responseMessage = log.response_message || 'N/A'
         return (
           <div
-            className="text-gray-900 truncate cursor-help block"
-            style={{ minWidth: 0 }}
+            className="truncate cursor-help block"
+            style={{ color: themeColors.text.primary, minWidth: 0 }}
             title={responseMessage !== 'N/A' ? responseMessage : undefined}
           >
             {responseMessage}
@@ -122,7 +138,7 @@ export default function EligibilityLogListColumns({
       width: '18%',
       align: 'left' as const,
       render: (value: any, log: any) => (
-        <div className="text-gray-900">{formatDate(log.request_sent_at)}</div>
+        <div style={{ color: themeColors.text.primary }}>{formatDate(log.request_sent_at)}</div>
       ),
     },
     {
@@ -131,7 +147,9 @@ export default function EligibilityLogListColumns({
       width: '18%',
       align: 'left' as const,
       render: (value: any, log: any) => (
-        <div className="text-gray-900">{formatDate(log.response_received_at)}</div>
+        <div style={{ color: themeColors.text.primary }}>
+          {formatDate(log.response_received_at)}
+        </div>
       ),
     },
     {
@@ -140,7 +158,7 @@ export default function EligibilityLogListColumns({
       width: '12%',
       align: 'left' as const,
       render: (value: any, log: any) => (
-        <div className="text-gray-900">{log.response_time.time}</div>
+        <div style={{ color: themeColors.text.primary }}>{log.response_time.time}</div>
       ),
     },
     {

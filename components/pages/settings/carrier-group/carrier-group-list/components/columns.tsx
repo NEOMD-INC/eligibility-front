@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
+import { themeColors } from '@/theme'
 
 interface CarrierGroupListColumnsProps {
   onDeleteClick?: (id: string, carrierGroupName: string) => void
@@ -15,9 +16,14 @@ export default function CarrierGroupListColumns({
       label: 'Description',
       width: '25%',
       align: 'left' as const,
-      render: (value: any, carrierGroup: any) => (
+      render: (carrierGroup: any) => (
         <Link href={`/settings/carrier-group/${carrierGroup.id || carrierGroup.uuid}`}>
-          <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
+          <div
+            className="font-semibold truncate"
+            style={{ color: themeColors.text.primary }}
+            onMouseEnter={e => (e.currentTarget.style.color = themeColors.text.link)}
+            onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.primary)}
+          >
             {carrierGroup.carrier_group_description || carrierGroup.description || 'N/A'}
           </div>
         </Link>
@@ -28,8 +34,8 @@ export default function CarrierGroupListColumns({
       label: 'Code',
       width: '20%',
       align: 'left' as const,
-      render: (value: any, carrierGroup: any) => (
-        <div className="text-gray-900 truncate">
+      render: (carrierGroup: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierGroup.carrier_group_code || carrierGroup.code || 'N/A'}
         </div>
       ),
@@ -39,8 +45,8 @@ export default function CarrierGroupListColumns({
       label: 'Filling Indicator',
       width: '20%',
       align: 'left' as const,
-      render: (value: any, carrierGroup: any) => (
-        <div className="text-gray-900 truncate">
+      render: (carrierGroup: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierGroup.fillingIndicator || carrierGroup.filling_indicator || 'N/A'}
         </div>
       ),
@@ -50,7 +56,7 @@ export default function CarrierGroupListColumns({
       label: 'Status',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, carrierGroup: any) => {
+      render: (carrierGroup: any) => {
         const statusValue =
           typeof carrierGroup.status === 'boolean'
             ? carrierGroup.status
@@ -59,12 +65,13 @@ export default function CarrierGroupListColumns({
               carrierGroup.isActive ||
               carrierGroup.is_active
         const status = statusValue ? 'Active' : 'Inactive'
-        const statusClass =
-          status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        const bgColor = status === 'Active' ? themeColors.green[100] : themeColors.red[100]
+        const textColor = status === 'Active' ? themeColors.green[600] : themeColors.red[700]
         return (
           <div className="flex justify-center">
             <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+              style={{ backgroundColor: bgColor, color: textColor }}
             >
               {status}
             </span>
@@ -77,7 +84,7 @@ export default function CarrierGroupListColumns({
       label: 'Actions',
       width: '20%',
       align: 'center' as const,
-      render: (value: any, carrierGroup: any) => (
+      render: (carrierGroup: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={carrierGroup}

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
+import { themeColors } from '@/theme'
 
 interface AvailityPayerListColumnsProps {
   onDeleteClick?: (id: string, payerName: string) => void
@@ -15,10 +16,15 @@ export default function AvailityPayerListColumns({
       label: 'Payer ID',
       width: '15%',
       align: 'left' as const,
-      render: (value: any, payer: any) => (
+      render: (payer: any) => (
         <Link href={`/settings/availity-payer/${payer.id || payer.uuid}`}>
-          <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
-            {payer.payerId || payer.payer_id || 'N/A'}
+          <div
+            className="font-semibold truncate"
+            style={{ color: themeColors.text.primary }}
+            onMouseEnter={e => (e.currentTarget.style.color = themeColors.text.link)}
+            onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.primary)}
+          >
+            {payer.payer_id || payer.payerId || 'N/A'}
           </div>
         </Link>
       ),
@@ -28,8 +34,10 @@ export default function AvailityPayerListColumns({
       label: 'Payer Name',
       width: '20%',
       align: 'left' as const,
-      render: (value: any, payer: any) => (
-        <div className="text-gray-900 truncate">{payer.payerName || payer.payer_name || 'N/A'}</div>
+      render: (payer: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
+          {payer.payer_name || payer.payerName || 'N/A'}
+        </div>
       ),
     },
     {
@@ -37,8 +45,10 @@ export default function AvailityPayerListColumns({
       label: 'Payer Code',
       width: '15%',
       align: 'left' as const,
-      render: (value: any, payer: any) => (
-        <div className="text-gray-900 truncate">{payer.payerCode || payer.payer_code || 'N/A'}</div>
+      render: (payer: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
+          {payer.payer_code || payer.payerCode || 'N/A'}
+        </div>
       ),
     },
     {
@@ -46,10 +56,15 @@ export default function AvailityPayerListColumns({
       label: 'City, State',
       width: '15%',
       align: 'left' as const,
-      render: (value: any, payer: any) => {
+      render: (payer: any) => {
         const city = payer.city || 'N/A'
         const state = payer.state || 'N/A'
-        return <div className="text-gray-900 truncate">{`${city}, ${state}`}</div>
+        return (
+          <div
+            className="truncate"
+            style={{ color: themeColors.text.primary }}
+          >{`${city}, ${state}`}</div>
+        )
       },
     },
     {
@@ -57,22 +72,25 @@ export default function AvailityPayerListColumns({
       label: 'Status',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, payer: any) => {
-        // Handle status as boolean or string
+      render: (payer: any) => {
         const statusValue =
-          typeof payer.status === 'boolean'
-            ? payer.status
-            : payer.status === 'active' ||
-              payer.status === 'Active' ||
-              payer.isActive ||
-              payer.is_active
+          typeof payer.is_active === 'boolean'
+            ? payer.is_active
+            : typeof payer.status === 'boolean'
+              ? payer.status
+              : payer.is_active === 1 ||
+                payer.is_active === '1' ||
+                payer.status === 'active' ||
+                payer.status === 'Active' ||
+                payer.isActive
         const status = statusValue ? 'Active' : 'Inactive'
-        const statusClass =
-          status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        const bgColor = status === 'Active' ? themeColors.green[100] : themeColors.red[100]
+        const textColor = status === 'Active' ? themeColors.green[600] : themeColors.red[700]
         return (
           <div className="flex justify-center">
             <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+              style={{ backgroundColor: bgColor, color: textColor }}
             >
               {status}
             </span>
@@ -96,10 +114,10 @@ export default function AvailityPayerListColumns({
               onDeleteClick
                 ? (id: string) => {
                     const payerName: string =
-                      payer.payerName ||
                       payer.payer_name ||
-                      payer.payerId ||
+                      payer.payerName ||
                       payer.payer_id ||
+                      payer.payerId ||
                       'payer'
                     onDeleteClick(id, payerName)
                   }

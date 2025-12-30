@@ -26,11 +26,11 @@ export const permissionsService = {
     return api.get(`/permissions/${userId}`)
   },
 
-  createPermission: (userData: {}) => {
+  createPermission: (userData: any) => {
     return api.post('/permissions/store', userData)
   },
 
-  updatePermission: (userId: string, userData: {}) => {
+  updatePermission: (userId: string, userData: any) => {
     return api.put(`/permissions/${userId}/update`, userData)
   },
 

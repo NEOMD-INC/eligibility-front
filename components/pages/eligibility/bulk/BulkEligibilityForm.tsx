@@ -14,6 +14,7 @@ import {
   submitBulkEligibility,
 } from '@/redux/slices/eligibility/bulk/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 
 import {
   formatFileSize,
@@ -91,14 +92,21 @@ export default function BulkEligibilityForm() {
     <PageTransition>
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-white shadow rounded-lg p-6">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-6">Upload Eligibility File</h1>
+          <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text.primary }}>
+            Upload Eligibility File
+          </h1>
 
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select File <span className="text-red-500">*</span>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: themeColors.gray[700] }}
+              >
+                Select File <span style={{ color: themeColors.text.error }}>*</span>
               </label>
-              <p className="text-sm text-gray-500 mb-4">Accepted formats: CSV (Max size: 10MB)</p>
+              <p className="text-sm mb-4" style={{ color: themeColors.text.muted }}>
+                Accepted formats: CSV (Max size: 10MB)
+              </p>
 
               {!uploadedFile ? (
                 <div
@@ -106,13 +114,29 @@ export default function BulkEligibilityForm() {
                   onDragLeave={e => handleDrag(e, setDragActive)}
                   onDragOver={e => handleDrag(e, setDragActive)}
                   onDrop={e => handleDrop(e, setDragActive, formik, setUploadedFile)}
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                    dragActive
-                      ? 'border-blue-500 bg-blue-50'
+                  className="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
+                  style={{
+                    borderColor: dragActive
+                      ? themeColors.blue[500]
                       : formik.touched.file && formik.errors.file
-                        ? 'border-red-300 bg-red-50'
-                        : 'border-gray-300 bg-gray-50 hover:border-gray-400'
-                  }`}
+                        ? themeColors.red[300]
+                        : themeColors.border.default,
+                    backgroundColor: dragActive
+                      ? themeColors.blue[100]
+                      : formik.touched.file && formik.errors.file
+                        ? themeColors.red[100]
+                        : themeColors.gray[50],
+                  }}
+                  onMouseEnter={e => {
+                    if (!dragActive && !(formik.touched.file && formik.errors.file)) {
+                      e.currentTarget.style.borderColor = themeColors.gray[400]
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!dragActive && !(formik.touched.file && formik.errors.file)) {
+                      e.currentTarget.style.borderColor = themeColors.border.default
+                    }
+                  }}
                 >
                   <input
                     type="file"
@@ -125,27 +149,41 @@ export default function BulkEligibilityForm() {
                   />
                   <label htmlFor="file" className="cursor-pointer">
                     <Upload
-                      className={`mx-auto mb-4 ${dragActive ? 'text-blue-500' : 'text-gray-400'}`}
+                      className="mx-auto mb-4"
                       size={48}
+                      style={{ color: dragActive ? themeColors.blue[500] : themeColors.gray[400] }}
                     />
-                    <p className="text-lg font-medium text-gray-700 mb-2">
+                    <p
+                      className="text-lg font-medium mb-2"
+                      style={{ color: themeColors.gray[700] }}
+                    >
                       Drag and drop your file here, or click to browse
                     </p>
-                    <p className="text-sm text-gray-500">CSV files only</p>
+                    <p className="text-sm" style={{ color: themeColors.text.muted }}>
+                      CSV files only
+                    </p>
                   </label>
                 </div>
               ) : (
-                <div className="border-2 border-green-300 bg-green-50 rounded-lg p-4">
+                <div
+                  className="border-2 rounded-lg p-4"
+                  style={{
+                    borderColor: themeColors.green[300],
+                    backgroundColor: themeColors.green[100],
+                  }}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{getFileIcon(uploadedFile.name)}</div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <File className="text-green-600" size={20} />
-                          <span className="font-medium text-gray-900">{uploadedFile.name}</span>
-                          <CheckCircle2 className="text-green-600" size={18} />
+                          <File size={20} style={{ color: themeColors.green[600] }} />
+                          <span className="font-medium" style={{ color: themeColors.text.primary }}>
+                            {uploadedFile.name}
+                          </span>
+                          <CheckCircle2 size={18} style={{ color: themeColors.green[600] }} />
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm mt-1" style={{ color: themeColors.text.muted }}>
                           {formatFileSize(uploadedFile.size)}
                         </p>
                       </div>
@@ -153,7 +191,12 @@ export default function BulkEligibilityForm() {
                     <button
                       type="button"
                       onClick={() => removeFile(formik, setUploadedFile)}
-                      className="p-2 text-red-600 hover:bg-red-100 rounded-md transition"
+                      className="p-2 rounded-md transition"
+                      style={{ color: themeColors.text.error }}
+                      onMouseEnter={e =>
+                        (e.currentTarget.style.backgroundColor = themeColors.red[100])
+                      }
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                       title="Remove file"
                     >
                       <X size={20} />
@@ -163,7 +206,9 @@ export default function BulkEligibilityForm() {
               )}
 
               {formik.touched.file && formik.errors.file && (
-                <p className="mt-2 text-sm text-red-600">{formik.errors.file}</p>
+                <p className="mt-2 text-sm" style={{ color: themeColors.text.error }}>
+                  {formik.errors.file}
+                </p>
               )}
             </div>
 
@@ -174,14 +219,43 @@ export default function BulkEligibilityForm() {
                   formik.resetForm()
                   setUploadedFile(null)
                 }}
-                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
+                className="px-6 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.white)}
+                onFocus={e =>
+                  (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.gray[300]}`)
+                }
+                onBlur={e => (e.currentTarget.style.boxShadow = '')}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!formik.values.file || submitLoading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                className="px-6 py-2 text-white rounded-md focus:outline-none focus:ring-2 disabled:cursor-not-allowed transition"
+                style={{
+                  backgroundColor:
+                    !formik.values.file || submitLoading
+                      ? themeColors.gray[400]
+                      : themeColors.blue[600],
+                }}
+                onMouseEnter={e => {
+                  if (!e.currentTarget.disabled)
+                    e.currentTarget.style.backgroundColor = themeColors.blue[700]
+                }}
+                onMouseLeave={e => {
+                  if (!e.currentTarget.disabled)
+                    e.currentTarget.style.backgroundColor = themeColors.blue[600]
+                }}
+                onFocus={e => {
+                  if (!e.currentTarget.disabled)
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`
+                }}
+                onBlur={e => (e.currentTarget.style.boxShadow = '')}
               >
                 {submitLoading ? 'Uploading...' : 'Upload File'}
               </button>

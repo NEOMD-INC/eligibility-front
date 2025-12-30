@@ -13,6 +13,7 @@ import {
   updateEligibilitySettings,
 } from '@/redux/slices/eligibility/settings/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 import type { ISASettingsFormValues } from '@/types'
 
 export default function ISASettingsForm() {
@@ -191,26 +192,39 @@ export default function ISASettingsForm() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
+      <div
+        className="flex flex-col justify-center p-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-6">Eligibility Settings</h1>
 
           <form onSubmit={formik.handleSubmit}>
             {errorMsg && (
               <div
-                className={`mb-6 p-4 rounded-lg ${
-                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                }`}
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  backgroundColor: isError ? themeColors.red[100] : themeColors.blue[100],
+                  color: isError ? themeColors.red[700] : themeColors.blue[700],
+                }}
               >
                 <span>{errorMsg}</span>
               </div>
             )}
 
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">Subscriber Settings</h2>
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: themeColors.text.secondary }}
+              >
+                Subscriber Settings
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     ID Qualifier
                   </label>
                   <input
@@ -219,28 +233,45 @@ export default function ISASettingsForm() {
                     placeholder="ID Qualifier"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.idQualifier}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.idQualifier && formik.errors.idQualifier
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.idQualifier && formik.errors.idQualifier
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.idQualifier && formik.errors.idQualifier ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.idQualifier && formik.errors.idQualifier && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.idQualifier}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.idQualifier}
+                    </p>
                   )}
                 </div>
               </div>
             </div>
 
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: themeColors.text.secondary }}
+              >
                 ISA Settings (Interchange Control Header)
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Authorization Information Qualifier
                   </label>
                   <input
@@ -249,25 +280,37 @@ export default function ISASettingsForm() {
                     placeholder="Authorization Information Qualifier"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.authorizationInformationQualifier}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.authorizationInformationQualifier &&
-                      formik.errors.authorizationInformationQualifier
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.authorizationInformationQualifier &&
+                        formik.errors.authorizationInformationQualifier
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.authorizationInformationQualifier && formik.errors.authorizationInformationQualifier ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.authorizationInformationQualifier &&
                     formik.errors.authorizationInformationQualifier && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
                         {formik.errors.authorizationInformationQualifier}
                       </p>
                     )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Authorization Information (15 spaces)
                   </label>
                   <input
@@ -276,30 +319,42 @@ export default function ISASettingsForm() {
                     placeholder="Authorization Information"
                     autoComplete="off"
                     onChange={handleAuthInfoChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.authorizationInformation.trim()}
                     maxLength={15}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.authorizationInformation &&
-                      formik.errors.authorizationInformation
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.authorizationInformation &&
+                        formik.errors.authorizationInformation
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.authorizationInformation && formik.errors.authorizationInformation ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.authorizationInformation &&
                     formik.errors.authorizationInformation && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
                         {formik.errors.authorizationInformation}
                       </p>
                     )}
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: themeColors.text.muted }}>
                     {formik.values.authorizationInformation.length}/15 characters (will be padded to
                     15 spaces)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Security Information Qualifier
                   </label>
                   <input
@@ -308,25 +363,37 @@ export default function ISASettingsForm() {
                     placeholder="Security Information Qualifier"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.securityInformationQualifier}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.securityInformationQualifier &&
-                      formik.errors.securityInformationQualifier
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.securityInformationQualifier &&
+                        formik.errors.securityInformationQualifier
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.securityInformationQualifier && formik.errors.securityInformationQualifier ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.securityInformationQualifier &&
                     formik.errors.securityInformationQualifier && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
                         {formik.errors.securityInformationQualifier}
                       </p>
                     )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Security Information (15 spaces)
                   </label>
                   <input
@@ -335,26 +402,40 @@ export default function ISASettingsForm() {
                     placeholder="Security Information"
                     autoComplete="off"
                     onChange={handleSecurityInfoChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.securityInformation}
                     maxLength={15}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.securityInformation && formik.errors.securityInformation
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.securityInformation && formik.errors.securityInformation
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.securityInformation && formik.errors.securityInformation ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.securityInformation && formik.errors.securityInformation && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.securityInformation}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.securityInformation}
+                    </p>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: themeColors.text.muted }}>
                     {formik.values.securityInformation.length}/15 characters (will be padded to 15
                     spaces)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Sender Qualifier
                   </label>
                   <input
@@ -363,21 +444,35 @@ export default function ISASettingsForm() {
                     placeholder="Sender Qualifier"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.senderQualifier}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.senderQualifier && formik.errors.senderQualifier
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.senderQualifier && formik.errors.senderQualifier
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.senderQualifier && formik.errors.senderQualifier ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.senderQualifier && formik.errors.senderQualifier && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.senderQualifier}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.senderQualifier}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Sender ID (max 15 chars)
                   </label>
                   <input
@@ -386,25 +481,39 @@ export default function ISASettingsForm() {
                     placeholder="Sender ID"
                     autoComplete="off"
                     onChange={handleSenderIdChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.senderId}
                     maxLength={15}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.senderId && formik.errors.senderId
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.senderId && formik.errors.senderId
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.senderId && formik.errors.senderId ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.senderId && formik.errors.senderId && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.senderId}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.senderId}
+                    </p>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: themeColors.text.muted }}>
                     {formik.values.senderId.length}/15 characters (will be padded to 15 spaces)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Receiver Qualifier
                   </label>
                   <input
@@ -413,21 +522,35 @@ export default function ISASettingsForm() {
                     placeholder="Receiver Qualifier"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.receiverQualifier}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.receiverQualifier && formik.errors.receiverQualifier
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.receiverQualifier && formik.errors.receiverQualifier
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.receiverQualifier && formik.errors.receiverQualifier ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.receiverQualifier && formik.errors.receiverQualifier && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.receiverQualifier}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.receiverQualifier}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Receiver ID (max 15 chars)
                   </label>
                   <input
@@ -436,25 +559,39 @@ export default function ISASettingsForm() {
                     placeholder="Receiver ID"
                     autoComplete="off"
                     onChange={handleReceiverIdChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.receiverId}
                     maxLength={15}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.receiverId && formik.errors.receiverId
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.receiverId && formik.errors.receiverId
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.receiverId && formik.errors.receiverId ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.receiverId && formik.errors.receiverId && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.receiverId}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.receiverId}
+                    </p>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: themeColors.text.muted }}>
                     {formik.values.receiverId.length}/15 characters (will be padded to 15 spaces)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Repetition Separator
                   </label>
                   <input
@@ -463,22 +600,36 @@ export default function ISASettingsForm() {
                     placeholder="Repetition Separator"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.repetitionSeparator}
                     maxLength={1}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.repetitionSeparator && formik.errors.repetitionSeparator
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.repetitionSeparator && formik.errors.repetitionSeparator
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.repetitionSeparator && formik.errors.repetitionSeparator ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.repetitionSeparator && formik.errors.repetitionSeparator && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.repetitionSeparator}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.repetitionSeparator}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Control Version
                   </label>
                   <input
@@ -487,34 +638,57 @@ export default function ISASettingsForm() {
                     placeholder="Control Version"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.controlVersion}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.controlVersion && formik.errors.controlVersion
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.controlVersion && formik.errors.controlVersion
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.controlVersion && formik.errors.controlVersion ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.controlVersion && formik.errors.controlVersion && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.controlVersion}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.controlVersion}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Acknowledgment Requested
                   </label>
                   <select
                     name="acknowledgmentRequested"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.acknowledgmentRequested}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.acknowledgmentRequested &&
-                      formik.errors.acknowledgmentRequested
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.acknowledgmentRequested &&
+                        formik.errors.acknowledgmentRequested
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.acknowledgmentRequested && formik.errors.acknowledgmentRequested ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   >
                     <option value="">Select Option</option>
                     <option value="0">No Acknowledgment Requested</option>
@@ -522,38 +696,55 @@ export default function ISASettingsForm() {
                   </select>
                   {formik.touched.acknowledgmentRequested &&
                     formik.errors.acknowledgmentRequested && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
                         {formik.errors.acknowledgmentRequested}
                       </p>
                     )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Usage Indicator
                   </label>
                   <select
                     name="usageIndicator"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.usageIndicator}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.usageIndicator && formik.errors.usageIndicator
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.usageIndicator && formik.errors.usageIndicator
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.usageIndicator && formik.errors.usageIndicator ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   >
                     <option value="">Select Usage Indicator</option>
                     <option value="P">Production Data</option>
                     <option value="T">Test Data</option>
                   </select>
                   {formik.touched.usageIndicator && formik.errors.usageIndicator && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.usageIndicator}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.usageIndicator}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Component Element Separator
                   </label>
                   <input
@@ -562,19 +753,28 @@ export default function ISASettingsForm() {
                     placeholder="Component Element Separator"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.componentElementSeparator}
                     maxLength={1}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.componentElementSeparator &&
-                      formik.errors.componentElementSeparator
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.componentElementSeparator &&
+                        formik.errors.componentElementSeparator
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.componentElementSeparator && formik.errors.componentElementSeparator ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.componentElementSeparator &&
                     formik.errors.componentElementSeparator && (
-                      <p className="text-red-600 text-sm mt-1">
+                      <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
                         {formik.errors.componentElementSeparator}
                       </p>
                     )}
@@ -586,14 +786,29 @@ export default function ISASettingsForm() {
               <button
                 type="button"
                 onClick={() => formik.resetForm()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                className="px-6 py-2 border rounded-md transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Reset
               </button>
               <SubmitButton
                 type="submit"
                 title="Save Settings"
-                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                class_name="px-6 py-2 text-white rounded-md transition"
+                style={{ backgroundColor: themeColors.blue[600] }}
+                onMouseEnter={e => {
+                  const btn = e.currentTarget as HTMLButtonElement
+                  if (!btn.disabled) btn.style.backgroundColor = themeColors.blue[700]
+                }}
+                onMouseLeave={e => {
+                  const btn = e.currentTarget as HTMLButtonElement
+                  if (!btn.disabled) btn.style.backgroundColor = themeColors.blue[600]
+                }}
                 btnLoading={updateLoading || loading}
                 callback_event=""
               />

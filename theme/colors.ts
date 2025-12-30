@@ -46,6 +46,24 @@ export const themeColors = {
     700: '#b91c1c',
   },
 
+  // Green colors (success actions)
+  green: {
+    100: '#dcfce7',
+    500: '#22c55e',
+    600: '#16a34a',
+  },
+
+  // Yellow colors (warning)
+  yellow: {
+    500: '#eab308',
+  },
+
+  // Sky colors (info actions)
+  sky: {
+    500: '#0ea5e9',
+    600: '#0284c7',
+  },
+
   // Zinc colors (neutral grays)
   zinc: {
     50: '#fafafa',

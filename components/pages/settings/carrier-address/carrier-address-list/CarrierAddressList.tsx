@@ -66,13 +66,10 @@ export default function CarrierAddressList() {
       <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
-            <h1
-              className="text-2xl font-bold text-gray-900"
-              style={{ color: themeColors.text.primary }}
-            >
+            <h1 className="text-2xl font-bold" style={{ color: themeColors.text.primary }}>
               Carrier Addresses
             </h1>
-            <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
+            <p className="mt-1 text-sm" style={{ color: themeColors.text.muted }}>
               Manage carrier addresses and their details
             </p>
           </div>
@@ -80,7 +77,13 @@ export default function CarrierAddressList() {
             <div className="flex flex-wrap">
               <Link
                 href="/settings/carrier-address/add"
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
+                className="px-4 py-2 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 flex items-center gap-2"
+                style={{ backgroundColor: themeColors.blue[600] }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
+                onFocus={e =>
+                  (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`)
+                }
               >
                 <Plus size={16} />
                 Add New Carrier Address
@@ -91,7 +94,14 @@ export default function CarrierAddressList() {
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
           {error && (
-            <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
+            <div
+              className="px-6 py-4 border-b"
+              style={{
+                backgroundColor: themeColors.red[100],
+                color: themeColors.red[700],
+                borderColor: themeColors.red[400],
+              }}
+            >
               <p className="text-sm font-medium">{error}</p>
             </div>
           )}
@@ -107,7 +117,7 @@ export default function CarrierAddressList() {
             clientSidePagination={false}
             noDataMessage={
               <div className="text-center py-8">
-                <p className="text-gray-500">No carrier addresses found</p>
+                <p style={{ color: themeColors.text.muted }}>No carrier addresses found</p>
               </div>
             }
             className="shadow-none rounded-none"

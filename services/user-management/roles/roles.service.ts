@@ -26,11 +26,11 @@ export const rolesService = {
     return api.get(`/roles/${userId}`)
   },
 
-  createRole: (userData: {}) => {
+  createRole: (userData: any) => {
     return api.post('/roles/store', userData)
   },
 
-  updateRole: (userId: string, userData: {}) => {
+  updateRole: (userId: string, userData: any) => {
     return api.put(`/roles/${userId}/update`, userData)
   },
 

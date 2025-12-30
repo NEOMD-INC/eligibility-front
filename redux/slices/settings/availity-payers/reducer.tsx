@@ -87,7 +87,7 @@ export const fetchAvailityPayerById = createAsyncThunk(
 // Async thunk to create availity payer
 export const createAvailityPayer = createAsyncThunk(
   'availityPayers/createAvailityPayer',
-  async (payerData: {}, { rejectWithValue }) => {
+  async (payerData: any, { rejectWithValue }) => {
     try {
       const apiData = mapFormToApi(payerData)
       const response = await AvailityPayerService.createAvailityPayer(apiData)
@@ -101,7 +101,7 @@ export const createAvailityPayer = createAsyncThunk(
 // Async thunk to update availity payer
 export const updateAvailityPayer = createAsyncThunk(
   'availityPayers/updateAvailityPayer',
-  async (params: { payerId: string; payerData: {} }, { rejectWithValue }) => {
+  async (params: { payerId: string; payerData: any }, { rejectWithValue }) => {
     try {
       const apiData = mapFormToApi(params.payerData)
       const response = await AvailityPayerService.updateAvailityPayer(params.payerId, apiData)

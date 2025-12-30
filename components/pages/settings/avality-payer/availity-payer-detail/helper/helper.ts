@@ -47,7 +47,11 @@ export const getPayerDetails = (currentAvailityPayer: any) => {
     },
     {
       title: 'Zip Code',
-      value: currentAvailityPayer.zip || currentAvailityPayer.zipCode || 'N/A',
+      value:
+        currentAvailityPayer.zip ||
+        currentAvailityPayer.zip_code ||
+        currentAvailityPayer.zipCode ||
+        'N/A',
     },
     {
       title: 'Phone',

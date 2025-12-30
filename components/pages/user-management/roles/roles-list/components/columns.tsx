@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
+import { themeColors } from '@/theme'
 
 interface RolesListColumnsProps {
   onDeleteClick?: (id: string, userName: string) => void
@@ -13,7 +14,7 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       label: 'Role Name',
       width: '20%',
       align: 'left' as const,
-      render: (value: any, role: any) => {
+      render: (role: any) => {
         const roleName = role.name || role.role_name || 'N/A'
         const roleId = role.id || role.uuid
 
@@ -21,11 +22,18 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
           <Link href={`/user-management/roles/role-detail/${roleId}`} className="block">
             <div className="flex items-center">
               <div className="flex flex-col justify-start min-w-0">
-                <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
+                <div
+                  className="font-semibold truncate"
+                  style={{ color: themeColors.text.primary }}
+                  onMouseEnter={e => (e.currentTarget.style.color = themeColors.text.link)}
+                  onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.primary)}
+                >
                   {roleName}
                 </div>
                 {role.guard_name && (
-                  <span className="text-gray-500 text-sm truncate">{role.guard_name}</span>
+                  <span className="text-sm truncate" style={{ color: themeColors.text.muted }}>
+                    {role.guard_name}
+                  </span>
                 )}
               </div>
             </div>
@@ -38,11 +46,14 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       label: 'Users',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, role: any) => {
+      render: (role: any) => {
         const userCount = role.user_count || role.users_count || 0
         return (
           <div className="flex justify-center">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+            <span
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+              style={{ backgroundColor: themeColors.green[100], color: themeColors.green[600] }}
+            >
               {userCount} {userCount === 1 ? 'user' : 'users'}
             </span>
           </div>
@@ -54,9 +65,8 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       label: 'Permissions',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, role: any) => {
+      render: (role: any) => {
         const permissions = role.permissions || role.permission_names || []
-        // Handle both array of strings and array of objects
         const permissionList = Array.isArray(permissions)
           ? permissions.map((perm: any) =>
               typeof perm === 'string' ? perm : perm.name || perm.permission_name || perm
@@ -70,16 +80,24 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
                 permissionList.slice(0, 2).map((perm: string, index: number) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                    style={{
+                      backgroundColor: themeColors.green[100],
+                      color: themeColors.green[600],
+                    }}
                   >
                     {perm}
                   </span>
                 ))
               ) : (
-                <span className="text-gray-500 text-sm">No permissions</span>
+                <span className="text-sm" style={{ color: themeColors.text.muted }}>
+                  No permissions
+                </span>
               )}
               {permissionList.length > 2 && (
-                <span className="text-gray-500 text-xs">+{permissionList.length - 2} more</span>
+                <span className="text-xs" style={{ color: themeColors.text.muted }}>
+                  +{permissionList.length - 2} more
+                </span>
               )}
             </div>
           </div>
@@ -91,7 +109,7 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       label: 'Actions',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, role: any) => (
+      render: (role: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={role}

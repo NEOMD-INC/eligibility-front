@@ -1,3 +1,1 @@
-import AvailityPayerList from './availity-payer-list/AvailityPayerList'
-
-export default AvailityPayerList
+export { default } from './availity-payer-list/AvailityPayerList'

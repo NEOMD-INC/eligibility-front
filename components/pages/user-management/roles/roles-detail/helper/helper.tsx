@@ -14,7 +14,7 @@ export const getnormalizedUsers = (usersWithRole: any[]) =>
   })
 
 export const getRoleInfo = (currentRole: any, normalizedUsers: any[]) => [
-  { title: 'System Name', value: currentRole?.system_name || 'N/A' },
+  { title: 'System Name', value: currentRole?.guard_name || 'N/A' },
   { title: 'Role Name', value: currentRole?.name || 'N/A' },
   { title: 'Users with Role', value: normalizedUsers.length || currentRole?.users_count || 0 },
   { title: 'Permissions', value: currentRole?.permissions?.length || 'No role Permission' },

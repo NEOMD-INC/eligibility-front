@@ -3,21 +3,22 @@ import api from '@/lib/api/axios'
 export const AvailityPayerService = {
   getAllAvailityPayer: (page?: number) => {
     const params = new URLSearchParams({
-      page: String(page),
+      page: String(page || 1),
+      per_page: '8',
     })
 
-    return api.get(`/availity-payers?${page ? params.toString() : ''}`)
+    return api.get(`/availity-payers?${params.toString()}`)
   },
 
   getAvailityPayerById: (userId: string) => {
     return api.get(`/availity-payers/${userId}`)
   },
 
-  createAvailityPayer: (userData: {}) => {
+  createAvailityPayer: (userData: any) => {
     return api.post('/availity-payers/store', userData)
   },
 
-  updateAvailityPayer: (userId: string, userData: {}) => {
+  updateAvailityPayer: (userId: string, userData: any) => {
     return api.put(`/availity-payers/${userId}/update`, userData)
   },
 

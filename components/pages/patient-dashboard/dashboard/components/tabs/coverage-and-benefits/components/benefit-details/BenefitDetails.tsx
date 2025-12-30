@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react'
 
+import { themeColors } from '@/theme'
+
 import InfoCard from '../../../../../../../../ui/cards/InfoCard/InfoCard'
 import ProgressCard from '../../../../../../../../ui/cards/ProgressCard/ProgressCard'
 import LimitationsCard from './components/LimitationsCard'
@@ -186,8 +188,8 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
 
   if (!benefit) {
     return (
-      <section className="flex-1 p-6 bg-gray-50">
-        <p className="text-gray-500">No coverage information available</p>
+      <section className="flex-1 p-6" style={{ backgroundColor: themeColors.gray[50] }}>
+        <p style={{ color: themeColors.text.muted }}>No coverage information available</p>
       </section>
     )
   }
@@ -197,47 +199,80 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
 
     const statusLower = status.toLowerCase()
     const isActive = statusLower === 'active'
-    const bgColor = isActive ? 'bg-green-100' : 'bg-red-100'
-    const textColor = isActive ? 'text-green-700' : 'text-red-700'
+    const bgColor = isActive ? themeColors.green[100] : themeColors.red[100]
+    const textColor = isActive ? themeColors.green[700] : themeColors.red[700]
 
     return (
-      <span className={`ml-3 px-2 py-1 rounded text-sm font-medium ${bgColor} ${textColor}`}>
+      <span
+        className="ml-3 px-2.5 py-0.5 rounded-full text-sm font-medium"
+        style={{ backgroundColor: bgColor, color: textColor }}
+      >
         {status}
       </span>
     )
   }
 
   return (
-    <section className="flex-1 p-6 bg-gray-50">
+    <section className="flex-1 p-6" style={{ backgroundColor: themeColors.gray[50] }}>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 flex items-center">
+        <h1
+          className="text-2xl font-semibold flex items-center"
+          style={{ color: themeColors.text.primary }}
+        >
           {benefit.benefit_type} - {benefit.coverage_level}
           {getCoverageStatusBadge(benefit.coverage_status)}
         </h1>
 
-        <div className="flex border-b border-gray-300">
+        <div className="flex border-b" style={{ borderColor: themeColors.border.default }}>
           <button
             onClick={() => setNetworkType('In Network')}
-            className={`px-4 py-2 text-sm font-medium relative transition-colors ${
-              networkType === 'In Network' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'
-            }`}
+            className="px-4 py-2 text-sm font-medium relative transition-colors"
+            style={{
+              color: networkType === 'In Network' ? themeColors.blue[600] : themeColors.gray[600],
+            }}
+            onMouseEnter={e => {
+              if (networkType !== 'In Network') {
+                e.currentTarget.style.color = themeColors.text.primary
+              }
+            }}
+            onMouseLeave={e => {
+              if (networkType !== 'In Network') {
+                e.currentTarget.style.color = themeColors.gray[600]
+              }
+            }}
           >
             In Network
             {networkType === 'In Network' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+              <div
+                className="absolute bottom-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: themeColors.blue[600] }}
+              ></div>
             )}
           </button>
           <button
             onClick={() => setNetworkType('Out of Network')}
-            className={`px-4 py-2 text-sm font-medium relative transition-colors ${
-              networkType === 'Out of Network'
-                ? 'text-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
+            className="px-4 py-2 text-sm font-medium relative transition-colors"
+            style={{
+              color:
+                networkType === 'Out of Network' ? themeColors.blue[600] : themeColors.gray[600],
+            }}
+            onMouseEnter={e => {
+              if (networkType !== 'Out of Network') {
+                e.currentTarget.style.color = themeColors.text.primary
+              }
+            }}
+            onMouseLeave={e => {
+              if (networkType !== 'Out of Network') {
+                e.currentTarget.style.color = themeColors.gray[600]
+              }
+            }}
           >
             Out of Network
             {networkType === 'Out of Network' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+              <div
+                className="absolute bottom-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: themeColors.blue[600] }}
+              ></div>
             )}
           </button>
         </div>
@@ -274,9 +309,7 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
             additionalInfo={coinsuranceData.additionalInfo}
           />
         )}
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {benefit.out_of_pocket !== null && benefit.out_of_pocket !== undefined && (
           <ProgressCard
             key={`outofpocket-${benefit.service_type_code}-${benefit.coverage_level_code}`}
@@ -289,13 +322,7 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
           />
         )}
 
-        <div
-          className={
-            benefit.out_of_pocket !== null && benefit.out_of_pocket !== undefined
-              ? 'md:col-span-2'
-              : 'md:col-span-3'
-          }
-        >
+        <div className="md:col-span-2">
           <LimitationsCard
             key={`limitations-${benefit.service_type_code}-${benefit.coverage_level_code}`}
             {...limitationsData}

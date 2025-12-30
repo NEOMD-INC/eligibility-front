@@ -78,7 +78,7 @@ export const fetchEligibilitySettings = createAsyncThunk(
 // Async thunk to update eligibility settings
 export const updateEligibilitySettings = createAsyncThunk(
   'eligibilitySettings/updateEligibilitySettings',
-  async (settingsData: {}, { rejectWithValue }) => {
+  async (settingsData: any, { rejectWithValue }) => {
     try {
       // Convert form data to API format
       const apiData = mapFormToApi(settingsData)

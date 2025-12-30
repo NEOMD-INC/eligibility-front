@@ -17,6 +17,7 @@ import {
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { rolesService } from '@/services/user-management/roles/roles.service'
+import { themeColors } from '@/theme'
 
 import { UserFormValues } from './types/types'
 
@@ -64,7 +65,6 @@ export default function AddUpdateUser() {
     fetchRoles()
   }, [])
 
-  // Fetch user data in edit mode
   useEffect(() => {
     if (isEditMode && userId) {
       dispatch(clearUsersError())
@@ -78,7 +78,6 @@ export default function AddUpdateUser() {
     }
   }, [dispatch, isEditMode, userId])
 
-  // Extract current roles when user data is loaded
   useEffect(() => {
     if (isEditMode && currentUser) {
       if (currentUser.roles && Array.isArray(currentUser.roles) && currentUser.roles.length > 0) {
@@ -100,7 +99,6 @@ export default function AddUpdateUser() {
     }
   }, [currentUser, isEditMode])
 
-  // Unified validation schema
   const validationSchema = Yup.object({
     fullName: Yup.string().required('Full name is required'),
     email: Yup.string().email('Invalid email address').required('Email is required'),
@@ -141,7 +139,6 @@ export default function AddUpdateUser() {
         }),
   })
 
-  // Unified Formik instance
   const formik = useFormik<UserFormValues>({
     initialValues: {
       fullName: isEditMode && currentUser ? currentUser.name || currentUser.full_name || '' : '',
@@ -164,12 +161,10 @@ export default function AddUpdateUser() {
 
         if (isEditMode) {
           if (!userId) return
-          // Only include password if provided
           if (values.newPassword && values.newPassword.trim().length > 0) {
             userData.password = values.newPassword.trim()
             userData.password_confirmation = values.confirmNewPassword?.trim() || ''
           }
-          // Preserve existing roles
           if (
             currentUser?.roles &&
             Array.isArray(currentUser.roles) &&
@@ -185,10 +180,8 @@ export default function AddUpdateUser() {
             router.push('/user-management/users')
           }
         } else {
-          // Add mode - password is required
           userData.password = values.password
           userData.password_confirmation = values.confirmPassword
-          // Add role if selected
           if (values.role) {
             const selectedRole = availableRoles.find(
               role => String(role.id) === String(values.role) || role.name === values.role
@@ -204,12 +197,10 @@ export default function AddUpdateUser() {
         }
       } catch (err: any) {
         console.log(err)
-        // Error is handled by Redux state
       }
     },
   })
 
-  // Ensure password fields stay empty in edit mode
   useEffect(() => {
     if (isEditMode) {
       formik.setFieldValue('newPassword', '', false)
@@ -217,7 +208,6 @@ export default function AddUpdateUser() {
     }
   }, [isEditMode, currentUser])
 
-  // Render field component to reduce duplication
   const renderField = (
     name: keyof UserFormValues,
     label: string,
@@ -232,8 +222,16 @@ export default function AddUpdateUser() {
 
     return (
       <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-800 mb-1">
-          {label} {extraLabel && <span className="text-gray-500 text-xs">{extraLabel}</span>}
+        <label
+          className="block text-sm font-semibold mb-1"
+          style={{ color: themeColors.text.secondary }}
+        >
+          {label}{' '}
+          {extraLabel && (
+            <span className="text-xs" style={{ color: themeColors.text.muted }}>
+              {extraLabel}
+            </span>
+          )}
         </label>
         <input
           type={type}
@@ -241,13 +239,25 @@ export default function AddUpdateUser() {
           placeholder={placeholder || label}
           autoComplete={type === 'password' ? 'new-password' : 'off'}
           onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
           value={value || ''}
-          className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-            hasError ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
-          }`}
+          className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+          style={{
+            color: themeColors.text.primary,
+            borderColor: hasError ? themeColors.border.error : themeColors.border.default,
+          }}
+          onFocus={e => {
+            e.currentTarget.style.boxShadow = `0 0 0 2px ${hasError ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+          }}
+          onBlur={e => {
+            e.currentTarget.style.boxShadow = ''
+            formik.handleBlur(e)
+          }}
         />
-        {hasError && <p className="text-red-600 text-sm mt-1">{error}</p>}
+        {hasError && (
+          <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+            {error}
+          </p>
+        )}
       </div>
     )
   }
@@ -258,13 +268,19 @@ export default function AddUpdateUser() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
+      <div
+        className="flex flex-col justify-center p-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-6">{isEditMode ? 'Edit User' : 'Add User'}</h1>
 
           <form onSubmit={formik.handleSubmit}>
             {error && (
-              <div className="mb-6 p-4 rounded-lg bg-red-100 text-red-700">
+              <div
+                className="mb-6 p-4 rounded-lg"
+                style={{ backgroundColor: themeColors.red[100], color: themeColors.red[700] }}
+              >
                 <span>{error}</span>
               </div>
             )}
@@ -297,8 +313,14 @@ export default function AddUpdateUser() {
             )}
 
             {isEditMode ? (
-              <div className="mb-6 pt-4 border-t border-gray-200">
-                <label className="block text-sm font-semibold text-gray-800 mb-3">
+              <div
+                className="mb-6 pt-4 border-t"
+                style={{ borderColor: themeColors.border.default }}
+              >
+                <label
+                  className="block text-sm font-semibold mb-3"
+                  style={{ color: themeColors.text.secondary }}
+                >
                   Current Roles
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -306,23 +328,36 @@ export default function AddUpdateUser() {
                     currentRoles.map((role, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                        style={{
+                          backgroundColor: themeColors.green[100],
+                          color: themeColors.green[600],
+                        }}
                       >
                         {role}
                       </span>
                     ))
                   ) : (
-                    <span className="text-gray-500 text-sm">No roles assigned</span>
+                    <span className="text-sm" style={{ color: themeColors.text.muted }}>
+                      No roles assigned
+                    </span>
                   )}
                 </div>
               </div>
             ) : (
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-800 mb-3">Role</label>
+                <label
+                  className="block text-sm font-semibold mb-3"
+                  style={{ color: themeColors.text.secondary }}
+                >
+                  Role
+                </label>
                 {rolesLoading ? (
                   <ComponentLoader message="Loading roles..." size="sm" variant="inline" />
                 ) : availableRoles.length === 0 ? (
-                  <div className="text-red-500 text-sm">No roles available</div>
+                  <div className="text-sm" style={{ color: themeColors.red[500] }}>
+                    No roles available
+                  </div>
                 ) : (
                   <div className="space-y-2">
                     {availableRoles.map(role => (
@@ -333,13 +368,24 @@ export default function AddUpdateUser() {
                           name="role"
                           value={role.id}
                           onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
                           checked={String(formik.values.role) === String(role.id)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                          className="w-4 h-4 border focus:ring-2"
+                          style={{
+                            color: themeColors.blue[600],
+                            borderColor: themeColors.border.default,
+                          }}
+                          onFocus={e => {
+                            e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`
+                          }}
+                          onBlur={e => {
+                            e.currentTarget.style.boxShadow = ''
+                            formik.handleBlur(e)
+                          }}
                         />
                         <label
                           htmlFor={`role-${role.id}`}
-                          className="ml-2 text-sm font-medium text-gray-700 capitalize cursor-pointer"
+                          className="ml-2 text-sm font-medium capitalize cursor-pointer"
+                          style={{ color: themeColors.gray[700] }}
                         >
                           {role.name || role.title || `Role ${role.id}`}
                         </label>
@@ -348,7 +394,9 @@ export default function AddUpdateUser() {
                   </div>
                 )}
                 {formik.touched.role && formik.errors.role && (
-                  <p className="text-red-600 text-sm mt-1">{formik.errors.role}</p>
+                  <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                    {formik.errors.role}
+                  </p>
                 )}
               </div>
             )}
@@ -357,7 +405,13 @@ export default function AddUpdateUser() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                className="px-6 py-2 border rounded-md transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Cancel
               </button>

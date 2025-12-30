@@ -3,11 +3,11 @@ import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
-
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import { setUser } from '@/redux/slices/current-user/userSlice'
 import { clearProfileError, updateUserProfile } from '@/redux/slices/user-profile/reducer'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 
 export default function ProfileInfoForm() {
   const dispatch = useDispatch<AppDispatch>()
@@ -54,61 +54,95 @@ export default function ProfileInfoForm() {
     <div>
       <form className="w-full" onSubmit={formik.handleSubmit}>
         {updateProfileError && (
-          <div className="mb-4 p-4 rounded-lg bg-red-100 text-red-700">
+          <div
+            className="mb-4 p-4 rounded-lg"
+            style={{ backgroundColor: themeColors.red[100], color: themeColors.red[700] }}
+          >
             <span>{updateProfileError}</span>
           </div>
         )}
 
         {showSuccess && !updateProfileError && (
-          <div className="mb-4 p-4 rounded-lg bg-green-100 text-green-700">
+          <div
+            className="mb-4 p-4 rounded-lg"
+            style={{ backgroundColor: themeColors.green[100], color: themeColors.green[600] }}
+          >
             <span>Profile updated successfully!</span>
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-semibold text-gray-800 mb-1">Name</label>
+            <label
+              className="block text-sm font-semibold mb-1"
+              style={{ color: themeColors.text.secondary }}
+            >
+              Name
+            </label>
             <input
               type="text"
               name="name"
               placeholder="Name"
               autoComplete="off"
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
               value={formik.values.name}
-              className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 
-                            focus:outline-none focus:ring-2
-                            ${
-                              formik.touched.name && formik.errors.name
-                                ? 'border-red-500 focus:ring-red-400'
-                                : 'border-gray-300 focus:ring-blue-400'
-                            }`}
+              className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+              style={{
+                color: themeColors.text.primary,
+                borderColor:
+                  formik.touched.name && formik.errors.name
+                    ? themeColors.border.error
+                    : themeColors.border.default,
+              }}
+              onFocus={e => {
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.name && formik.errors.name ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+              }}
+              onBlur={e => {
+                e.currentTarget.style.boxShadow = ''
+                formik.handleBlur(e)
+              }}
             />
             {formik.touched.name && formik.errors.name && (
-              <p className="text-red-600 text-sm mt-1">{formik.errors.name}</p>
+              <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                {formik.errors.name as any}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-800 mb-1">Email</label>
+            <label
+              className="block text-sm font-semibold mb-1"
+              style={{ color: themeColors.text.secondary }}
+            >
+              Email
+            </label>
             <input
               type="email"
               name="email"
               placeholder="Email"
               autoComplete="off"
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
               value={formik.values.email}
-              className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 
-                            focus:outline-none focus:ring-2
-                            ${
-                              formik.touched.email && formik.errors.email
-                                ? 'border-red-500 focus:ring-red-400'
-                                : 'border-gray-300 focus:ring-blue-400'
-                            }`}
+              className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+              style={{
+                color: themeColors.text.primary,
+                borderColor:
+                  formik.touched.email && formik.errors.email
+                    ? themeColors.border.error
+                    : themeColors.border.default,
+              }}
+              onFocus={e => {
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.email && formik.errors.email ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+              }}
+              onBlur={e => {
+                e.currentTarget.style.boxShadow = ''
+                formik.handleBlur(e)
+              }}
             />
             {formik.touched.email && formik.errors.email && (
-              <p className="text-red-600 text-sm mt-1">{formik.errors.email}</p>
+              <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                {formik.errors.email as any}
+              </p>
             )}
           </div>
         </div>
@@ -116,7 +150,16 @@ export default function ProfileInfoForm() {
         <div className="w-30 mt-6">
           <SubmitButton
             type="submit"
-            class_name="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition"
+            class_name="w-full text-white py-3 rounded-md transition"
+            style={{ backgroundColor: themeColors.blue[600] }}
+            onMouseEnter={e => {
+              const btn = e.currentTarget as HTMLButtonElement
+              if (!btn.disabled) btn.style.backgroundColor = themeColors.blue[700]
+            }}
+            onMouseLeave={e => {
+              const btn = e.currentTarget as HTMLButtonElement
+              if (!btn.disabled) btn.style.backgroundColor = themeColors.blue[600]
+            }}
             title="Save"
             callback_event=""
             btnLoading={updateProfileLoading}

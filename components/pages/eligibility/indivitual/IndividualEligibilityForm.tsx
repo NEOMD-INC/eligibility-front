@@ -25,6 +25,7 @@ import { fetchLogById } from '@/redux/slices/logs/eligibility-logs/actions'
 import { fetchAllAvailityPayers } from '@/redux/slices/settings/availity-payers/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { EligibilityIndivitualService } from '@/services/eligibility/indivitual/indivitual.service'
+import { themeColors } from '@/theme'
 import { getGenderOptions } from '@/utils/constants/gender-options'
 import { PLACE_OF_SERVICE_CODES } from '@/utils/constants/place-of-service'
 import { RELATIONSHIP_CODES } from '@/utils/constants/relationship-codes'
@@ -424,7 +425,10 @@ export default function IndividualEligibilityForm() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
+      <div
+        className="flex flex-col justify-center p-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-6">
             {logId ? 'Edit Eligibility Check' : 'Individual Eligibility Check'}
@@ -433,19 +437,29 @@ export default function IndividualEligibilityForm() {
           <form onSubmit={formik.handleSubmit}>
             {errorMsg && (
               <div
-                className={`mb-6 p-4 rounded-lg ${
-                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                }`}
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  backgroundColor: isError ? themeColors.red[100] : themeColors.blue[100],
+                  color: isError ? themeColors.red[700] : themeColors.blue[700],
+                }}
               >
                 <span>{errorMsg}</span>
               </div>
             )}
 
             <div className="mb-8 pb-6 border-b">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">Payer</h2>
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: themeColors.text.secondary }}
+              >
+                Payer
+              </h2>
               <div className="mb-6 max-w-md">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">
-                  Payer ID <span className="text-red-500">*</span>
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.text.secondary }}
+                >
+                  Payer ID <span style={{ color: themeColors.red[500] }}>*</span>
                 </label>
                 <SearchableSelectPayer
                   name="payerId"
@@ -458,26 +472,38 @@ export default function IndividualEligibilityForm() {
                   loading={payersLoading}
                 />
                 {formik.touched.payerId && formik.errors.payerId && (
-                  <p className="text-red-600 text-sm mt-1">{formik.errors.payerId}</p>
+                  <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                    {formik.errors.payerId}
+                  </p>
                 )}
               </div>
             </div>
 
             <div className="mb-8 pb-6 border-b">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">Practice</h2>
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: themeColors.text.secondary }}
+              >
+                Practice
+              </h2>
               {reuseErrorMsg && (
                 <div
-                  className={`mb-4 p-4 rounded-lg ${
-                    reuseError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                  }`}
+                  className="mb-4 p-4 rounded-lg"
+                  style={{
+                    backgroundColor: reuseError ? themeColors.red[100] : themeColors.blue[100],
+                    color: reuseError ? themeColors.red[700] : themeColors.blue[700],
+                  }}
                 >
                   <span>{reuseErrorMsg}</span>
                 </div>
               )}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    NPI <span className="text-red-500">*</span>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    NPI <span style={{ color: themeColors.red[500] }}>*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -489,19 +515,40 @@ export default function IndividualEligibilityForm() {
                         const value = e.target.value.replace(/\D/g, '')
                         formik.setFieldValue('npi', value)
                       }}
-                      onBlur={formik.handleBlur}
                       value={formik.values.npi}
-                      className={`w-full px-4 py-2 pr-24 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                        formik.touched.npi && formik.errors.npi
-                          ? 'border-red-500 focus:ring-red-400'
-                          : 'border-gray-300 focus:ring-blue-400'
-                      }`}
+                      className="w-full px-4 py-2 pr-24 rounded-md border bg-white focus:outline-none focus:ring-2"
+                      style={{
+                        color: themeColors.text.primary,
+                        borderColor:
+                          formik.touched.npi && formik.errors.npi
+                            ? themeColors.border.error
+                            : themeColors.border.default,
+                      }}
+                      onFocus={e => {
+                        e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.npi && formik.errors.npi ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                      }}
+                      onBlur={e => {
+                        e.currentTarget.style.boxShadow = ''
+                        formik.handleBlur(e)
+                      }}
                     />
                     <button
                       type="button"
                       onClick={handleVerifyNpi}
                       disabled={verifyingNpi || !formik.values.npi}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-medium text-white rounded-md transition focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ backgroundColor: themeColors.blue[600] }}
+                      onMouseEnter={e =>
+                        !e.currentTarget.disabled &&
+                        (e.currentTarget.style.backgroundColor = themeColors.blue[700])
+                      }
+                      onMouseLeave={e =>
+                        !e.currentTarget.disabled &&
+                        (e.currentTarget.style.backgroundColor = themeColors.blue[600])
+                      }
+                      onFocus={e =>
+                        (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`)
+                      }
                       title="Verify NPI"
                     >
                       {verifyingNpi ? (
@@ -512,13 +559,18 @@ export default function IndividualEligibilityForm() {
                     </button>
                   </div>
                   {formik.touched.npi && formik.errors.npi && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.npi}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.npi}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Practice Last Name <span className="text-red-500">*</span>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    Practice Last Name <span style={{ color: themeColors.red[500] }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -526,21 +578,35 @@ export default function IndividualEligibilityForm() {
                     placeholder="Practice Last Name"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.practiceLastName}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.practiceLastName && formik.errors.practiceLastName
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.practiceLastName && formik.errors.practiceLastName
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.practiceLastName && formik.errors.practiceLastName ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.practiceLastName && formik.errors.practiceLastName && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.practiceLastName}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.practiceLastName}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Practice First Name
                   </label>
                   <input
@@ -549,16 +615,27 @@ export default function IndividualEligibilityForm() {
                     placeholder="Practice First Name"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.practiceFirstName}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.practiceFirstName && formik.errors.practiceFirstName
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.practiceFirstName && formik.errors.practiceFirstName
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.practiceFirstName && formik.errors.practiceFirstName ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.practiceFirstName && formik.errors.practiceFirstName && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.practiceFirstName}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.practiceFirstName}
+                    </p>
                   )}
                 </div>
 
@@ -566,7 +643,17 @@ export default function IndividualEligibilityForm() {
                   <button
                     type="button"
                     onClick={handleResetPractice}
-                    className="flex items-center justify-center px-3 py-[12px] bg-red-600 text-white rounded-md hover:bg-red-700 transition focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="flex items-center justify-center px-3 py-[12px] text-white rounded-md transition focus:outline-none focus:ring-2"
+                    style={{ backgroundColor: themeColors.red[600] }}
+                    onMouseEnter={e =>
+                      (e.currentTarget.style.backgroundColor = themeColors.red[700])
+                    }
+                    onMouseLeave={e =>
+                      (e.currentTarget.style.backgroundColor = themeColors.red[600])
+                    }
+                    onFocus={e =>
+                      (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.red[400]}`)
+                    }
                     title="Reset Practice Fields"
                   >
                     <RotateCw size={16} />
@@ -575,7 +662,20 @@ export default function IndividualEligibilityForm() {
                     type="button"
                     onClick={handleReuse}
                     disabled={updateLoading}
-                    className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 text-white rounded-md transition focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: themeColors.gray[600] }}
+                    onMouseEnter={e =>
+                      !e.currentTarget.disabled &&
+                      (e.currentTarget.style.backgroundColor = themeColors.gray[700])
+                    }
+                    onMouseLeave={e =>
+                      !e.currentTarget.disabled &&
+                      (e.currentTarget.style.backgroundColor = themeColors.gray[600])
+                    }
+                    onFocus={e =>
+                      !e.currentTarget.disabled &&
+                      (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.gray[400]}`)
+                    }
                   >
                     {updateLoading ? (
                       <>
@@ -595,11 +695,19 @@ export default function IndividualEligibilityForm() {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">Subscriber</h2>
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: themeColors.text.secondary }}
+              >
+                Subscriber
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Subscriber ID <span className="text-red-500">*</span>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    Subscriber ID <span style={{ color: themeColors.red[500] }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -607,22 +715,36 @@ export default function IndividualEligibilityForm() {
                     placeholder="Subscriber ID"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.subscriberId}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.subscriberId && formik.errors.subscriberId
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.subscriberId && formik.errors.subscriberId
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.subscriberId && formik.errors.subscriberId ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.subscriberId && formik.errors.subscriberId && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.subscriberId}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.subscriberId}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Last Name <span className="text-red-500">*</span>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    Last Name <span style={{ color: themeColors.red[500] }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -630,22 +752,36 @@ export default function IndividualEligibilityForm() {
                     placeholder="Last Name"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.lastName}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.lastName && formik.errors.lastName
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.lastName && formik.errors.lastName
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.lastName && formik.errors.lastName ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.lastName && formik.errors.lastName && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.lastName}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.lastName}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    First Name <span className="text-red-500">*</span>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    First Name <span style={{ color: themeColors.red[500] }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -653,43 +789,73 @@ export default function IndividualEligibilityForm() {
                     placeholder="First Name"
                     autoComplete="off"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.firstName}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.firstName && formik.errors.firstName
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.firstName && formik.errors.firstName
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.firstName && formik.errors.firstName ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.firstName && formik.errors.firstName && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.firstName}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.firstName}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Date of Birth (DOB) <span className="text-red-500">*</span>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    Date of Birth (DOB) <span style={{ color: themeColors.red[500] }}>*</span>
                   </label>
                   <input
                     type="date"
                     name="dob"
                     max={getDOBMaxDate()}
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.dob}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.dob && formik.errors.dob
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.dob && formik.errors.dob
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.dob && formik.errors.dob ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.dob && formik.errors.dob && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.dob}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.dob}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">Gender</label>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    Gender
+                  </label>
                   <SearchableSelect
                     name="gender"
                     value={formik.values.gender}
@@ -701,12 +867,17 @@ export default function IndividualEligibilityForm() {
                     maxVisibleItems={10}
                   />
                   {formik.touched.gender && formik.errors.gender && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.gender}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.gender}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Relationship Code
                   </label>
                   <SearchableSelect
@@ -720,13 +891,18 @@ export default function IndividualEligibilityForm() {
                     maxVisibleItems={15}
                   />
                   {formik.touched.relationshipCode && formik.errors.relationshipCode && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.relationshipCode}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.relationshipCode}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Service Date <span className="text-red-500">*</span>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    Service Date <span style={{ color: themeColors.red[500] }}>*</span>
                   </label>
                   <input
                     type="date"
@@ -734,24 +910,38 @@ export default function IndividualEligibilityForm() {
                     min={serviceDateRestrictions.min}
                     max={serviceDateRestrictions.max}
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     value={formik.values.serviceDate}
-                    className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                      formik.touched.serviceDate && formik.errors.serviceDate
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-blue-400'
-                    }`}
+                    className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      color: themeColors.text.primary,
+                      borderColor:
+                        formik.touched.serviceDate && formik.errors.serviceDate
+                          ? themeColors.border.error
+                          : themeColors.border.default,
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.serviceDate && formik.errors.serviceDate ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.boxShadow = ''
+                      formik.handleBlur(e)
+                    }}
                   />
                   {formik.touched.serviceDate && formik.errors.serviceDate && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.serviceDate}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.serviceDate}
+                    </p>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: themeColors.text.muted }}>
                     Selectable range: 1 year and 10 days ago to 2 months in future
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
                     Service Type
                   </label>
                   <SearchableSelect
@@ -765,13 +955,18 @@ export default function IndividualEligibilityForm() {
                     maxVisibleItems={15}
                   />
                   {formik.touched.serviceType && formik.errors.serviceType && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.serviceType}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.serviceType}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Place of Service <span className="text-red-500">*</span>
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    Place of Service <span style={{ color: themeColors.red[500] }}>*</span>
                   </label>
                   <SearchableSelect
                     name="placeOfService"
@@ -784,7 +979,9 @@ export default function IndividualEligibilityForm() {
                     maxVisibleItems={15}
                   />
                   {formik.touched.placeOfService && formik.errors.placeOfService && (
-                    <p className="text-red-600 text-sm mt-1">{formik.errors.placeOfService}</p>
+                    <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                      {formik.errors.placeOfService}
+                    </p>
                   )}
                 </div>
               </div>
@@ -794,14 +991,31 @@ export default function IndividualEligibilityForm() {
               <button
                 type="button"
                 onClick={() => formik.resetForm()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                className="px-6 py-2 border rounded-md transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Reset
               </button>
               <SubmitButton
                 type="submit"
                 title="Submit Eligibility Check"
-                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                class_name="px-6 py-2 text-white rounded-md transition"
+                style={{
+                  backgroundColor: themeColors.blue[600],
+                }}
+                onMouseEnter={e => {
+                  if (!e.currentTarget.disabled)
+                    e.currentTarget.style.backgroundColor = themeColors.blue[700]
+                }}
+                onMouseLeave={e => {
+                  if (!e.currentTarget.disabled)
+                    e.currentTarget.style.backgroundColor = themeColors.blue[600]
+                }}
                 btnLoading={btnLoading || submitLoading}
                 callback_event=""
               />

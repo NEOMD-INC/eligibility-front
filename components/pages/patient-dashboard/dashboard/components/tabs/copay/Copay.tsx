@@ -1,6 +1,7 @@
 'use client'
 
 import InfoCard from '@/components/ui/cards/InfoCard/InfoCard'
+import { themeColors } from '@/theme'
 
 import { CopayItem, RawCopayData } from './types/types'
 
@@ -19,8 +20,10 @@ export default function Copay({ copaysData }: any) {
       },
     })) || []
   return (
-    <div className="p-6 bg-gray-50 min-h-[500px]">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Copay</h1>
+    <div className="p-6 min-h-[500px]" style={{ backgroundColor: themeColors.gray[50] }}>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text.primary }}>
+        Copay
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {copayData1.map((copay, index) => (
           <InfoCard

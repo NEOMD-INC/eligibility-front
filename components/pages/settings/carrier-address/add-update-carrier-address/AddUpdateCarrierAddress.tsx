@@ -16,6 +16,7 @@ import {
   updateCarrierAddress,
 } from '@/redux/slices/settings/carrier-addresses/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 import type { CarrierAddressFormValues } from '@/types'
 
 export default function AddUpdateCarrierAddress() {
@@ -100,12 +101,17 @@ export default function AddUpdateCarrierAddress() {
         actualName: currentCarrierAddress.actual_name || '',
         addressId: currentCarrierAddress.address_id || '',
         addressLine1:
-          currentCarrierAddress.address_line1 || currentCarrierAddress.address_line_1 || '',
+          currentCarrierAddress.address1 ||
+          currentCarrierAddress.address_line1 ||
+          currentCarrierAddress.address_line_1 ||
+          '',
         city: currentCarrierAddress.city || '',
         state: currentCarrierAddress.state || '',
         zipCode: currentCarrierAddress.zip_code || '',
-        phoneType: currentCarrierAddress.phone_type || '',
-        phoneNumber: currentCarrierAddress.phone_number || '',
+        phoneType:
+          currentCarrierAddress.insurance_phone_type1 || currentCarrierAddress.phone_type || '',
+        phoneNumber:
+          currentCarrierAddress.insurance_phone_number1 || currentCarrierAddress.phone_number || '',
         insuranceDepartment: currentCarrierAddress.insurance_department || '',
       })
     }
@@ -126,20 +132,40 @@ export default function AddUpdateCarrierAddress() {
 
     return (
       <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-800 mb-1">{label}</label>
+        <label
+          className="block text-sm font-semibold mb-1"
+          style={{ color: themeColors.text.secondary }}
+        >
+          {label}
+        </label>
         <input
           type="text"
           name={name}
           placeholder={label}
           autoComplete="off"
           onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
           value={value || ''}
-          className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-            hasError ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
-          }`}
+          className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+          style={{
+            color: themeColors.text.primary,
+            borderColor: hasError ? themeColors.border.error : themeColors.border.default,
+            boxShadow: hasError ? `0 0 0 2px ${themeColors.border.focusRing.red}` : undefined,
+          }}
+          onFocus={e => {
+            if (!hasError) {
+              e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.border.focusRing.blue}`
+            }
+          }}
+          onBlur={e => {
+            e.currentTarget.style.boxShadow = undefined
+            formik.handleBlur(e)
+          }}
         />
-        {hasError && <p className="text-red-600 text-sm mt-1">{error}</p>}
+        {hasError && (
+          <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+            {error}
+          </p>
+        )}
       </div>
     )
   }
@@ -150,7 +176,10 @@ export default function AddUpdateCarrierAddress() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
+      <div
+        className="flex flex-col justify-center p-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-6">
             {isEditMode ? 'Edit Carrier Address' : 'Add Carrier Address'}
@@ -159,9 +188,11 @@ export default function AddUpdateCarrierAddress() {
           <form onSubmit={formik.handleSubmit}>
             {errorMsg && (
               <div
-                className={`mb-6 p-4 rounded-lg ${
-                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                }`}
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  backgroundColor: isError ? themeColors.red[100] : themeColors.blue[100],
+                  color: isError ? themeColors.red[700] : themeColors.blue[700],
+                }}
               >
                 <span>{errorMsg}</span>
               </div>
@@ -182,7 +213,13 @@ export default function AddUpdateCarrierAddress() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                className="px-6 py-2 border rounded-md transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Cancel
               </button>

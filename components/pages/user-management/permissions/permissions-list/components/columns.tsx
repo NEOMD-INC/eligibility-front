@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
+import { themeColors } from '@/theme'
 
 interface PermissionsListColumnsProps {
   onDeleteClick?: (id: string, permissionName: string) => void
@@ -15,11 +16,16 @@ export default function PermissionsListColumns({
       label: 'Permission Name',
       width: '25%',
       align: 'left' as const,
-      render: (value: any, permission: any) => {
+      render: (permission: any) => {
         const permissionName = permission.name || 'N/A'
         return (
           <Link href={`#`} className="block">
-            <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
+            <div
+              className="font-semibold truncate"
+              style={{ color: themeColors.text.primary }}
+              onMouseEnter={e => (e.currentTarget.style.color = themeColors.text.link)}
+              onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.primary)}
+            >
               {permissionName}
             </div>
           </Link>
@@ -31,11 +37,14 @@ export default function PermissionsListColumns({
       label: 'Roles',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, permission: any) => {
+      render: (permission: any) => {
         const role = permission.roles_count || 'N/A'
         return (
           <div className="flex justify-center">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+            <span
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+              style={{ backgroundColor: themeColors.green[100], color: themeColors.green[600] }}
+            >
               {role}
             </span>
           </div>
@@ -47,7 +56,7 @@ export default function PermissionsListColumns({
       label: 'Actions',
       width: '15%',
       align: 'center' as const,
-      render: (value: any, permission: any) => (
+      render: (permission: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={permission}

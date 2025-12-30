@@ -13,11 +13,11 @@ export const CarrierSetupsService = {
     return api.get(`/carrier-setups/${userId}`)
   },
 
-  createCarrierSetups: (userData: {}) => {
+  createCarrierSetups: (userData: any) => {
     return api.post('/carrier-setups/store', userData)
   },
 
-  updateCarrierSetups: (userId: string, userData: {}) => {
+  updateCarrierSetups: (userId: string, userData: any) => {
     return api.put(`/carrier-setups/${userId}/update`, userData)
   },
 

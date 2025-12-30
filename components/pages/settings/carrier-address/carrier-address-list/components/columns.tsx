@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
+import { themeColors } from '@/theme'
 
 interface CarrierAddressListColumnsProps {
   onDeleteClick?: (id: string, carrierAddressName: string) => void
@@ -15,9 +16,14 @@ export default function CarrierAddressListColumns({
       label: 'Carrier Code',
       width: '20%',
       align: 'left' as const,
-      render: (value: any, carrierAddress: any) => (
+      render: (carrierAddress: any) => (
         <Link href={`/settings/carrier-address/${carrierAddress.id || carrierAddress.uuid}`}>
-          <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
+          <div
+            className="font-semibold truncate"
+            style={{ color: themeColors.text.primary }}
+            onMouseEnter={e => (e.currentTarget.style.color = themeColors.text.link)}
+            onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.primary)}
+          >
             {carrierAddress.carrierCode || carrierAddress.carrier_code || 'N/A'}
           </div>
         </Link>
@@ -28,8 +34,8 @@ export default function CarrierAddressListColumns({
       label: 'Actual Name',
       width: '30%',
       align: 'left' as const,
-      render: (value: any, carrierAddress: any) => (
-        <div className="text-gray-900 truncate">
+      render: (carrierAddress: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierAddress.actualName || carrierAddress.actual_name || 'N/A'}
         </div>
       ),
@@ -39,8 +45,8 @@ export default function CarrierAddressListColumns({
       label: 'Address ID',
       width: '30%',
       align: 'left' as const,
-      render: (value: any, carrierAddress: any) => (
-        <div className="text-gray-900 truncate">
+      render: (carrierAddress: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierAddress.addressId || carrierAddress.address_id || 'N/A'}
         </div>
       ),
@@ -50,7 +56,7 @@ export default function CarrierAddressListColumns({
       label: 'Actions',
       width: '20%',
       align: 'center' as const,
-      render: (value: any, carrierAddress: any) => (
+      render: (carrierAddress: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={carrierAddress}

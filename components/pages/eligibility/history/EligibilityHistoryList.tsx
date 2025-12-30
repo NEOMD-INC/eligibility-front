@@ -38,8 +38,6 @@ export default function EligibilityHistoryList() {
     eligibilityId: null,
   })
 
-  console.log('history', history)
-
   const hasPendingHistory = history.some((item: any) => {
     const status = (item.status || '').toLowerCase()
     const queueStatus = (item.queueStatus || item.queue_status || '').toLowerCase()
@@ -142,19 +140,20 @@ export default function EligibilityHistoryList() {
       <div className="p-6 relative">
         <div className="flex justify-between items-center max-w-auto rounded bg-white p-6 mb-[-5px]">
           <div>
-            <h1
-              className="text-2xl font-bold text-gray-900"
-              style={{ color: themeColors.text.primary }}
-            >
+            <h1 className="text-2xl font-bold" style={{ color: themeColors.text.primary }}>
               Eligibility History
             </h1>
-            <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
+            <p className="mt-1 text-sm" style={{ color: themeColors.text.muted }}>
               View and manage eligibility check history
             </p>
           </div>
           <button
             onClick={handleNewRequest}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 transition"
+            style={{ backgroundColor: themeColors.blue[600] }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
+            onFocus={e => (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`)}
           >
             <Plus size={18} />
             <span>New Request</span>
@@ -162,10 +161,24 @@ export default function EligibilityHistoryList() {
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-end">
+          <div
+            className="px-6 py-4 border-b flex justify-end"
+            style={{ borderColor: themeColors.border.default }}
+          >
             <button
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium border rounded-md focus:outline-none focus:ring-2 transition"
+              style={{
+                color: themeColors.gray[700],
+                backgroundColor: themeColors.gray[100],
+                borderColor: themeColors.border.default,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[200])}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.gray[100])}
+              onFocus={e =>
+                (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.gray[300]}`)
+              }
+              onBlur={e => (e.currentTarget.style.boxShadow = '')}
             >
               <Filter size={18} />
               <span>Filters</span>
@@ -177,7 +190,13 @@ export default function EligibilityHistoryList() {
           </div>
 
           {isFiltersOpen && (
-            <div className="border-b border-gray-200 bg-gray-50">
+            <div
+              className="border-b"
+              style={{
+                borderColor: themeColors.border.default,
+                backgroundColor: themeColors.gray[50],
+              }}
+            >
               <Filters
                 fields={filterFields}
                 onReset={handleFilterReset}
@@ -198,7 +217,9 @@ export default function EligibilityHistoryList() {
             clientSidePagination={false}
             noDataMessage={
               <div className="text-center py-8">
-                <p className="text-gray-500">{error || 'No eligibility history found'}</p>
+                <p style={{ color: themeColors.text.muted }}>
+                  {error || 'No eligibility history found'}
+                </p>
               </div>
             }
           />
@@ -212,7 +233,7 @@ export default function EligibilityHistoryList() {
           message="Are you sure you want to retry this eligibility check?"
           confirmText="Retry"
           cancelText="Cancel"
-          confirmButtonClass="bg-blue-600 hover:bg-blue-700"
+          confirmButtonClass=""
         />
       </div>
     </PageTransition>

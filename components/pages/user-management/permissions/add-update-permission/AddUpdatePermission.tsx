@@ -4,7 +4,6 @@ import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
-
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
@@ -16,6 +15,7 @@ import {
   updatePermission,
 } from '@/redux/slices/user-management/permissions/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 import type { PermissionFormValues } from '@/types'
 
 export default function AddUpdatePermission() {
@@ -118,7 +118,10 @@ export default function AddUpdatePermission() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
+      <div
+        className="flex flex-col justify-center p-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-6">
             {isEditMode ? 'Edit Permission' : 'Add Permission'}
@@ -127,16 +130,21 @@ export default function AddUpdatePermission() {
           <form onSubmit={formik.handleSubmit}>
             {errorMsg && (
               <div
-                className={`mb-6 p-4 rounded-lg ${
-                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                }`}
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  backgroundColor: isError ? themeColors.red[100] : themeColors.blue[100],
+                  color: isError ? themeColors.red[700] : themeColors.blue[700],
+                }}
               >
                 <span>{errorMsg}</span>
               </div>
             )}
 
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
+              <label
+                className="block text-sm font-semibold mb-1"
+                style={{ color: themeColors.text.secondary }}
+              >
                 Permission Name
               </label>
               <input
@@ -145,16 +153,27 @@ export default function AddUpdatePermission() {
                 placeholder="Permission Name"
                 autoComplete="off"
                 onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
                 value={formik.values.permissionName}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.permissionName && formik.errors.permissionName
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
+                className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                style={{
+                  color: themeColors.text.primary,
+                  borderColor:
+                    formik.touched.permissionName && formik.errors.permissionName
+                      ? themeColors.border.error
+                      : themeColors.border.default,
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.permissionName && formik.errors.permissionName ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.boxShadow = ''
+                  formik.handleBlur(e)
+                }}
               />
               {formik.touched.permissionName && formik.errors.permissionName && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.permissionName}</p>
+                <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                  {formik.errors.permissionName}
+                </p>
               )}
             </div>
 
@@ -162,7 +181,13 @@ export default function AddUpdatePermission() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                className="px-6 py-2 border rounded-md transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Cancel
               </button>

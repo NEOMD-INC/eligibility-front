@@ -2,6 +2,8 @@ import { Eye, FilePenLine, RotateCw, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
 
+import { themeColors } from '@/theme'
+
 export interface GridActionButtonsProps {
   data: Record<string, any>
   from?: string
@@ -20,6 +22,18 @@ export interface GridActionButtonsProps {
   isUser?: boolean
   isPending?: boolean
 }
+
+const PendingSpinner = () => (
+  <div
+    className="flex items-center justify-center w-8 h-8 rounded-md mr-2"
+    style={{ backgroundColor: '#eab308' }}
+    title="Pending"
+  >
+    <div className="relative w-4 h-4">
+      <div className="absolute top-0 left-0 w-full h-full border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  </div>
+)
 
 const GridActionButtons: React.FC<GridActionButtonsProps> = ({
   data,
@@ -63,19 +77,14 @@ const GridActionButtons: React.FC<GridActionButtonsProps> = ({
     }
   }
 
-  const PendingSpinner = () => (
-    <div
-      className="flex items-center justify-center w-8 h-8 rounded-md bg-yellow-500 mr-2"
-      title="Pending"
-    >
-      <div className="relative w-4 h-4">
-        <div className="absolute top-0 left-0 w-full h-full border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    </div>
-  )
-
   return (
-    <Suspense fallback={<div className="text-gray-500 text-sm">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="text-sm" style={{ color: themeColors.text.muted }}>
+          Loading...
+        </div>
+      }
+    >
       <div
         id="event_trigger"
         className="flex flex-row flex-nowrap items-center justify-start min-w-max"
@@ -84,13 +93,15 @@ const GridActionButtons: React.FC<GridActionButtonsProps> = ({
         {retryPermission && (
           <button
             type="button"
-            style={{ cursor: 'pointer', backgroundColor: '#3b82f6' }}
             onClick={() => {
               if (typeof retryResourceId === 'function') {
                 retryResourceId(data[from])
               }
             }}
-            className="flex items-center justify-center w-8 h-8 rounded-md bg-blue-500 hover:bg-blue-600 text-white transition mr-2"
+            className="flex items-center justify-center w-8 h-8 rounded-md text-white transition mr-2"
+            style={{ backgroundColor: themeColors.blue[600], cursor: 'pointer' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
             title="Retry"
           >
             <RotateCw size={18} />
@@ -102,7 +113,10 @@ const GridActionButtons: React.FC<GridActionButtonsProps> = ({
             href={showBtnPath || '#'}
             id={showBtnPath ? undefined : showDrawerId}
             onClick={!isUser ? handleShowClick : undefined}
-            className="flex items-center justify-center w-8 h-8 rounded-md bg-sky-500 hover:bg-sky-600 text-white transition mr-2"
+            className="flex items-center justify-center w-8 h-8 rounded-md text-white transition mr-2"
+            style={{ backgroundColor: '#0ea5e9' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#0284c7')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#0ea5e9')}
             title="View"
           >
             <Eye size={18} />
@@ -114,7 +128,10 @@ const GridActionButtons: React.FC<GridActionButtonsProps> = ({
             href={editBtnPath || '#'}
             id={editBtnPath ? undefined : editDrawerId}
             onClick={handleEditClick}
-            className="flex items-center justify-center w-8 h-8 rounded-md bg-green-500 hover:bg-green-600 text-white transition mr-2"
+            className="flex items-center justify-center w-8 h-8 rounded-md text-white transition mr-2"
+            style={{ backgroundColor: '#22c55e' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#16a34a')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#22c55e')}
             title="Edit"
           >
             <FilePenLine size={18} />
@@ -124,7 +141,6 @@ const GridActionButtons: React.FC<GridActionButtonsProps> = ({
         {deletePermission && (
           <button
             type="button"
-            style={{ cursor: 'pointer' }}
             onClick={() => {
               const oldModal = document.getElementById('kt_modal_1')
               if (oldModal) oldModal.classList.remove('hidden')
@@ -133,7 +149,10 @@ const GridActionButtons: React.FC<GridActionButtonsProps> = ({
                 deleteResourceId(data[from])
               }
             }}
-            className="flex items-center justify-center w-8 h-8 rounded-md bg-red-500 hover:bg-red-600 text-white transition mr-3"
+            className="flex items-center justify-center w-8 h-8 rounded-md text-white transition mr-3"
+            style={{ backgroundColor: themeColors.red[600], cursor: 'pointer' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.red[700])}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.red[600])}
             title="Delete"
           >
             <Trash2 size={18} />

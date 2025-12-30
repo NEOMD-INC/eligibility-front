@@ -1,6 +1,7 @@
 'use client'
 
 import ProgressCard from '@/components/ui/cards/ProgressCard/ProgressCard'
+import { themeColors } from '@/theme'
 
 export default function OutOfPocket({ outOfPocketData }: any) {
   const outOfPocketData1 =
@@ -24,8 +25,10 @@ export default function OutOfPocket({ outOfPocketData }: any) {
     }) || []
 
   return (
-    <div className="p-6 bg-gray-50">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Out of Pocket</h1>
+    <div className="p-6" style={{ backgroundColor: themeColors.gray[50] }}>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text.primary }}>
+        Out of Pocket
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {outOfPocketData1.map((outOfPocket, index) => (
           <ProgressCard

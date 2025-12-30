@@ -14,6 +14,7 @@ import {
   fetchCarrierSetupById,
 } from '@/redux/slices/settings/carrier-setups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 
 import { getCarrierSetupDetails } from './helper/helper'
 
@@ -70,13 +71,24 @@ export default function CarrierSetupDetail() {
 
   if (error && !currentCarrierSetup) {
     return (
-      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
+      <div
+        className="flex flex-col justify-center p-6 space-y-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full bg-white shadow-lg rounded-xl p-8">
           <div className="flex flex-col justify-center items-center py-12">
-            <div className="text-red-600 mb-4">{error}</div>
+            <div className="mb-4" style={{ color: themeColors.text.error }}>
+              {error}
+            </div>
             <button
               onClick={() => router.back()}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow transition"
+              className="px-4 py-2 rounded-lg shadow transition"
+              style={{
+                backgroundColor: themeColors.gray[300],
+                color: themeColors.text.secondary,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[400])}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.gray[300])}
             >
               Go Back
             </button>
@@ -93,7 +105,10 @@ export default function CarrierSetupDetail() {
           <h1 className="text-2xl font-bold mb-4 pb-3">Carrier Setup Details</h1>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+            <div
+              className="mb-4 p-4 rounded-lg"
+              style={{ backgroundColor: themeColors.red[100], color: themeColors.red[700] }}
+            >
               <p className="text-sm font-medium">{error}</p>
             </div>
           )}
@@ -101,8 +116,10 @@ export default function CarrierSetupDetail() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b pb-6 mb-3">
             {CARRIER_SETUP_DETAILS.map((detail, index) => (
               <div key={index}>
-                <p className="text-gray-500 font-semibold mb-1">{detail.title}</p>
-                <p className="text-gray-800">{detail.value}</p>
+                <p className="font-semibold mb-1" style={{ color: themeColors.text.muted }}>
+                  {detail.title}
+                </p>
+                <p style={{ color: themeColors.text.secondary }}>{detail.value}</p>
               </div>
             ))}
           </div>
@@ -110,7 +127,19 @@ export default function CarrierSetupDetail() {
           <div className="flex justify-end gap-2 mt-3 pt-6">
             <button
               onClick={() => router.back()}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow transition"
+              className="px-4 py-2 rounded-lg shadow transition"
+              style={{
+                backgroundColor: themeColors.gray[300],
+                color: themeColors.text.secondary,
+              }}
+              onMouseEnter={e => {
+                if (!e.currentTarget.disabled)
+                  e.currentTarget.style.backgroundColor = themeColors.gray[400]
+              }}
+              onMouseLeave={e => {
+                if (!e.currentTarget.disabled)
+                  e.currentTarget.style.backgroundColor = themeColors.gray[300]
+              }}
               disabled={deleteLoading}
             >
               Go Back
@@ -118,14 +147,32 @@ export default function CarrierSetupDetail() {
             <button
               onClick={handleDelete}
               disabled={deleteLoading}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-white px-4 py-2 rounded-lg shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: themeColors.red[600] }}
+              onMouseEnter={e => {
+                if (!e.currentTarget.disabled)
+                  e.currentTarget.style.backgroundColor = themeColors.red[700]
+              }}
+              onMouseLeave={e => {
+                if (!e.currentTarget.disabled)
+                  e.currentTarget.style.backgroundColor = themeColors.red[600]
+              }}
             >
               {deleteLoading ? 'Deleting...' : 'Delete'}
             </button>
             <button
               onClick={handleEdit}
               disabled={deleteLoading}
-              className="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-white px-4 py-2 rounded-lg shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: themeColors.blue[700] }}
+              onMouseEnter={e => {
+                if (!e.currentTarget.disabled)
+                  e.currentTarget.style.backgroundColor = themeColors.blue[700] || '#1e40af'
+              }}
+              onMouseLeave={e => {
+                if (!e.currentTarget.disabled)
+                  e.currentTarget.style.backgroundColor = themeColors.blue[700]
+              }}
             >
               Edit
             </button>

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { TitleTransitionButton } from '@/components/providers/title-transition-provider/TittleTransitionProvider'
+import { themeColors } from '@/theme'
 
 import { getCategories } from './components/quick-link-dashboard.config'
 import { QuickLinkCategory } from './types/type'
@@ -19,19 +20,27 @@ export default function QuickLinkDashboard() {
 
   return (
     <PageTransition>
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 min-h-screen" style={{ backgroundColor: themeColors.gray[50] }}>
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-            <p className="text-gray-600">Quick access Dashboard</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: themeColors.text.primary }}>
+              Dashboard
+            </h1>
+            <p style={{ color: themeColors.gray[600] }}>Quick access Dashboard</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="space-y-8">
               {categories.map((category, categoryIndex) => (
                 <div key={categoryIndex}>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-blue-600 rounded"></div>
+                  <h2
+                    className="text-xl font-semibold mb-4 flex items-center gap-2"
+                    style={{ color: themeColors.text.secondary }}
+                  >
+                    <div
+                      className="w-1 h-6 rounded"
+                      style={{ backgroundColor: themeColors.blue[600] }}
+                    ></div>
                     {category.title}
                   </h2>
 
@@ -40,22 +49,50 @@ export default function QuickLinkDashboard() {
                       <TitleTransitionButton
                         key={itemIndex}
                         onClick={() => handleNavigation(item.path)}
-                        className="cursor-pointer group relative p-6 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all duration-200 text-left"
+                        className="cursor-pointer group relative p-6 bg-white border-2 rounded-lg hover:shadow-md transition-all duration-200 text-left"
+                        style={{ borderColor: themeColors.border.default }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.borderColor = themeColors.blue[500]
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.borderColor = themeColors.border.default
+                        }}
                       >
                         <div className="flex flex-col items-start">
-                          <div className="mb-4 p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-                            <div className="text-blue-600">{item.icon}</div>
+                          <div
+                            className="mb-4 p-3 rounded-lg transition-colors"
+                            style={{ backgroundColor: themeColors.blue[100] }}
+                            onMouseEnter={e =>
+                              (e.currentTarget.style.backgroundColor = themeColors.blue[200])
+                            }
+                            onMouseLeave={e =>
+                              (e.currentTarget.style.backgroundColor = themeColors.blue[100])
+                            }
+                          >
+                            <div style={{ color: themeColors.blue[600] }}>{item.icon}</div>
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                          <h3
+                            className="text-lg font-semibold mb-1 transition-colors"
+                            style={{ color: themeColors.text.primary }}
+                            onMouseEnter={e =>
+                              (e.currentTarget.style.color = themeColors.blue[600])
+                            }
+                            onMouseLeave={e =>
+                              (e.currentTarget.style.color = themeColors.text.primary)
+                            }
+                          >
                             {item.name}
                           </h3>
                           {item.description && (
-                            <p className="text-sm text-gray-500">{item.description}</p>
+                            <p className="text-sm" style={{ color: themeColors.text.muted }}>
+                              {item.description}
+                            </p>
                           )}
                         </div>
                         <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                           <svg
-                            className="w-5 h-5 text-blue-600"
+                            className="w-5 h-5"
+                            style={{ color: themeColors.blue[600] }}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -73,7 +110,10 @@ export default function QuickLinkDashboard() {
                   </div>
 
                   {categoryIndex < categories.length - 1 && (
-                    <div className="mt-8 border-b border-gray-200"></div>
+                    <div
+                      className="mt-8 border-b"
+                      style={{ borderColor: themeColors.border.default }}
+                    ></div>
                   )}
                 </div>
               ))}

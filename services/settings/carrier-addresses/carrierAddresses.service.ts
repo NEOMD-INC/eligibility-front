@@ -13,11 +13,11 @@ export const CarrierAddressesService = {
     return api.get(`/carrier-addresses/${userId}`)
   },
 
-  createCarrierAddresses: (userData: {}) => {
+  createCarrierAddresses: (userData: any) => {
     return api.post('/carrier-addresses/store', userData)
   },
 
-  updateCarrierAddresses: (userId: string, userData: {}) => {
+  updateCarrierAddresses: (userId: string, userData: any) => {
     return api.put(`/carrier-addresses/${userId}/update`, userData)
   },
 

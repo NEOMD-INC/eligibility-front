@@ -1,3 +1,1 @@
-import RolesList from './roles-list/RolesList'
-
-export default RolesList
+export { default } from './roles-list/RolesList'

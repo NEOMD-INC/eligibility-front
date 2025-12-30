@@ -55,7 +55,7 @@ export const fetchUserById = createAsyncThunk(
 // Async thunk to create user
 export const createUser = createAsyncThunk(
   'users/createUser',
-  async (userData: {}, { rejectWithValue }) => {
+  async (userData: any, { rejectWithValue }) => {
     try {
       const response = await userService.createUser(userData)
       return response.data
@@ -68,7 +68,7 @@ export const createUser = createAsyncThunk(
 // Async thunk to update user
 export const updateUser = createAsyncThunk(
   'users/updateUser',
-  async (params: { userId: string; userData: {} }, { rejectWithValue }) => {
+  async (params: { userId: string; userData: any }, { rejectWithValue }) => {
     try {
       const response = await userService.updateUser(params.userId, params.userData)
       return response.data

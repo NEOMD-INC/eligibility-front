@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import GridActionButtons from '@/components/ui/buttons/grid-action-buttons/GridActionButtons'
+import { themeColors } from '@/theme'
 
 interface CarrierSetupListColumnsProps {
   onDeleteClick?: (id: string, carrierSetupName: string) => void
@@ -15,9 +16,14 @@ export default function CarrierSetupListColumns({
       label: 'Group Code',
       width: '20%',
       align: 'left' as const,
-      render: (value: any, carrierSetup: any) => (
+      render: (carrierSetup: any) => (
         <Link href={`/settings/carrier-setup/${carrierSetup.id || carrierSetup.uuid}`}>
-          <div className="text-gray-900 font-semibold hover:text-blue-600 truncate">
+          <div
+            className="font-semibold truncate"
+            style={{ color: themeColors.text.primary }}
+            onMouseEnter={e => (e.currentTarget.style.color = themeColors.text.link)}
+            onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.primary)}
+          >
             {carrierSetup.carrier_group_code || 'N/A'}
           </div>
         </Link>
@@ -28,8 +34,8 @@ export default function CarrierSetupListColumns({
       label: 'Group Description',
       width: '25%',
       align: 'left' as const,
-      render: (value: any, carrierSetup: any) => (
-        <div className="text-gray-900 truncate">
+      render: (carrierSetup: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierSetup.carrier_group_description || 'N/A'}
         </div>
       ),
@@ -39,8 +45,8 @@ export default function CarrierSetupListColumns({
       label: 'Carrier Code',
       width: '20%',
       align: 'left' as const,
-      render: (value: any, carrierSetup: any) => (
-        <div className="text-gray-900 truncate">
+      render: (carrierSetup: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierSetup.carrierCode || carrierSetup.carrier_code || 'N/A'}
         </div>
       ),
@@ -50,8 +56,8 @@ export default function CarrierSetupListColumns({
       label: 'Carrier Description',
       width: '25%',
       align: 'left' as const,
-      render: (value: any, carrierSetup: any) => (
-        <div className="text-gray-900 truncate">
+      render: (carrierSetup: any) => (
+        <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierSetup.carrierDescription || carrierSetup.carrier_description || 'N/A'}
         </div>
       ),
@@ -61,7 +67,7 @@ export default function CarrierSetupListColumns({
       label: 'Actions',
       width: '10%',
       align: 'center' as const,
-      render: (value: any, carrierSetup: any) => (
+      render: (carrierSetup: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={carrierSetup}

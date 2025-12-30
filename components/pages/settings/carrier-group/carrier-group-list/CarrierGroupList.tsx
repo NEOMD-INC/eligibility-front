@@ -4,7 +4,6 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
 import Filters, { FilterField } from '@/components/ui/filters/Filters'
@@ -17,7 +16,6 @@ import {
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { themeColors } from '@/theme'
-
 import CarrierGroupListColumns from './components/columns'
 
 export default function CarrierGroupList() {
@@ -172,13 +170,10 @@ export default function CarrierGroupList() {
       <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
-            <h1
-              className="text-2xl font-bold text-gray-900"
-              style={{ color: themeColors.text.primary }}
-            >
+            <h1 className="text-2xl font-bold" style={{ color: themeColors.text.primary }}>
               Carrier Groups
             </h1>
-            <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
+            <p className="mt-1 text-sm" style={{ color: themeColors.text.muted }}>
               Manage carrier groups and their configurations
             </p>
           </div>
@@ -186,7 +181,13 @@ export default function CarrierGroupList() {
             <div className="flex flex-wrap">
               <Link
                 href="/settings/carrier-group/add"
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
+                className="px-4 py-2 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 flex items-center gap-2"
+                style={{ backgroundColor: themeColors.blue[600] }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
+                onFocus={e =>
+                  (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`)
+                }
               >
                 <Plus size={16} />
                 Add New Carrier Group
@@ -204,7 +205,14 @@ export default function CarrierGroupList() {
           />
 
           {error && (
-            <div className="px-6 py-4 bg-red-100 text-red-700 border-b border-red-200">
+            <div
+              className="px-6 py-4 border-b"
+              style={{
+                backgroundColor: themeColors.red[100],
+                color: themeColors.red[700],
+                borderColor: themeColors.red[400],
+              }}
+            >
               <p className="text-sm font-medium">{error}</p>
             </div>
           )}
@@ -220,7 +228,7 @@ export default function CarrierGroupList() {
             clientSidePagination={false}
             noDataMessage={
               <div className="text-center py-8">
-                <p className="text-gray-500">No carrier groups found</p>
+                <p style={{ color: themeColors.text.muted }}>No carrier groups found</p>
               </div>
             }
             className="shadow-none rounded-none"

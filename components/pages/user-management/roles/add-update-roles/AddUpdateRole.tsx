@@ -4,7 +4,6 @@ import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
-
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
@@ -17,6 +16,7 @@ import {
   updateRole,
 } from '@/redux/slices/user-management/roles/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 import type { RoleFormValues } from '@/types'
 
 export default function AddUpdateRole() {
@@ -35,14 +35,11 @@ export default function AddUpdateRole() {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Group permissions by prefix (e.g., "view_", "create_", etc.)
-  // Store permission objects with id and name
   const PERMISSIONS_GROUPED = (() => {
     if (!allPermissions || allPermissions.length === 0) {
       return []
     }
 
-    // Normalize permissions to objects with id and name
     const normalizedPermissions = allPermissions
       .map((perm: any) => {
         if (perm && typeof perm === 'object') {
@@ -51,12 +48,10 @@ export default function AddUpdateRole() {
             name: perm.name || perm.permission_name || perm.permission || String(perm),
           }
         }
-        // If it's a string, we can't get the ID, so skip it
         return null
       })
       .filter((perm: any) => perm && perm.id && perm.name)
 
-    // Group by prefix
     return normalizedPermissions.reduce((acc: any[], perm: any) => {
       if (!perm || !perm.name) return acc
 
@@ -74,7 +69,6 @@ export default function AddUpdateRole() {
     }, [])
   })()
 
-  // Unified validation schema
   const validationSchema = Yup.object({
     roleName: Yup.string().required('Role name is required'),
     permissions: Yup.array()
@@ -82,7 +76,6 @@ export default function AddUpdateRole() {
       .required('Permissions are required'),
   })
 
-  // Unified Formik instance
   const formik = useFormik<RoleFormValues>({
     initialValues: {
       roleName: '',
@@ -128,7 +121,6 @@ export default function AddUpdateRole() {
     },
   })
 
-  // Fetch role data in edit mode
   useEffect(() => {
     if (isEditMode && roleId) {
       dispatch(clearRolesError())
@@ -143,25 +135,20 @@ export default function AddUpdateRole() {
     }
   }, [dispatch, isEditMode, roleId])
 
-  // Populate form with role data when it's loaded
   useEffect(() => {
     if (isEditMode && currentRole && allPermissions.length > 0) {
-      // Extract role name
       const roleName = currentRole.name || ''
 
-      // Extract permissions - map permission names to IDs
       const permissions = currentRole.permissions || []
       const permissionIds: string[] = []
 
       permissions.forEach((perm: any) => {
-        // Get permission name
         const permName =
           typeof perm === 'string'
             ? perm
             : perm?.name || perm?.permission_name || perm?.permission || String(perm)
 
         if (permName) {
-          // Find the permission in allPermissions by name and get its ID
           const foundPerm = allPermissions.find((p: any) => {
             const pName = p.name || p.permission_name || p.permission
             return pName === permName
@@ -180,13 +167,10 @@ export default function AddUpdateRole() {
     }
   }, [currentRole, isEditMode, allPermissions])
 
-  // Fetch permissions on component mount
   useEffect(() => {
-    // Fetch all permissions (use a large page size to get all permissions)
     dispatch(fetchAllPermissions({ page: 1 }))
   }, [dispatch])
 
-  // Update error message from Redux state
   useEffect(() => {
     if (error) {
       setIsError(true)
@@ -215,51 +199,77 @@ export default function AddUpdateRole() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
+      <div
+        className="flex flex-col justify-center p-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-6">{isEditMode ? 'Edit Role' : 'Add Role'}</h1>
 
           <form onSubmit={formik.handleSubmit}>
             {errorMsg && (
               <div
-                className={`mb-6 p-4 rounded-lg ${
-                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                }`}
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  backgroundColor: isError ? themeColors.red[100] : themeColors.blue[100],
+                  color: isError ? themeColors.red[700] : themeColors.blue[700],
+                }}
               >
                 <span>{errorMsg}</span>
               </div>
             )}
 
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-800 mb-1">Role Name</label>
+              <label
+                className="block text-sm font-semibold mb-1"
+                style={{ color: themeColors.text.secondary }}
+              >
+                Role Name
+              </label>
               <input
                 type="text"
                 name="roleName"
                 placeholder="Role Name"
                 autoComplete="off"
                 onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
                 value={formik.values.roleName}
-                className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-                  formik.touched.roleName && formik.errors.roleName
-                    ? 'border-red-500 focus:ring-red-400'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
+                className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+                style={{
+                  color: themeColors.text.primary,
+                  borderColor:
+                    formik.touched.roleName && formik.errors.roleName
+                      ? themeColors.border.error
+                      : themeColors.border.default,
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${formik.touched.roleName && formik.errors.roleName ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.boxShadow = ''
+                  formik.handleBlur(e)
+                }}
               />
               {formik.touched.roleName && formik.errors.roleName && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.roleName}</p>
+                <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                  {formik.errors.roleName}
+                </p>
               )}
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-800 mb-3">Permissions</label>
+              <label
+                className="block text-sm font-semibold mb-3"
+                style={{ color: themeColors.text.secondary }}
+              >
+                Permissions
+              </label>
               {permissionsLoading ? (
                 <div className="text-center py-4">
                   <ComponentLoader message="Loading permissions..." size="sm" variant="inline" />
                 </div>
               ) : PERMISSIONS_GROUPED.length === 0 ? (
                 <div className="text-center py-4">
-                  <p className="text-gray-500">No permissions available</p>
+                  <p style={{ color: themeColors.text.muted }}>No permissions available</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -274,9 +284,13 @@ export default function AddUpdateRole() {
                     return (
                       <div
                         key={groupIndex}
-                        className={`border border-gray-200 rounded-lg p-4 ${gridClass}`}
+                        className={`border rounded-lg p-4 ${gridClass}`}
+                        style={{ borderColor: themeColors.border.default }}
                       >
-                        <h3 className="text-base font-semibold text-gray-900 mb-3 capitalize">
+                        <h3
+                          className="text-base font-semibold mb-3 capitalize"
+                          style={{ color: themeColors.text.primary }}
+                        >
                           {group.title}
                         </h3>
                         <div
@@ -299,11 +313,22 @@ export default function AddUpdateRole() {
                                   onChange={e =>
                                     handlePermissionChange(permissionId, e.target.checked)
                                   }
-                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                  className="w-4 h-4 border rounded focus:ring-2"
+                                  style={{
+                                    color: themeColors.blue[600],
+                                    borderColor: themeColors.border.default,
+                                  }}
+                                  onFocus={e => {
+                                    e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`
+                                  }}
+                                  onBlur={e => {
+                                    e.currentTarget.style.boxShadow = ''
+                                  }}
                                 />
                                 <label
                                   htmlFor={`permission-${groupIndex}-${permIndex}`}
-                                  className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
+                                  className="ml-2 text-sm font-medium cursor-pointer"
+                                  style={{ color: themeColors.gray[700] }}
                                 >
                                   {permissionName}
                                 </label>
@@ -317,7 +342,9 @@ export default function AddUpdateRole() {
                 </div>
               )}
               {formik.touched.permissions && formik.errors.permissions && (
-                <p className="text-red-600 text-sm mt-1">{formik.errors.permissions}</p>
+                <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+                  {formik.errors.permissions}
+                </p>
               )}
             </div>
 
@@ -325,14 +352,29 @@ export default function AddUpdateRole() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                className="px-6 py-2 border rounded-md transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Cancel
               </button>
               <SubmitButton
                 type="submit"
                 title={isEditMode ? 'Update Role' : 'Add Role'}
-                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                class_name="px-6 py-2 text-white rounded-md transition"
+                style={{ backgroundColor: themeColors.blue[600] }}
+                onMouseEnter={e => {
+                  const btn = e.currentTarget as HTMLButtonElement
+                  if (!btn.disabled) btn.style.backgroundColor = themeColors.blue[700]
+                }}
+                onMouseLeave={e => {
+                  const btn = e.currentTarget as HTMLButtonElement
+                  if (!btn.disabled) btn.style.backgroundColor = themeColors.blue[600]
+                }}
                 btnLoading={isEditMode ? updateLoading || fetchRoleLoading : createLoading}
                 callback_event=""
               />

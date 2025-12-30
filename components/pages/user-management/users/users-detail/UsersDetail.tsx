@@ -2,7 +2,6 @@
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import { UserProfileImage } from '@/components/ui/image/Image'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
@@ -12,7 +11,7 @@ import {
   fetchUserById,
 } from '@/redux/slices/user-management/users/actions'
 import { AppDispatch, RootState } from '@/redux/store'
-
+import { themeColors } from '@/theme'
 import { getRoleDetails, getUserDetails, groupPermissionsByPrefix } from './helper/helper'
 
 export default function UsersDetail() {
@@ -47,10 +46,15 @@ export default function UsersDetail() {
     return (
       <div className="flex items-center justify-center p-6">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
+          <p className="mb-4" style={{ color: themeColors.text.error }}>
+            {error}
+          </p>
           <button
             onClick={() => router.push('/user-management/users')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 text-white rounded-md"
+            style={{ backgroundColor: themeColors.blue[600] }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
           >
             Go Back
           </button>
@@ -63,10 +67,15 @@ export default function UsersDetail() {
     return (
       <div className="flex items-center justify-center p-6">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">User not found</p>
+          <p className="mb-4" style={{ color: themeColors.gray[600] }}>
+            User not found
+          </p>
           <button
             onClick={() => router.push('/user-management/users')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 text-white rounded-md"
+            style={{ backgroundColor: themeColors.blue[600] }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
           >
             Go Back
           </button>
@@ -77,11 +86,20 @@ export default function UsersDetail() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6 space-y-6">
-        <div className="w-full bg-blue-600 text-white rounded-xl shadow-md p-6">
+      <div
+        className="flex flex-col justify-center p-6 space-y-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
+        <div
+          className="w-full text-white rounded-xl shadow-md p-6"
+          style={{ backgroundColor: themeColors.blue[600] }}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <div className="w-20 h-20 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0">
+              <div
+                className="w-20 h-20 rounded-full overflow-hidden mr-3 border flex-shrink-0"
+                style={{ borderColor: themeColors.border.default }}
+              >
                 <UserProfileImage profileImagePath={currentUser?.profile_image_path} width={80} />
               </div>
 
@@ -89,7 +107,7 @@ export default function UsersDetail() {
                 <h2 className="text-2xl font-semibold">
                   {currentUser?.username || currentUser?.full_name || 'User'}
                 </h2>
-                <p className="text-blue-100">{currentUser?.email || 'N/A'}</p>
+                <p style={{ color: themeColors.blue[100] }}>{currentUser?.email || 'N/A'}</p>
               </div>
             </div>
           </div>
@@ -101,8 +119,10 @@ export default function UsersDetail() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b pb-3">
             {USER_DETAILS.map((obj, index) => (
               <div key={index}>
-                <p className="text-gray-500 font-semibold">{obj.title}</p>
-                <p className="text-gray-800">{obj.value}</p>
+                <p className="font-semibold" style={{ color: themeColors.text.muted }}>
+                  {obj.title}
+                </p>
+                <p style={{ color: themeColors.text.secondary }}>{obj.value}</p>
               </div>
             ))}
           </div>
@@ -114,13 +134,16 @@ export default function UsersDetail() {
               ROLE_DETAILS.map((obj: { title: string }, index: number) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-3 py-1 mb-5 rounded-full text-xs font-semibold bg-green-100 text-green-700 mr-2"
+                  className="inline-flex items-center px-3 py-1 mb-5 rounded-full text-xs font-semibold mr-2"
+                  style={{ backgroundColor: themeColors.green[100], color: themeColors.green[600] }}
                 >
                   {obj.title}
                 </span>
               ))
             ) : (
-              <p className="text-gray-500 text-sm mb-5">No roles assigned</p>
+              <p className="text-sm mb-5" style={{ color: themeColors.text.muted }}>
+                No roles assigned
+              </p>
             )}
           </div>
 
@@ -131,14 +154,21 @@ export default function UsersDetail() {
               <div className="border-b pb-6">
                 {PERMISSIONS_GROUPED.map((group: any, groupIndex: number) => (
                   <div key={groupIndex} className="mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 capitalize">
+                    <h3
+                      className="text-lg font-semibold mb-3 capitalize"
+                      style={{ color: themeColors.text.primary }}
+                    >
                       {group.name}
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {group.permissions?.map((permission: string, permIndex: number) => (
                         <span
                           key={permIndex}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-700"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                          style={{
+                            backgroundColor: themeColors.gray[100],
+                            color: themeColors.gray[700],
+                          }}
                         >
                           {permission}
                         </span>
@@ -154,7 +184,12 @@ export default function UsersDetail() {
             <div>
               <button
                 onClick={() => router.push(`/user-management/users/edit/${userId}`)}
-                className="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg shadow"
+                className="text-white px-4 py-2 rounded-lg shadow"
+                style={{ backgroundColor: themeColors.blue[700] }}
+                onMouseEnter={e =>
+                  (e.currentTarget.style.backgroundColor = themeColors.blue[700] || '#1e40af')
+                }
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
               >
                 Edit User
               </button>

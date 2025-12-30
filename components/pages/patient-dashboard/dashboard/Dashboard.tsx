@@ -11,6 +11,7 @@ import { TitleTransitionButton } from '@/components/providers/title-transition-p
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import { fetchPatientDashboard } from '@/redux/slices/patient-dashboard/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 
 import Coinsurance from './components/tabs/coinsurance/Coinsurance'
 import Copay from './components/tabs/copay/Copay'
@@ -174,10 +175,12 @@ export default function Dashboard() {
   if (!logId) {
     return (
       <PageTransition>
-        <div className="w-full bg-gray-50 p-6">
+        <div className="w-full p-6" style={{ backgroundColor: themeColors.gray[50] }}>
           <div className="bg-white shadow rounded-lg p-6 text-center">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-4">Patient Dashboard</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-semibold mb-4" style={{ color: themeColors.text.primary }}>
+              Patient Dashboard
+            </h1>
+            <p style={{ color: themeColors.gray[600] }}>
               No log ID provided. Please select an eligibility check from the history.
             </p>
           </div>
@@ -232,24 +235,51 @@ export default function Dashboard() {
 
   return (
     <PageTransition>
-      <div className="w-full bg-gray-50 p-6 space-y-6">
+      <div className="w-full p-6 space-y-6" style={{ backgroundColor: themeColors.gray[50] }}>
         <div className="bg-white shadow rounded-lg p-6 flex justify-between items-start relative">
           <div
-            className={`absolute left-0 top-0 bottom-0 w-5 ${coverages.plan_status === 'active' ? 'bg-green-600' : 'bg-yellow-600'}`}
+            className="absolute left-0 top-0 bottom-0 w-3"
+            style={{
+              backgroundColor:
+                coverages.plan_status === 'active'
+                  ? themeColors.green[600]
+                  : themeColors.yellow[500] || '#eab308',
+            }}
           />
           <div className="space-y-2 pl-2">
-            <h1 className="text-2xl font-semibold text-green-700 flex items-center gap-2">
+            <h1
+              className="text-2xl font-semibold flex items-center gap-2"
+              style={{ color: themeColors.green[700] }}
+            >
               {patientInformation.name || 'Jane Doe'}
-              <span className="text-green-600">☂️</span>
+              {(() => {
+                const status = coverages?.plan_status || ''
+                if (!status) return null
+
+                const statusLower = status.toLowerCase()
+                const isActive = statusLower === 'active'
+                const bgColor = isActive ? themeColors.green[100] : themeColors.red[100]
+                const textColor = isActive ? themeColors.green[700] : themeColors.red[700]
+
+                return (
+                  <span
+                    className="ml-3 px-2.5 py-0.5 rounded-full text-sm font-medium"
+                    style={{ backgroundColor: bgColor, color: textColor }}
+                  >
+                    {status}
+                  </span>
+                )
+              })()}
+              <span style={{ color: themeColors.green[600] }}>☂️</span>
             </h1>
 
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               {patientInformation.gender} . {patientInformation.age}Yrs . {patientInformation.dob} ·
               <span className="font-medium"> Relationship to Subscriber</span>{' '}
               <b>{patientInformation.relationship_name}</b>
             </p>
 
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               <span className="font-medium">Policy No.</span> <b>{coverages.plan_number}</b>
               <span className="mx-2">|</span>
               <span className="font-medium">Group No.</span> <b>{coverages.group_number}</b>
@@ -262,14 +292,16 @@ export default function Dashboard() {
 
           <div className="text-left space-y-2">
             <div className="flex justify-start">
-              <span className="text-purple-600 text-3xl font-bold">{payer.name}</span>
+              <span className="text-3xl font-bold" style={{ color: '#9333ea' }}>
+                {payer.name}
+              </span>
             </div>
 
-            <p className="text-sm text-gray-600">
+            {/* <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               <span className="font-medium">Insurance</span> {payer.name}
-            </p>
+            </p> */}
 
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               <span className="font-medium">Insurance Active From</span>
               <br />
               {dates?.eligibility_begin_date} to {dates?.eligibility_end_date}
@@ -288,8 +320,10 @@ export default function Dashboard() {
                 className="object-contain"
               />
             </div>
-            <p className="text-sm text-gray-600">verified on {dates?.transaction_date}</p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: themeColors.gray[600] }}>
+              verified on {dates?.transaction_date}
+            </p>
+            <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               Benefit effective from {dates?.eligibility_begin_date} - {dates?.eligibility_end_date}
             </p>
           </div>
@@ -303,18 +337,18 @@ export default function Dashboard() {
               <span className="font-medium">Name</span> {subscriber.name || 'John Doe'}
             </p>
 
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               DOB {subscriber.dob} · {subscriber.gender ? subscriber.gender : 'Other'}{' '}
               {subscriber.age}Yrs
             </p>
 
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               {formatAddress(
                 subscriber.address,
                 subscriber.city,
                 subscriber.state,
                 subscriber.zip
-              ) || '486 Grove Street Apartment #20, New York, NY 10014-1203'}
+              ) || 'No Address found'}
             </p>
           </div>
 
@@ -326,10 +360,10 @@ export default function Dashboard() {
             <p className="text-sm">
               <span className="font-medium">{provider.name}</span>
               <br />
-              <span className="text-gray-500">NPI {provider.npi}</span>
+              <span style={{ color: themeColors.text.muted }}>NPI {provider.npi}</span>
             </p>
 
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               {formatAddress(provider.address, provider.city, provider.state, provider.zip)}
             </p>
           </div>
@@ -337,20 +371,33 @@ export default function Dashboard() {
 
         {!allTabsEmpty && (
           <div className="bg-white shadow rounded-lg">
-            <div className="flex border-b border-gray-200">
+            <div className="flex border-b" style={{ borderColor: themeColors.border.default }}>
               {tabs.map((tab, index) => (
                 <TitleTransitionButton
                   key={index}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer ${
-                    activeTab === tab
-                      ? 'bg-blue-50 text-gray-700'
-                      : 'bg-white text-gray-600 hover:text-gray-900'
-                  }`}
+                  className="px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer"
+                  style={{
+                    backgroundColor: activeTab === tab ? themeColors.blue[100] : themeColors.white,
+                    color: activeTab === tab ? themeColors.gray[700] : themeColors.gray[600],
+                  }}
+                  onMouseEnter={(e: any) => {
+                    if (activeTab !== tab) {
+                      e.currentTarget.style.color = themeColors.text.primary
+                    }
+                  }}
+                  onMouseLeave={(e: any) => {
+                    if (activeTab !== tab) {
+                      e.currentTarget.style.color = themeColors.gray[600]
+                    }
+                  }}
                 >
                   {tab}
                   {activeTab === tab && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                    <div
+                      className="absolute bottom-0 left-0 right-0 h-0.5"
+                      style={{ backgroundColor: themeColors.blue[600] }}
+                    ></div>
                   )}
                 </TitleTransitionButton>
               ))}
@@ -369,8 +416,15 @@ export default function Dashboard() {
                   <OutOfPocket outOfPocketData={outOfPocketData} />
                 ) : (
                   <div className="p-12 text-center">
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">{activeTab}</h2>
-                    <p className="text-gray-500 text-lg">Coming Soon</p>
+                    <h2
+                      className="text-2xl font-semibold mb-2"
+                      style={{ color: themeColors.text.secondary }}
+                    >
+                      {activeTab}
+                    </h2>
+                    <p className="text-lg" style={{ color: themeColors.text.muted }}>
+                      Coming Soon
+                    </p>
                   </div>
                 )}
               </TabTransition>

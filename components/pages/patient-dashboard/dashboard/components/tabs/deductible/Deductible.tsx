@@ -1,6 +1,7 @@
 'use client'
 
 import ProgressCard from '@/components/ui/cards/ProgressCard/ProgressCard'
+import { themeColors } from '@/theme'
 
 export default function Deductible({ deductiblesData }: any) {
   const deductibleData1 =
@@ -24,8 +25,10 @@ export default function Deductible({ deductiblesData }: any) {
     }) || []
 
   return (
-    <div className="p-6 bg-gray-50">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Deductible</h1>
+    <div className="p-6" style={{ backgroundColor: themeColors.gray[50] }}>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text.primary }}>
+        Deductible
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {deductibleData1.map((deductible, index) => (
           <ProgressCard

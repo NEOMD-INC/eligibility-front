@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 
+import { themeColors } from '@/theme'
 import { DataTableProps, TablePaginationProps } from '@/types/ui/table'
 
 type TableRow = Record<string, unknown>
@@ -94,7 +95,11 @@ const DataTable = <T extends TableRow = TableRow>({
     }
 
     return (
-      <tr className="hover:bg-gray-50 transition-colors">
+      <tr
+        className="transition-colors"
+        onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+        onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+      >
         {columns.map(column => {
           const cellValue = row[column.key]
           let renderedContent: React.ReactNode
@@ -147,7 +152,10 @@ const DataTable = <T extends TableRow = TableRow>({
     return (
       <div className={`bg-white shadow rounded-lg overflow-hidden ${className}`}>
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div
+            className="animate-spin rounded-full h-8 w-8 border-b-2"
+            style={{ borderColor: themeColors.blue[600] }}
+          ></div>
         </div>
       </div>
     )
@@ -157,19 +165,29 @@ const DataTable = <T extends TableRow = TableRow>({
     <div className={`bg-white shadow rounded-lg overflow-hidden ${className}`}>
       <div className="overflow-x-auto">
         <table
-          className="w-full border-collapse text-sm text-gray-700"
-          style={{ tableLayout: 'fixed' }}
+          className="w-full border-collapse text-sm"
+          style={{ color: themeColors.gray[700], tableLayout: 'fixed' }}
         >
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
+            <tr
+              className="border-b"
+              style={{
+                backgroundColor: themeColors.gray[50],
+                borderColor: themeColors.border.default,
+              }}
+            >
               {columns.map(column => {
                 const isCenter = column.align === 'center'
                 const isRight = column.align === 'right'
                 return (
                   <th
                     key={column.key}
-                    className={`px-4 py-3 font-semibold text-gray-800 ${getAlignmentClass(column.align)}`}
-                    style={column.width ? { width: column.width } : {}}
+                    className={`px-4 py-3 font-semibold ${getAlignmentClass(column.align)}`}
+                    style={
+                      column.width
+                        ? { width: column.width, color: themeColors.text.secondary }
+                        : { color: themeColors.text.secondary }
+                    }
                   >
                     <div
                       className={`flex items-center ${
@@ -178,7 +196,12 @@ const DataTable = <T extends TableRow = TableRow>({
                     >
                       {column.label}
                       {column.sortable && (
-                        <button className="ml-1 text-gray-400 hover:text-gray-600">
+                        <button
+                          className="ml-1"
+                          style={{ color: themeColors.gray[400] }}
+                          onMouseEnter={e => (e.currentTarget.style.color = themeColors.gray[600])}
+                          onMouseLeave={e => (e.currentTarget.style.color = themeColors.gray[400])}
+                        >
                           <svg
                             className="w-4 h-4"
                             fill="none"
@@ -204,7 +227,11 @@ const DataTable = <T extends TableRow = TableRow>({
           <tbody className="divide-y divide-gray-200">
             {displayData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="text-center py-8 text-gray-500">
+                <td
+                  colSpan={columns.length}
+                  className="text-center py-8"
+                  style={{ color: themeColors.text.muted }}
+                >
                   {noDataMessage || 'No data found'}
                 </td>
               </tr>
@@ -222,7 +249,7 @@ const DataTable = <T extends TableRow = TableRow>({
       </div>
 
       {totalPages !== 0 && (
-        <div className="border-t border-gray-200 px-6 py-4">
+        <div className="border-t px-6 py-4" style={{ borderColor: themeColors.border.default }}>
           <TablePagination
             currentPage={activePage}
             totalPages={totalPages}
@@ -266,7 +293,7 @@ const TablePagination: React.FC<TablePaginationProps> = ({
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
-      <div className="text-sm text-gray-700">
+      <div className="text-sm" style={{ color: themeColors.gray[700] }}>
         Showing {startItem} to {endItem} of {totalItems} entries
       </div>
 
@@ -274,7 +301,17 @@ const TablePagination: React.FC<TablePaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-1 text-sm bg-white border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            borderColor: themeColors.border.default,
+          }}
+          onMouseEnter={e => {
+            if (!e.currentTarget.disabled)
+              e.currentTarget.style.backgroundColor = themeColors.gray[50]
+          }}
+          onMouseLeave={e => {
+            if (!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = themeColors.white
+          }}
         >
           Previous
         </button>
@@ -283,11 +320,23 @@ const TablePagination: React.FC<TablePaginationProps> = ({
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className={`px-3 py-1 text-sm border rounded ${
-              currentPage === page
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white border-gray-300 hover:bg-gray-50'
-            }`}
+            className="px-3 py-1 text-sm border rounded"
+            style={{
+              backgroundColor: currentPage === page ? themeColors.blue[600] : themeColors.white,
+              color: currentPage === page ? themeColors.white : themeColors.text.primary,
+              borderColor:
+                currentPage === page ? themeColors.blue[600] : themeColors.border.default,
+            }}
+            onMouseEnter={e => {
+              if (currentPage !== page) {
+                e.currentTarget.style.backgroundColor = themeColors.gray[50]
+              }
+            }}
+            onMouseLeave={e => {
+              if (currentPage !== page) {
+                e.currentTarget.style.backgroundColor = themeColors.white
+              }
+            }}
           >
             {page}
           </button>
@@ -296,7 +345,17 @@ const TablePagination: React.FC<TablePaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-1 text-sm bg-white border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            borderColor: themeColors.border.default,
+          }}
+          onMouseEnter={e => {
+            if (!e.currentTarget.disabled)
+              e.currentTarget.style.backgroundColor = themeColors.gray[50]
+          }}
+          onMouseLeave={e => {
+            if (!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = themeColors.white
+          }}
         >
           Next
         </button>

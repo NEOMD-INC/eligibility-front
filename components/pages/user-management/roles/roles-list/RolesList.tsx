@@ -137,13 +137,10 @@ export default function RolesList() {
       <div className="p-6 relative">
         <div className="flex justify-between max-w-auto rounded bg-white p-6">
           <div>
-            <h1
-              className="text-2xl font-bold text-gray-900"
-              style={{ color: themeColors.text.primary }}
-            >
+            <h1 className="text-2xl font-bold" style={{ color: themeColors.text.primary }}>
               Roles
             </h1>
-            <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
+            <p className="mt-1 text-sm" style={{ color: themeColors.text.muted }}>
               Manage Roles
             </p>
           </div>
@@ -151,7 +148,13 @@ export default function RolesList() {
             <div className="flex flex-wrap">
               <Link
                 href="/user-management/roles/add-new-role"
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
+                className="px-4 py-2 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 flex items-center gap-2"
+                style={{ backgroundColor: themeColors.blue[600] }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
+                onFocus={e =>
+                  (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`)
+                }
               >
                 <Plus size={16} />
                 Add New Role
@@ -179,19 +182,23 @@ export default function RolesList() {
             clientSidePagination={false}
             noDataMessage={
               <div className="text-center py-8">
-                <p className="text-gray-500">No Roles found</p>
+                <p style={{ color: themeColors.text.muted }}>No Roles found</p>
               </div>
             }
             className="shadow-none rounded-none"
           />
           {error && (
-            <div className="px-6 py-4 bg-red-50 border-t border-red-200">
-              <p className="text-sm text-red-600">{error}</p>
+            <div
+              className="px-6 py-4 border-t"
+              style={{ backgroundColor: themeColors.red[100], borderColor: themeColors.red[400] }}
+            >
+              <p className="text-sm" style={{ color: themeColors.text.error }}>
+                {error}
+              </p>
             </div>
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
         <ConfirmationModal
           isOpen={deleteModal.isOpen}
           onClose={() => setDeleteModal({ isOpen: false, id: null, roleName: null })}
@@ -200,7 +207,7 @@ export default function RolesList() {
           message={`Are you sure you want to delete role "${deleteModal.roleName}"?`}
           confirmText="Delete"
           cancelText="Cancel"
-          confirmButtonClass="bg-red-600 hover:bg-red-700"
+          confirmButtonClass=""
           isLoading={deleteLoading}
         />
       </div>

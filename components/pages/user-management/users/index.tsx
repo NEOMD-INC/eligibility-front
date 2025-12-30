@@ -1,3 +1,1 @@
-import UsersList from './users-list/UsersList'
-
-export default UsersList
+export { default } from './users-list/UsersList'

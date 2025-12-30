@@ -6,7 +6,7 @@ const DefaultImage = ({ gender }: ImageProps) => {
   const imageSource =
     gender === 'male' ? '/media/svg/avatars/001-boy.svg' : '/media/svg/avatars/014-girl-7.svg'
 
-  return <img src={imageSource} alt="" />
+  return <Image src={imageSource} alt="" />
 }
 export default DefaultImage
 
@@ -21,11 +21,10 @@ export const UserProfileImage = ({ profileImagePath, width, square }: UserProfil
   const imageClassName = square ? 'rounded' : 'rounded-circle'
   const isExternalUrl =
     profileImagePath?.startsWith('http://') || profileImagePath?.startsWith('https://')
-  // const isLocalPath = !hasImage || (!isExternalUrl && !baseUrl)
 
   if (hasImage && (isExternalUrl || baseUrl)) {
     return (
-      <img
+      <Image
         className={imageClassName}
         src={imageSrc}
         alt="Profile"

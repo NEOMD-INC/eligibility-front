@@ -19,6 +19,7 @@ export const getCarrierAddressDetails = (currentCarrierAddress: any) => {
     {
       title: 'Address Line 1',
       value:
+        currentCarrierAddress.address1 ||
         currentCarrierAddress.address_line1 ||
         currentCarrierAddress.address_line_1 ||
         currentCarrierAddress.addressLine1 ||
@@ -38,11 +39,19 @@ export const getCarrierAddressDetails = (currentCarrierAddress: any) => {
     },
     {
       title: 'Phone Type',
-      value: currentCarrierAddress.phone_type || currentCarrierAddress.phoneType || 'N/A',
+      value:
+        currentCarrierAddress.insurance_phone_type1 ||
+        currentCarrierAddress.phone_type ||
+        currentCarrierAddress.phoneType ||
+        'N/A',
     },
     {
       title: 'Phone Number',
-      value: currentCarrierAddress.phone_number || currentCarrierAddress.phoneNumber || 'N/A',
+      value:
+        currentCarrierAddress.insurance_phone_number1 ||
+        currentCarrierAddress.phone_number ||
+        currentCarrierAddress.phoneNumber ||
+        'N/A',
     },
     {
       title: 'Insurance Department',

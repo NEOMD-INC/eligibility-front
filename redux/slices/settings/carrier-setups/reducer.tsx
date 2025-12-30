@@ -40,13 +40,27 @@ const mapFormToApi = (obj: any): any => {
       } else if (key === 'carrierDescription') {
         apiObj.carrier_description = obj[key]
       } else if (key === 'batchPlayerId') {
-        apiObj.batch_player_id = obj[key]
+        apiObj.batch_payer_id = obj[key]
       } else if (key === 'isClia') {
-        apiObj.is_clia = obj[key]
+        // Convert boolean to number (1 or 0)
+        apiObj.is_clia = obj[key] === true || obj[key] === 'true' || obj[key] === 1 ? 1 : 0
       } else if (key === 'correctedClaim') {
         apiObj.corrected_claim = obj[key]
       } else if (key === 'enrollmentRequired') {
-        apiObj.enrollment_required = obj[key]
+        // Convert enrollmentRequired string to enrollment number (0 or 1)
+        const enrollmentValue = obj[key]
+        if (enrollmentValue === 'Required' || enrollmentValue === '1' || enrollmentValue === 1) {
+          apiObj.enrollment = 1
+        } else if (
+          enrollmentValue === 'Not Required' ||
+          enrollmentValue === '0' ||
+          enrollmentValue === 0 ||
+          enrollmentValue === ''
+        ) {
+          apiObj.enrollment = 0
+        } else {
+          apiObj.enrollment = enrollmentValue
+        }
       } else {
         // For other fields (state, cob), keep as is
         apiObj[key] = mapFormToApi(obj[key])
@@ -87,7 +101,7 @@ export const fetchCarrierSetupById = createAsyncThunk(
 // Async thunk to create carrier setup
 export const createCarrierSetup = createAsyncThunk(
   'carrierSetups/createCarrierSetup',
-  async (carrierSetupData: {}, { rejectWithValue }) => {
+  async (carrierSetupData: any, { rejectWithValue }) => {
     try {
       const apiData = mapFormToApi(carrierSetupData)
       const response = await CarrierSetupsService.createCarrierSetups(apiData)
@@ -101,7 +115,7 @@ export const createCarrierSetup = createAsyncThunk(
 // Async thunk to update carrier setup
 export const updateCarrierSetup = createAsyncThunk(
   'carrierSetups/updateCarrierSetup',
-  async (params: { carrierSetupId: string; carrierSetupData: {} }, { rejectWithValue }) => {
+  async (params: { carrierSetupId: string; carrierSetupData: any }, { rejectWithValue }) => {
     try {
       const apiData = mapFormToApi(params.carrierSetupData)
       const response = await CarrierSetupsService.updateCarrierSetups(

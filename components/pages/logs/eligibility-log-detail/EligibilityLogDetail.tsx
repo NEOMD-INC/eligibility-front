@@ -44,10 +44,15 @@ export default function EligibilityLogDetail() {
       <PageTransition>
         <div className="flex items-center justify-center p-6">
           <div className="text-center">
-            <p className="text-red-600 mb-4">Invalid log ID. Please select a log from the list.</p>
+            <p className="mb-4" style={{ color: themeColors.text.error }}>
+              Invalid log ID. Please select a log from the list.
+            </p>
             <button
               onClick={() => router.push('/logs')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-4 py-2 text-white rounded-md"
+              style={{ backgroundColor: themeColors.blue[600] }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
             >
               Go Back to Logs
             </button>
@@ -75,16 +80,28 @@ export default function EligibilityLogDetail() {
 
   const getStatusBadge = (status?: string) => {
     if (!status) return null
-    const statusColor =
-      status === 'success' || status === 'completed' || status === 'eligible'
-        ? 'bg-green-100 text-green-800'
-        : status === 'failed' || status === 'error' || status === 'not_eligible'
-          ? 'bg-red-100 text-red-800'
-          : status === 'pending'
-            ? 'bg-yellow-100 text-yellow-800'
-            : 'bg-gray-100 text-gray-800'
+    let bgColor: string
+    let textColor: string
+
+    if (status === 'success' || status === 'completed' || status === 'eligible') {
+      bgColor = themeColors.green[100]
+      textColor = themeColors.green[600]
+    } else if (status === 'failed' || status === 'error' || status === 'not_eligible') {
+      bgColor = themeColors.red[100]
+      textColor = themeColors.red[700]
+    } else if (status === 'pending') {
+      bgColor = themeColors.yellow[500] ? '#fef3c7' : '#fef3c7' // yellow-100 equivalent
+      textColor = themeColors.yellow[500] || '#92400e' // yellow-800 equivalent
+    } else {
+      bgColor = themeColors.gray[100]
+      textColor = themeColors.gray[800]
+    }
+
     return (
-      <span className={`px-3 py-1 text-sm font-semibold rounded-full ${statusColor}`}>
+      <span
+        className="px-3 py-1 text-sm font-semibold rounded-full"
+        style={{ backgroundColor: bgColor, color: textColor }}
+      >
         {status}
       </span>
     )
@@ -108,10 +125,15 @@ export default function EligibilityLogDetail() {
       <PageTransition>
         <div className="flex items-center justify-center p-6">
           <div className="text-center">
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="mb-4" style={{ color: themeColors.text.error }}>
+              {error}
+            </p>
             <button
               onClick={() => router.push('/logs')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-4 py-2 text-white rounded-md"
+              style={{ backgroundColor: themeColors.blue[600] }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
             >
               Go Back
             </button>
@@ -126,10 +148,15 @@ export default function EligibilityLogDetail() {
       <PageTransition>
         <div className="flex items-center justify-center p-6">
           <div className="text-center">
-            <p className="text-gray-600 mb-4">Log not found</p>
+            <p className="mb-4" style={{ color: themeColors.gray[600] }}>
+              Log not found
+            </p>
             <button
               onClick={() => router.push('/logs')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-4 py-2 text-white rounded-md"
+              style={{ backgroundColor: themeColors.blue[600] }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.blue[700])}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.blue[600])}
             >
               Go Back
             </button>
@@ -321,35 +348,50 @@ export default function EligibilityLogDetail() {
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1
-              className="text-2xl font-bold text-gray-900"
-              style={{ color: themeColors.text.primary }}
-            >
+            <h1 className="text-2xl font-bold" style={{ color: themeColors.text.primary }}>
               Eligibility Log Details
             </h1>
-            <p className="mt-1 text-sm text-gray-500" style={{ color: themeColors.text.muted }}>
+            <p className="mt-1 text-sm" style={{ color: themeColors.text.muted }}>
               View detailed information about the eligibility check
             </p>
           </div>
           <button
             onClick={() => router.back()}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+            className="px-4 py-2 border rounded-md transition"
+            style={{
+              borderColor: themeColors.border.default,
+              color: themeColors.gray[700],
+            }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
             Back
           </button>
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div
+            className="px-6 py-4 border-b"
+            style={{
+              backgroundColor: themeColors.gray[50],
+              borderColor: themeColors.border.default,
+            }}
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Queue Status
                 </label>
                 {getStatusBadge(queueStatus)}
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Eligibility Status
                 </label>
                 {getStatusBadge(eligibilityStatus)}
@@ -357,76 +399,134 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Request Information</h2>
+          <div className="px-6 py-4 border-b" style={{ borderColor: themeColors.border.default }}>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text.primary }}>
+              Request Information
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Neo Reference ID
                 </label>
-                <p className="text-gray-900">{neoReferenceId}</p>
+                <p style={{ color: themeColors.text.primary }}>{neoReferenceId}</p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Created At</label>
-                <p className="text-gray-900">{formatDate(createdAt)}</p>
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
+                  Created At
+                </label>
+                <p style={{ color: themeColors.text.primary }}>{formatDate(createdAt)}</p>
               </div>
             </div>
           </div>
 
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Service Information</h2>
+          <div
+            className="px-6 py-4 border-b"
+            style={{
+              backgroundColor: themeColors.gray[50],
+              borderColor: themeColors.border.default,
+            }}
+          >
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text.primary }}>
+              Service Information
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Service Date
                 </label>
-                <p className="text-gray-900">{formatDate(serviceDate)}</p>
+                <p style={{ color: themeColors.text.primary }}>{formatDate(serviceDate)}</p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Service Type
                 </label>
-                <p className="text-gray-900">
+                <p style={{ color: themeColors.text.primary }}>
                   {serviceTypeCode ? getServiceTypeLabel(String(serviceTypeCode)) : 'N/A'}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Subscriber Info</h2>
+          <div className="px-6 py-4 border-b" style={{ borderColor: themeColors.border.default }}>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text.primary }}>
+              Subscriber Info
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Subscriber ID
                 </label>
-                <p className="text-gray-900">{subscriberId || 'N/A'}</p>
+                <p style={{ color: themeColors.text.primary }}>{subscriberId || 'N/A'}</p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
-                <p className="text-gray-900">{patientName || subscriberName || 'N/A'}</p>
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
+                  Name
+                </label>
+                <p style={{ color: themeColors.text.primary }}>
+                  {patientName || subscriberName || 'N/A'}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">DOB</label>
-                <p className="text-gray-900">{formatDate(patientDob || subscriberDob)}</p>
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
+                  DOB
+                </label>
+                <p style={{ color: themeColors.text.primary }}>
+                  {formatDate(patientDob || subscriberDob)}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Gender</label>
-                <p className="text-gray-900">{patientGender || subscriberGender || 'N/A'}</p>
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
+                  Gender
+                </label>
+                <p style={{ color: themeColors.text.primary }}>
+                  {patientGender || subscriberGender || 'N/A'}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Relationship
                 </label>
-                <p className="text-gray-900">
+                <p style={{ color: themeColors.text.primary }}>
                   {relationshipName ||
                     (relationshipCode ? getRelationshipCodeLabel(String(relationshipCode)) : 'N/A')}
                 </p>
               </div>
               {(patientAddress || patientCity || patientState || patientZip) && (
                 <div className="md:col-span-2 lg:col-span-3">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
-                  <p className="text-gray-900">
+                  <label
+                    className="block text-sm font-semibold mb-1"
+                    style={{ color: themeColors.gray[700] }}
+                  >
+                    Address
+                  </label>
+                  <p style={{ color: themeColors.text.primary }}>
                     {[patientAddress, patientCity, patientState, patientZip]
                       .filter(Boolean)
                       .join(', ') || 'N/A'}
@@ -436,46 +536,79 @@ export default function EligibilityLogDetail() {
             </div>
           </div>
 
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Provider Info</h2>
+          <div
+            className="px-6 py-4 border-b"
+            style={{
+              backgroundColor: themeColors.gray[50],
+              borderColor: themeColors.border.default,
+            }}
+          >
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text.primary }}>
+              Provider Info
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Provider Name
                 </label>
-                <p className="text-gray-900">{providerName || 'N/A'}</p>
+                <p style={{ color: themeColors.text.primary }}>{providerName || 'N/A'}</p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">NPI</label>
-                <p className="text-gray-900">{providerNpi || 'N/A'}</p>
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
+                  NPI
+                </label>
+                <p style={{ color: themeColors.text.primary }}>{providerNpi || 'N/A'}</p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Place of Service
                 </label>
-                <p className="text-gray-900">
+                <p style={{ color: themeColors.text.primary }}>
                   {placeOfServiceCode ? getPlaceOfServiceLabel(String(placeOfServiceCode)) : 'N/A'}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Response and Information</h2>
+          <div className="px-6 py-4 border-b" style={{ borderColor: themeColors.border.default }}>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text.primary }}>
+              Response and Information
+            </h2>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label
+                  className="block text-sm font-semibold mb-1"
+                  style={{ color: themeColors.gray[700] }}
+                >
                   Response Message
                 </label>
-                <div className="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                <div
+                  className="border rounded-lg p-4"
+                  style={{
+                    backgroundColor: themeColors.gray[50],
+                    borderColor: themeColors.border.default,
+                  }}
+                >
                   {responseMessage ? (
-                    <p className="text-gray-900 whitespace-pre-wrap break-words">
+                    <p
+                      className="whitespace-pre-wrap break-words"
+                      style={{ color: themeColors.text.primary }}
+                    >
                       {typeof responseMessage === 'object'
                         ? JSON.stringify(responseMessage, null, 2)
                         : String(responseMessage)}
                     </p>
                   ) : (
-                    <p className="text-gray-500">No response message available</p>
+                    <p style={{ color: themeColors.text.muted }}>No response message available</p>
                   )}
                 </div>
               </div>
@@ -486,11 +619,23 @@ export default function EligibilityLogDetail() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Request 270</h2>
+                  <h2 className="text-lg font-semibold" style={{ color: themeColors.text.primary }}>
+                    Request 270
+                  </h2>
                   {request270 && (
                     <button
                       onClick={handleCopyRequest}
-                      className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="flex items-center gap-2 px-3 py-1.5 text-sm text-white rounded-md focus:outline-none focus:ring-2 transition"
+                      style={{ backgroundColor: themeColors.blue[600] }}
+                      onMouseEnter={e =>
+                        (e.currentTarget.style.backgroundColor = themeColors.blue[700])
+                      }
+                      onMouseLeave={e =>
+                        (e.currentTarget.style.backgroundColor = themeColors.blue[600])
+                      }
+                      onFocus={e =>
+                        (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`)
+                      }
                       title="Copy Request 270"
                     >
                       {copiedRequest ? (
@@ -507,7 +652,13 @@ export default function EligibilityLogDetail() {
                     </button>
                   )}
                 </div>
-                <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 min-h-[200px]">
+                <div
+                  className="border rounded-lg p-4 min-h-[200px]"
+                  style={{
+                    backgroundColor: themeColors.gray[50],
+                    borderColor: themeColors.border.default,
+                  }}
+                >
                   {request270 ? (
                     <div className="space-y-2">
                       {typeof request270 === 'string' &&
@@ -516,12 +667,18 @@ export default function EligibilityLogDetail() {
                           href={request270}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 underline break-all"
+                          className="underline break-all"
+                          style={{ color: themeColors.text.link }}
+                          onMouseEnter={e => (e.currentTarget.style.color = themeColors.blue[700])}
+                          onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.link)}
                         >
                           {request270}
                         </a>
                       ) : (
-                        <pre className="text-sm text-gray-700 whitespace-pre-wrap break-words">
+                        <pre
+                          className="text-sm whitespace-pre-wrap break-words"
+                          style={{ color: themeColors.gray[700] }}
+                        >
                           {typeof request270 === 'object'
                             ? JSON.stringify(request270, null, 2)
                             : String(request270)}
@@ -529,18 +686,30 @@ export default function EligibilityLogDetail() {
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-500">No request data available</p>
+                    <p style={{ color: themeColors.text.muted }}>No request data available</p>
                   )}
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Response 271</h2>
+                  <h2 className="text-lg font-semibold" style={{ color: themeColors.text.primary }}>
+                    Response 271
+                  </h2>
                   {response271 && (
                     <button
                       onClick={handleCopyResponse}
-                      className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="flex items-center gap-2 px-3 py-1.5 text-sm text-white rounded-md focus:outline-none focus:ring-2 transition"
+                      style={{ backgroundColor: themeColors.blue[600] }}
+                      onMouseEnter={e =>
+                        (e.currentTarget.style.backgroundColor = themeColors.blue[700])
+                      }
+                      onMouseLeave={e =>
+                        (e.currentTarget.style.backgroundColor = themeColors.blue[600])
+                      }
+                      onFocus={e =>
+                        (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`)
+                      }
                       title="Copy Response 271"
                     >
                       {copiedResponse ? (
@@ -557,7 +726,13 @@ export default function EligibilityLogDetail() {
                     </button>
                   )}
                 </div>
-                <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 min-h-[200px]">
+                <div
+                  className="border rounded-lg p-4 min-h-[200px]"
+                  style={{
+                    backgroundColor: themeColors.gray[50],
+                    borderColor: themeColors.border.default,
+                  }}
+                >
                   {response271 ? (
                     <div className="space-y-2">
                       {typeof response271 === 'string' &&
@@ -566,12 +741,18 @@ export default function EligibilityLogDetail() {
                           href={response271}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 underline break-all"
+                          className="underline break-all"
+                          style={{ color: themeColors.text.link }}
+                          onMouseEnter={e => (e.currentTarget.style.color = themeColors.blue[700])}
+                          onMouseLeave={e => (e.currentTarget.style.color = themeColors.text.link)}
                         >
                           {response271}
                         </a>
                       ) : (
-                        <pre className="text-sm text-gray-700 whitespace-pre-wrap break-words">
+                        <pre
+                          className="text-sm whitespace-pre-wrap break-words"
+                          style={{ color: themeColors.gray[700] }}
+                        >
                           {typeof response271 === 'object'
                             ? JSON.stringify(response271, null, 2)
                             : String(response271)}
@@ -579,7 +760,7 @@ export default function EligibilityLogDetail() {
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-500">No response data available</p>
+                    <p style={{ color: themeColors.text.muted }}>No response data available</p>
                   )}
                 </div>
               </div>

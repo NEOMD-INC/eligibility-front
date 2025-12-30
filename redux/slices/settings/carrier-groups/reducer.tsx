@@ -91,7 +91,7 @@ export const fetchCarrierGroupById = createAsyncThunk(
 // Async thunk to create carrier group
 export const createCarrierGroup = createAsyncThunk(
   'carrierGroups/createCarrierGroup',
-  async (carrierGroupData: {}, { rejectWithValue }) => {
+  async (carrierGroupData: any, { rejectWithValue }) => {
     try {
       // Map form fields to API field names
       const apiData = mapFormToApi(carrierGroupData)
@@ -106,7 +106,7 @@ export const createCarrierGroup = createAsyncThunk(
 // Async thunk to update carrier group
 export const updateCarrierGroup = createAsyncThunk(
   'carrierGroups/updateCarrierGroup',
-  async (params: { carrierGroupId: string; carrierGroupData: {} }, { rejectWithValue }) => {
+  async (params: { carrierGroupId: string; carrierGroupData: any }, { rejectWithValue }) => {
     try {
       // Map form fields to API field names
       const apiData = mapFormToApi(params.carrierGroupData)

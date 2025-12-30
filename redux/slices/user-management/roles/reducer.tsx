@@ -55,7 +55,7 @@ export const fetchRoleById = createAsyncThunk(
 // Async thunk to create role
 export const createRole = createAsyncThunk(
   'roles/createRole',
-  async (roleData: {}, { rejectWithValue }) => {
+  async (roleData: any, { rejectWithValue }) => {
     try {
       const response = await rolesService.createRole(roleData)
       return response.data
@@ -68,7 +68,7 @@ export const createRole = createAsyncThunk(
 // Async thunk to update role
 export const updateRole = createAsyncThunk(
   'roles/updateRole',
-  async (params: { roleId: string; roleData: {} }, { rejectWithValue }) => {
+  async (params: { roleId: string; roleData: any }, { rejectWithValue }) => {
     try {
       const response = await rolesService.updateRole(params.roleId, params.roleData)
       return response.data

@@ -16,6 +16,7 @@ import {
   updateAvailityPayer,
 } from '@/redux/slices/settings/availity-payers/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 import type { AvailityPayerFormValues } from '@/types'
 
 export default function AddUpdateAvailityPayer() {
@@ -34,17 +35,17 @@ export default function AddUpdateAvailityPayer() {
   const validationSchema = Yup.object({
     payerId: Yup.string().required('Payer ID is required'),
     payerName: Yup.string().required('Payer name is required'),
-    payerCode: Yup.string().required('Payer code is required'),
-    contactName: Yup.string().required('Contact name is required'),
-    addressLine1: Yup.string().required('Address line 1 is required'),
-    addressLine2: Yup.string(),
-    city: Yup.string().required('City is required'),
-    state: Yup.string().required('State is required'),
-    zipCode: Yup.string().required('Zip code is required'),
-    phone: Yup.string().required('Phone is required'),
-    email: Yup.string().email('Invalid email address').required('Email is required'),
+    payerCode: Yup.string().nullable(),
+    contactName: Yup.string().nullable(),
+    addressLine1: Yup.string().nullable(),
+    addressLine2: Yup.string().nullable(),
+    city: Yup.string().nullable(),
+    state: Yup.string().nullable(),
+    zipCode: Yup.string().nullable(),
+    phone: Yup.string().nullable(),
+    email: Yup.string().email('Invalid email address').nullable(),
     isActive: Yup.boolean(),
-    notes: Yup.string(),
+    notes: Yup.string().nullable(),
   })
 
   const formik = useFormik<AvailityPayerFormValues>({
@@ -107,7 +108,7 @@ export default function AddUpdateAvailityPayer() {
         addressLine2: currentAvailityPayer.address_line_2 || '',
         city: currentAvailityPayer.city || '',
         state: currentAvailityPayer.state || '',
-        zipCode: currentAvailityPayer.zip || '',
+        zipCode: currentAvailityPayer.zip || currentAvailityPayer.zip_code || '',
         phone: currentAvailityPayer.phone || '',
         email: currentAvailityPayer.email || '',
         isActive:
@@ -141,7 +142,11 @@ export default function AddUpdateAvailityPayer() {
     if (type === 'textarea') {
       return (
         <div key={name} className="mb-4">
-          <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor={name}
+            className="block text-sm font-medium mb-1"
+            style={{ color: themeColors.gray[700] }}
+          >
             {label}
           </label>
           <textarea
@@ -149,14 +154,23 @@ export default function AddUpdateAvailityPayer() {
             name={name}
             value={fieldValue as string}
             onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
             rows={4}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              fieldError ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+            style={{
+              borderColor: fieldError ? themeColors.border.error : themeColors.border.default,
+            }}
+            onFocus={e => {
+              e.currentTarget.style.boxShadow = `0 0 0 2px ${fieldError ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+            }}
+            onBlur={e => {
+              e.currentTarget.style.boxShadow = ''
+              formik.handleBlur(e)
+            }}
           />
           {fieldError && (
-            <p className="mt-1 text-sm text-red-600">{formik.errors[name] as string}</p>
+            <p className="mt-1 text-sm" style={{ color: themeColors.text.error }}>
+              {formik.errors[name] as string}
+            </p>
           )}
         </div>
       )
@@ -172,13 +186,26 @@ export default function AddUpdateAvailityPayer() {
               name={name}
               checked={fieldValue as boolean}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="mr-2 h-4 w-4 border rounded"
+              style={{
+                color: themeColors.blue[600],
+                borderColor: themeColors.border.default,
+              }}
+              onFocus={e => {
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.blue[400]}`
+              }}
+              onBlur={e => {
+                e.currentTarget.style.boxShadow = ''
+              }}
             />
-            <span className="text-sm font-medium text-gray-700">{label}</span>
+            <span className="text-sm font-medium" style={{ color: themeColors.gray[700] }}>
+              {label}
+            </span>
           </label>
           {fieldError && (
-            <p className="mt-1 text-sm text-red-600">{formik.errors[name] as string}</p>
+            <p className="mt-1 text-sm" style={{ color: themeColors.text.error }}>
+              {formik.errors[name] as string}
+            </p>
           )}
         </div>
       )
@@ -186,7 +213,11 @@ export default function AddUpdateAvailityPayer() {
 
     return (
       <div key={name} className="mb-4">
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor={name}
+          className="block text-sm font-medium mb-1"
+          style={{ color: themeColors.gray[700] }}
+        >
           {label}
         </label>
         <input
@@ -195,12 +226,23 @@ export default function AddUpdateAvailityPayer() {
           name={name}
           value={fieldValue as string}
           onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            fieldError ? 'border-red-500' : 'border-gray-300'
-          }`}
+          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+          style={{
+            borderColor: fieldError ? themeColors.border.error : themeColors.border.default,
+          }}
+          onFocus={e => {
+            e.currentTarget.style.boxShadow = `0 0 0 2px ${fieldError ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+          }}
+          onBlur={e => {
+            e.currentTarget.style.boxShadow = ''
+            formik.handleBlur(e)
+          }}
         />
-        {fieldError && <p className="mt-1 text-sm text-red-600">{formik.errors[name] as string}</p>}
+        {fieldError && (
+          <p className="mt-1 text-sm" style={{ color: themeColors.text.error }}>
+            {formik.errors[name] as string}
+          </p>
+        )}
       </div>
     )
   }
@@ -211,7 +253,10 @@ export default function AddUpdateAvailityPayer() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
+      <div
+        className="flex flex-col justify-center p-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-6">
             {isEditMode ? 'Edit Availity Payer' : 'Add Availity Payer'}
@@ -220,9 +265,11 @@ export default function AddUpdateAvailityPayer() {
           <form onSubmit={formik.handleSubmit}>
             {errorMsg && (
               <div
-                className={`mb-6 p-4 rounded-lg ${
-                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                }`}
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  backgroundColor: isError ? themeColors.red[100] : themeColors.blue[100],
+                  color: isError ? themeColors.red[700] : themeColors.blue[700],
+                }}
               >
                 <span>{errorMsg}</span>
               </div>
@@ -246,14 +293,29 @@ export default function AddUpdateAvailityPayer() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                className="px-6 py-2 border rounded-md transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Cancel
               </button>
               <SubmitButton
                 type="submit"
                 title={isEditMode ? 'Update Payer' : 'Add Payer'}
-                class_name="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                class_name="px-6 py-2 text-white rounded-md transition"
+                style={{ backgroundColor: themeColors.blue[600] }}
+                onMouseEnter={e => {
+                  const btn = e.currentTarget as HTMLButtonElement
+                  if (!btn.disabled) btn.style.backgroundColor = themeColors.blue[700]
+                }}
+                onMouseLeave={e => {
+                  const btn = e.currentTarget as HTMLButtonElement
+                  if (!btn.disabled) btn.style.backgroundColor = themeColors.blue[600]
+                }}
                 btnLoading={isEditMode ? updateLoading || fetchAvailityPayerLoading : createLoading}
                 callback_event=""
               />

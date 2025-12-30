@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { themeColors } from '@/theme'
+
 export interface SearchableSelectOption {
   value: string
   label: string
@@ -123,16 +125,33 @@ export default function SearchableSelect({
       {/* Custom dropdown */}
       <div
         onClick={handleToggle}
-        className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 cursor-pointer ${
-          error ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
-        } ${disabled ? 'bg-gray-100 cursor-not-allowed opacity-50' : ''} ${className}`}
+        className={`w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2 cursor-pointer ${
+          disabled ? 'cursor-not-allowed opacity-50' : ''
+        } ${className}`}
+        style={{
+          color: themeColors.text.primary,
+          borderColor: error ? themeColors.border.error : themeColors.border.default,
+          backgroundColor: disabled ? themeColors.gray[100] : themeColors.white,
+        }}
+        onFocus={e => {
+          if (!disabled) {
+            e.currentTarget.style.boxShadow = `0 0 0 2px ${error ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+          }
+        }}
+        onBlur={e => {
+          e.currentTarget.style.boxShadow = ''
+        }}
       >
         <div className="flex items-center justify-between">
-          <span className={`text-sm ${value ? 'text-gray-900' : 'text-gray-500'}`}>
+          <span
+            className="text-sm"
+            style={{ color: value ? themeColors.text.primary : themeColors.text.muted }}
+          >
             {displayValue}
           </span>
           <svg
-            className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
+            className={`w-5 h-5 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
+            style={{ color: themeColors.gray[400] }}
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -147,16 +166,28 @@ export default function SearchableSelect({
 
       {/* Dropdown menu */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-80 overflow-hidden">
+        <div
+          className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-80 overflow-hidden"
+          style={{ borderColor: themeColors.border.default }}
+        >
           {/* Search input */}
-          <div className="p-2 border-b border-gray-200">
+          <div className="p-2 border-b" style={{ borderColor: themeColors.border.default }}>
             <input
               ref={searchInputRef}
               type="text"
               placeholder="Search..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2"
+              style={{
+                borderColor: themeColors.border.default,
+              }}
+              onFocus={e => {
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.border.focusRing.blue}`
+              }}
+              onBlur={e => {
+                e.currentTarget.style.boxShadow = ''
+              }}
               onClick={e => e.stopPropagation()}
             />
           </div>
@@ -172,15 +203,31 @@ export default function SearchableSelect({
             }}
           >
             {filteredOptions.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">No options found</div>
+              <div
+                className="px-4 py-3 text-sm text-center"
+                style={{ color: themeColors.text.muted }}
+              >
+                No options found
+              </div>
             ) : (
               filteredOptions.map(option => (
                 <div
                   key={option.value}
                   onClick={() => handleSelect(option.value)}
-                  className={`px-4 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
-                    value === option.value ? 'bg-blue-100 font-semibold' : ''
-                  }`}
+                  className="px-4 py-2 text-sm cursor-pointer font-semibold"
+                  style={{
+                    backgroundColor: value === option.value ? themeColors.blue[100] : 'transparent',
+                  }}
+                  onMouseEnter={e => {
+                    if (value !== option.value) {
+                      e.currentTarget.style.backgroundColor = themeColors.blue[50] || '#eff6ff'
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (value !== option.value) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                    }
+                  }}
                 >
                   {option.label}
                 </div>

@@ -5,7 +5,7 @@ export const EligibilitySettingsService = {
     return api.get(`/eligibility-settings`)
   },
 
-  updateEligibilitySettings: (userData: {}) => {
+  updateEligibilitySettings: (userData: any) => {
     return api.put('/eligibility-update-settings', userData)
   },
 }

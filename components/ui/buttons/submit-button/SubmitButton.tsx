@@ -6,11 +6,21 @@ const SubmitButton = ({
   class_name,
   callback_event,
   btnLoading,
-}: SubmitButtonProps) => {
+  style,
+  onMouseEnter,
+  onMouseLeave,
+}: SubmitButtonProps & {
+  style?: React.CSSProperties
+  onMouseEnter?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  onMouseLeave?: (e: React.MouseEvent<HTMLButtonElement>) => void
+}) => {
   const inputProp: any = {
     disabled: btnLoading,
     className: class_name,
     onClick: callback_event,
+    style,
+    onMouseEnter,
+    onMouseLeave,
   }
 
   if (callback_event === '') {

@@ -16,6 +16,7 @@ import {
   updateCarrierSetup,
 } from '@/redux/slices/settings/carrier-setups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
+import { themeColors } from '@/theme'
 import type { CarrierSetupFormValues } from '@/types'
 
 export default function AddUpdateCarrierSetup() {
@@ -93,6 +94,14 @@ export default function AddUpdateCarrierSetup() {
 
   useEffect(() => {
     if (isEditMode && currentCarrierSetup) {
+      const enrollmentValue = currentCarrierSetup.enrollment
+      const enrollmentRequired =
+        enrollmentValue === 1 || enrollmentValue === '1' || enrollmentValue === true
+          ? 'Required'
+          : enrollmentValue === 0 || enrollmentValue === '0' || enrollmentValue === false
+            ? 'Not Required'
+            : currentCarrierSetup.enrollment_required || ''
+
       formik.setValues({
         carrierGroupCode: currentCarrierSetup.carrier_group_code || '',
         carrierGroupDescription: currentCarrierSetup.carrier_group_description || '',
@@ -108,7 +117,7 @@ export default function AddUpdateCarrierSetup() {
               : false,
         cob: currentCarrierSetup.cob || '',
         correctedClaim: currentCarrierSetup.corrected_claim || '',
-        enrollmentRequired: currentCarrierSetup.enrollment_required || '',
+        enrollmentRequired: enrollmentRequired,
       })
     }
   }, [currentCarrierSetup, isEditMode])
@@ -134,7 +143,12 @@ export default function AddUpdateCarrierSetup() {
     if (type === 'select') {
       return (
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-gray-800 mb-1">{label}</label>
+          <label
+            className="block text-sm font-semibold mb-1"
+            style={{ color: themeColors.text.secondary }}
+          >
+            {label}
+          </label>
           <select
             name={name}
             onChange={e => {
@@ -147,7 +161,6 @@ export default function AddUpdateCarrierSetup() {
                 formik.handleChange(e)
               }
             }}
-            onBlur={formik.handleBlur}
             value={
               name === 'isClia'
                 ? formik.values.isClia === undefined
@@ -155,9 +168,18 @@ export default function AddUpdateCarrierSetup() {
                   : String(formik.values.isClia)
                 : String(value || '')
             }
-            className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-              hasError ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
-            }`}
+            className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+            style={{
+              color: themeColors.text.primary,
+              borderColor: hasError ? themeColors.border.error : themeColors.border.default,
+            }}
+            onFocus={e => {
+              e.currentTarget.style.boxShadow = `0 0 0 2px ${hasError ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+            }}
+            onBlur={e => {
+              e.currentTarget.style.boxShadow = ''
+              formik.handleBlur(e)
+            }}
           >
             {options?.map(opt => (
               <option key={opt.value} value={opt.value}>
@@ -165,27 +187,48 @@ export default function AddUpdateCarrierSetup() {
               </option>
             ))}
           </select>
-          {hasError && <p className="text-red-600 text-sm mt-1">{error}</p>}
+          {hasError && (
+            <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+              {error}
+            </p>
+          )}
         </div>
       )
     }
 
     return (
       <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-800 mb-1">{label}</label>
+        <label
+          className="block text-sm font-semibold mb-1"
+          style={{ color: themeColors.text.secondary }}
+        >
+          {label}
+        </label>
         <input
           type="text"
           name={name}
           placeholder={label}
           autoComplete="off"
           onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
           value={String(value || '')}
-          className={`w-full px-4 py-2 rounded-md border bg-white text-gray-900 focus:outline-none focus:ring-2 ${
-            hasError ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
-          }`}
+          className="w-full px-4 py-2 rounded-md border bg-white focus:outline-none focus:ring-2"
+          style={{
+            color: themeColors.text.primary,
+            borderColor: hasError ? themeColors.border.error : themeColors.border.default,
+          }}
+          onFocus={e => {
+            e.currentTarget.style.boxShadow = `0 0 0 2px ${hasError ? themeColors.border.focusRing.red : themeColors.border.focusRing.blue}`
+          }}
+          onBlur={e => {
+            e.currentTarget.style.boxShadow = ''
+            formik.handleBlur(e)
+          }}
         />
-        {hasError && <p className="text-red-600 text-sm mt-1">{error}</p>}
+        {hasError && (
+          <p className="text-sm mt-1" style={{ color: themeColors.text.error }}>
+            {error}
+          </p>
+        )}
       </div>
     )
   }
@@ -196,7 +239,10 @@ export default function AddUpdateCarrierSetup() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col justify-center bg-gray-100 p-6">
+      <div
+        className="flex flex-col justify-center p-6"
+        style={{ backgroundColor: themeColors.gray[100] }}
+      >
         <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-6">
             {isEditMode ? 'Edit Carrier Setup' : 'Add Carrier Setup'}
@@ -205,9 +251,11 @@ export default function AddUpdateCarrierSetup() {
           <form onSubmit={formik.handleSubmit}>
             {errorMsg && (
               <div
-                className={`mb-6 p-4 rounded-lg ${
-                  isError ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                }`}
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  backgroundColor: isError ? themeColors.red[100] : themeColors.blue[100],
+                  color: isError ? themeColors.red[700] : themeColors.blue[700],
+                }}
               >
                 <span>{errorMsg}</span>
               </div>
@@ -236,7 +284,13 @@ export default function AddUpdateCarrierSetup() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                className="px-6 py-2 border rounded-md transition"
+                style={{
+                  borderColor: themeColors.border.default,
+                  color: themeColors.gray[700],
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[50])}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Cancel
               </button>

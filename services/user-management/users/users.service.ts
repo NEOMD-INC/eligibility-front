@@ -27,11 +27,11 @@ export const userService = {
     return api.get(`/users/${userId}`)
   },
 
-  createUser: (userData: {}) => {
+  createUser: (userData: any) => {
     return api.post('/users/store', userData)
   },
 
-  updateUser: (userId: string, userData: {}) => {
+  updateUser: (userId: string, userData: any) => {
     return api.put(`/users/${userId}/update`, userData)
   },
 

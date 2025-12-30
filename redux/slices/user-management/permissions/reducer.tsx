@@ -79,7 +79,7 @@ export const fetchPermissionById = createAsyncThunk(
 // Async thunk to create permission
 export const createPermission = createAsyncThunk(
   'permissions/createPermission',
-  async (permissionData: {}, { rejectWithValue }) => {
+  async (permissionData: any, { rejectWithValue }) => {
     try {
       const response = await permissionsService.createPermission(permissionData)
       return response.data
@@ -92,7 +92,7 @@ export const createPermission = createAsyncThunk(
 // Async thunk to update permission
 export const updatePermission = createAsyncThunk(
   'permissions/updatePermission',
-  async (params: { permissionId: string; permissionData: {} }, { rejectWithValue }) => {
+  async (params: { permissionId: string; permissionData: any }, { rejectWithValue }) => {
     try {
       const response = await permissionsService.updatePermission(
         params.permissionId,
