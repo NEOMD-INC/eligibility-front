@@ -1,13 +1,8 @@
 // Simple toast utility that can be called from anywhere (including axios interceptors)
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info'
+import type { Toast, ToastType } from '@/types/ui'
 
-export interface Toast {
-  id: string
-  message: string
-  type: ToastType
-  duration?: number
-}
+export type { Toast, ToastType }
 
 type ToastListener = (toasts: Toast[]) => void
 
@@ -20,7 +15,6 @@ class ToastManager {
     // Return initial state
     listener([...this.toasts])
 
-    // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== listener)
     }

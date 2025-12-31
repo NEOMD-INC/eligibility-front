@@ -1,20 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react'
 import React from 'react'
 
-const variants = {
-  hidden: { opacity: 0, y: 6 },
-  visible: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -6 },
-}
-
-const transition = {
-  duration: 0.2,
-  ease: [0.22, 1, 0.36, 1],
-}
-
-export interface TabTransitionProps {
-  children: React.ReactNode
-}
+import { transition, variants } from './helper/helper'
+import { TabTransitionProps } from './types/types'
 
 export function TabTransition({ children }: TabTransitionProps) {
   return (
@@ -25,7 +13,7 @@ export function TabTransition({ children }: TabTransitionProps) {
         initial="hidden"
         animate="visible"
         exit="exit"
-        transition={transition}
+        transition={transition as any}
       >
         {children}
       </motion.div>

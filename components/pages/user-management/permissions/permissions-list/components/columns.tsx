@@ -16,7 +16,7 @@ export default function PermissionsListColumns({
       label: 'Permission Name',
       width: '25%',
       align: 'left' as const,
-      render: (permission: any) => {
+      render: (value: any, permission: any) => {
         const permissionName = permission.name || 'N/A'
         return (
           <Link href={`#`} className="block">
@@ -37,7 +37,7 @@ export default function PermissionsListColumns({
       label: 'Roles',
       width: '15%',
       align: 'center' as const,
-      render: (permission: any) => {
+      render: (value: any, permission: any) => {
         const role = permission.roles_count || 'N/A'
         return (
           <div className="flex justify-center">
@@ -56,7 +56,7 @@ export default function PermissionsListColumns({
       label: 'Actions',
       width: '15%',
       align: 'center' as const,
-      render: (permission: any) => (
+      render: (value: any, permission: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={permission}

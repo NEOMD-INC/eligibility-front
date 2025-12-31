@@ -297,10 +297,6 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* <p className="text-sm" style={{ color: themeColors.gray[600] }}>
-              <span className="font-medium">Insurance</span> {payer.name}
-            </p> */}
-
             <p className="text-sm" style={{ color: themeColors.gray[600] }}>
               <span className="font-medium">Insurance Active From</span>
               <br />
@@ -334,7 +330,7 @@ export default function Dashboard() {
             <h2 className="text-lg font-semibold flex items-center gap-2">👤 Subscriber</h2>
 
             <p className="text-sm">
-              <span className="font-medium">Name</span> {subscriber.name || 'John Doe'}
+              <span className="font-medium">Name - </span> {subscriber.name || 'John Doe'}
             </p>
 
             <p className="text-sm" style={{ color: themeColors.gray[600] }}>
@@ -358,7 +354,7 @@ export default function Dashboard() {
             </h2>
 
             <p className="text-sm">
-              <span className="font-medium">{provider.name}</span>
+              <span className="font-medium">Name - {provider.name}</span>
               <br />
               <span style={{ color: themeColors.text.muted }}>NPI {provider.npi}</span>
             </p>

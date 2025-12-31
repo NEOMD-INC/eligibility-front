@@ -3,25 +3,7 @@ import Link from 'next/link'
 import React, { Suspense } from 'react'
 
 import { themeColors } from '@/theme'
-
-export interface GridActionButtonsProps {
-  data: Record<string, any>
-  from?: string
-  editBtnPath?: string
-  showBtnPath?: string
-  deleteResourceId?: (id: string | number) => void
-  retryResourceId?: (id: string | number) => void
-  showIdDispatch?: (id: string | number | null) => void
-  editIdDispatch?: (id: string | number | null) => void
-  editDrawerId?: string
-  showDrawerId?: string
-  viewPermission?: boolean
-  updatePermission?: boolean
-  deletePermission?: boolean
-  retryPermission?: boolean
-  isUser?: boolean
-  isPending?: boolean
-}
+import { GridActionButtonsProps } from '@/types/ui/buttons'
 
 const PendingSpinner = () => (
   <div

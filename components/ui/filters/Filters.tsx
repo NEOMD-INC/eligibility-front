@@ -1,27 +1,9 @@
 import { Search } from 'lucide-react'
 import React from 'react'
 
-export interface FilterField {
-  name: string
-  label: string
-  type: 'text' | 'select' | 'number' | 'email' | 'date'
-  placeholder?: string
-  value: string | number
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void
-  options?: Array<{ value: string | number; label: string }>
-  className?: string
-}
+import type { FilterField, FiltersProps } from '@/types/ui'
 
-export interface FiltersProps {
-  fields: FilterField[]
-  onReset: () => void
-  onSubmit: () => void
-  columns?: number
-  showSearchIcon?: boolean
-  resetLabel?: string
-  submitLabel?: string
-  className?: string
-}
+export { type FilterField, type FiltersProps }
 
 export default function Filters({
   fields,
@@ -48,7 +30,6 @@ export default function Filters({
   const gridColsClass = gridColsClassMap[columns] || 'grid-cols-1 md:grid-cols-4'
 
   const renderField = (field: FilterField) => {
-    // When there are 4+ fields, use full width to fit in grid
     const widthClass = fields.length >= 4 ? 'w-full' : 'w-full max-w-xs'
     const baseInputClass = `${widthClass} px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm`
     const baseSelectClass = `${widthClass} px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold bg-white text-sm`
@@ -121,8 +102,6 @@ export default function Filters({
     }
   }
 
-  // Determine layout based on number of fields
-  // For 7+ fields, use flex with fields in one line, buttons can wrap
   const shouldUseGrid = fields.length >= 4 && fields.length < 7
   const shouldUseFlex = fields.length >= 7
   const containerClass = shouldUseFlex
@@ -135,7 +114,6 @@ export default function Filters({
     <div className={`px-6 py-4 bg-gray-50 border-b border-gray-200 ${className}`}>
       {shouldUseFlex ? (
         <>
-          {/* Fields in one line */}
           <div className="flex flex-nowrap items-end gap-3 w-full">
             {fields.map(field => (
               <div key={field.name} className="flex-shrink-0 flex-1 min-w-0">
@@ -147,7 +125,6 @@ export default function Filters({
             ))}
           </div>
 
-          {/* Buttons on next line if needed */}
           <div className="flex items-center gap-2 w-full justify-end mt-4">
             <button
               onClick={onReset}
@@ -179,7 +156,6 @@ export default function Filters({
             </div>
           ))}
 
-          {/* Inline buttons - close to search fields */}
           <div className="flex items-center gap-2">
             <button
               onClick={onReset}
@@ -211,7 +187,6 @@ export default function Filters({
             </div>
           ))}
 
-          {/* Inline buttons - close to search fields */}
           <div className="flex items-center gap-2">
             <button
               onClick={onReset}

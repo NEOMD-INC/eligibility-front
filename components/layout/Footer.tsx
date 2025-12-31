@@ -4,24 +4,10 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { themeColors } from '@/theme'
 
-export interface FooterConfig {
-  display?: boolean
-  containerClass?: string
-  fixed?: {
-    desktop?: boolean
-    mobile?: boolean
-  }
-}
+import type { FooterConfig, FooterProps } from './types/types'
+export { type FooterConfig, type FooterProps }
 
-export interface FooterProps {
-  config?: {
-    app?: {
-      footer?: FooterConfig
-    }
-  }
-}
-
-const Footer: React.FC<FooterProps> = ({ config = {} }) => {
+export const Footer: React.FC<FooterProps> = ({ config = {} }) => {
   const [hover, setHover] = useState(false)
 
   const footerConfig: FooterConfig = useMemo(
@@ -107,5 +93,3 @@ const updateDOM = (config: FooterConfig): void => {
     document.body.classList.add('data-kt-app-footer-fixed-mobile')
   }
 }
-
-export { Footer }

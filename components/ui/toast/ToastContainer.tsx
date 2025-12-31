@@ -2,12 +2,9 @@
 
 import React from 'react'
 
-import ToastComponent, { Toast } from './Toast'
+import type { ToastContainerProps } from '@/types/ui/toast'
 
-interface ToastContainerProps {
-  toasts: Toast[]
-  onRemove: (id: string) => void
-}
+import ToastComponent from './Toast'
 
 const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
   if (toasts.length === 0) return null

@@ -3,19 +3,7 @@
 import { AlertCircle, CheckCircle, Info, X, XCircle } from 'lucide-react'
 import React, { useEffect } from 'react'
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info'
-
-export interface Toast {
-  id: string
-  message: string
-  type: ToastType
-  duration?: number
-}
-
-interface ToastProps {
-  toast: Toast
-  onRemove: (id: string) => void
-}
+import type { ToastProps } from '@/types/ui/toast'
 
 const ToastComponent: React.FC<ToastProps> = ({ toast, onRemove }) => {
   useEffect(() => {

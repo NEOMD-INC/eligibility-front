@@ -3,26 +3,10 @@
 import ProgressCard from '@/components/ui/cards/ProgressCard/ProgressCard'
 import { themeColors } from '@/theme'
 
-export default function Deductible({ deductiblesData }: any) {
-  const deductibleData1 =
-    deductiblesData?.map((item: any) => {
-      const messages = item.messages || []
-      const remaining = parseFloat(item.deductible?.remaining || 0)
-      const total = parseFloat(item.deductible?.total || 0)
-      const used = Math.max(0, total - remaining)
+import { getDeductableData } from './components/deductable.config'
 
-      return {
-        title: item.benefit_type,
-        value: `$${remaining} Remaining`,
-        used: used,
-        total: total,
-        footer: 'Resets on 12/31/2024',
-        additionalInfo: {
-          timePeriod: 'Year to Date',
-          notes: messages[1],
-        },
-      }
-    }) || []
+export default function Deductible({ deductiblesData }: any) {
+  const deductibleData1 = getDeductableData(deductiblesData)
 
   return (
     <div className="p-6" style={{ backgroundColor: themeColors.gray[50] }}>

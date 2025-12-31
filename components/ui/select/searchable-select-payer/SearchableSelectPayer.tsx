@@ -10,19 +10,7 @@ import {
 import { AppDispatch } from '@/redux/store'
 import { themeColors } from '@/theme'
 import type { AvailityPayer } from '@/types'
-
-export interface SearchableSelectPayerProps {
-  name: string
-  value: string
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
-  onBlur: (e: React.FocusEvent<HTMLSelectElement>) => void
-  placeholder?: string
-  className?: string
-  error?: boolean
-  disabled?: boolean
-  searchResults?: AvailityPayer[]
-  loading?: boolean
-}
+import type { SearchableSelectPayerProps } from '@/types/ui'
 
 export default function SearchableSelectPayer({
   name,

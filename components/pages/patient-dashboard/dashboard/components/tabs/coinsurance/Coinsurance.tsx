@@ -3,44 +3,11 @@
 import InfoCard from '@/components/ui/cards/InfoCard/InfoCard'
 import { themeColors } from '@/theme'
 
-import { CoinsuranceItem, CoinsuranceProps } from './types/types'
+import { getCoInsuranceData } from './components/coinsurance.config'
+import { CoinsuranceProps } from './types/types'
 
 export default function Coinsurance({ coinsuranceData }: CoinsuranceProps) {
-  const coinsuranceData1 =
-    coinsuranceData?.map((item: CoinsuranceItem) => {
-      const messages = item.messages || []
-      const subtitle =
-        messages.length > 2
-          ? messages[2]
-          : messages[0] || 'Primary Care Visit. Copay Included in OOP'
-      const allMessages =
-        messages.length > 0 ? messages.join('; ') : 'Up to 30% of Hospital Charges'
-
-      const coinsurancePercent = item.coinsurance_percent ?? item.coinsurance_value
-      const timePeriod = item.coinsurance_time_period || 'Calendar Year'
-
-      let displayValue: string
-      if (coinsurancePercent === null || coinsurancePercent === undefined) {
-        displayValue = 'N/A'
-      } else if (typeof coinsurancePercent === 'string') {
-        displayValue = coinsurancePercent.includes('%')
-          ? coinsurancePercent
-          : `${coinsurancePercent}%`
-      } else {
-        displayValue = `${coinsurancePercent}%`
-      }
-
-      return {
-        title: item.benefit_type,
-        value: displayValue,
-        subtitle: subtitle,
-        footer: timePeriod,
-        additionalInfo: {
-          timePeriod: timePeriod,
-          notes: allMessages,
-        },
-      }
-    }) || []
+  const coinsuranceData1 = getCoInsuranceData(coinsuranceData as any)
 
   return (
     <div className="p-6 min-h-[500px]" style={{ backgroundColor: themeColors.gray[50] }}>

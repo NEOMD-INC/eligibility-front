@@ -16,54 +16,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { themeColors } from '@/theme'
 
-interface MenuItemBase {
-  name: string
-  icon: LucideIcon
-}
-
-interface LinkMenuItem extends MenuItemBase {
-  type: 'link'
-  path: string
-}
-
-interface NestedSubMenuItem {
-  name: string
-  path: string
-}
-
-interface NestedSubItem {
-  type: 'nested'
-  name: string
-  nestedItems?: NestedSubMenuItem[]
-}
-
-interface RegularSubItem {
-  type?: 'link'
-  name: string
-  path: string
-}
-
-type SubMenuItem = NestedSubItem | RegularSubItem
-
-interface MenuMenuItem extends MenuItemBase {
-  type: 'menu'
-  subItems: SubMenuItem[]
-}
-
-interface SubheadingMenuItem {
-  type: 'subheading'
-  name: string
-}
-
-type MenuItem = LinkMenuItem | MenuMenuItem | SubheadingMenuItem
-
-interface OpenMenus {
-  [key: string]: boolean
-}
-
-interface OpenNestedMenus {
-  [key: string]: boolean
-}
+import { MenuItem, OpenMenus, OpenNestedMenus, RegularSubItem } from './types/types'
 
 const Sidebar: React.FC = () => {
   const [isHovered, setIsHovered] = useState<boolean>(false)

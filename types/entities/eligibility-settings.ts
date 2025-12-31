@@ -4,7 +4,6 @@
 
 export interface SubscriberSettings {
   id_qualifier?: string
-  // Legacy/compatibility fields
   idQualifier?: string
 }
 
@@ -22,7 +21,6 @@ export interface ISASettings {
   acknowledgment_requested?: string
   usage_indicator?: string
   component_element_separator?: string
-  // Legacy/compatibility fields
   authorizationInformationQualifier?: string
   authorizationInformation?: string
   securityInformationQualifier?: string
@@ -43,7 +41,6 @@ export interface EligibilitySettings {
   subscriber?: SubscriberSettings
   submitter?: any
   receiver?: any
-  // Direct ISA fields for backward compatibility
   authorization_information_qualifier?: string
   authorization_information?: string
   security_information_qualifier?: string
@@ -66,9 +63,7 @@ export interface SubscriberSettingsFormValues {
 
 // Form values for ISA Settings
 export interface ISASettingsFormValues {
-  // Subscriber Settings
   idQualifier: string
-  // ISA Settings
   authorizationInformationQualifier: string
   authorizationInformation: string
   securityInformationQualifier: string

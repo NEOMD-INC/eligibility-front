@@ -1,7 +1,3 @@
-/**
- * Redux-specific types
- */
-
 import { BaseListState } from '../common'
 import {
   AvailityPayer,

@@ -15,7 +15,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'User',
       width: '30%',
       align: 'left' as const,
-      render: (user: any) => {
+      render: (value: any, user: any) => {
         const userImage = user.profile_image_path || user.image || user.profile_image
         const userName = user.name || 'User'
 
@@ -57,7 +57,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'Email',
       width: '25%',
       align: 'left' as const,
-      render: (user: any) => (
+      render: (value: any, user: any) => (
         <div className="truncate" style={{ color: themeColors.text.primary }}>
           {user.email || 'N/A'}
         </div>
@@ -68,7 +68,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'Roles',
       width: '15%',
       align: 'center' as const,
-      render: (user: any) => {
+      render: (value: any, user: any) => {
         let roleDisplay = 'N/A'
 
         if (user.role) {
@@ -95,7 +95,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'Created',
       width: '15%',
       align: 'left' as const,
-      render: (user: any) => {
+      render: (value: any, user: any) => {
         const createdDate = user.created_at || user.created || user.createdAt
         if (!createdDate) return <span className="text-gray-500">N/A</span>
 
@@ -113,7 +113,7 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
       label: 'Actions',
       width: '15%',
       align: 'center' as const,
-      render: (user: any) => (
+      render: (value: any, user: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={user}

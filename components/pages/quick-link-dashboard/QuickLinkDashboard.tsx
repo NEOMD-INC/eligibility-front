@@ -51,10 +51,10 @@ export default function QuickLinkDashboard() {
                         onClick={() => handleNavigation(item.path)}
                         className="cursor-pointer group relative p-6 bg-white border-2 rounded-lg hover:shadow-md transition-all duration-200 text-left"
                         style={{ borderColor: themeColors.border.default }}
-                        onMouseEnter={e => {
+                        onMouseEnter={(e: any) => {
                           e.currentTarget.style.borderColor = themeColors.blue[500]
                         }}
-                        onMouseLeave={e => {
+                        onMouseLeave={(e: any) => {
                           e.currentTarget.style.borderColor = themeColors.border.default
                         }}
                       >

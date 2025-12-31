@@ -3,6 +3,7 @@ import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
 import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
@@ -14,6 +15,7 @@ import {
 } from '@/redux/slices/settings/carrier-addresses/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { themeColors } from '@/theme'
+
 import { getCarrierAddressDetails } from './helper/helper'
 
 export default function CarrierAddressDetail() {

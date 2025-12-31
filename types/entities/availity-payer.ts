@@ -19,7 +19,6 @@ export interface AvailityPayer extends BaseEntity {
   is_active?: boolean
   status?: boolean | string
   notes?: string
-  // Legacy/compatibility fields
   payerId?: string
   payerName?: string
   payerCode?: string

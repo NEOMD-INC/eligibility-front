@@ -16,7 +16,6 @@ export interface CarrierAddress extends BaseEntity {
   phone_type?: string
   phone_number?: string
   insurance_department?: string
-  // Legacy/compatibility fields
   carrierCode?: string
   actualName?: string
   addressId?: string

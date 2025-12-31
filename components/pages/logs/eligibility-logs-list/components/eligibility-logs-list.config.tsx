@@ -1,0 +1,51 @@
+export const getEligibilityLogsFilter = ({ filters, handleFilterChange }: any) => [
+  {
+    name: 'queue_status',
+    label: 'Queue Status',
+    type: 'select',
+    value: filters.queue_status || '',
+    onChange: handleFilterChange,
+    options: [
+      { value: '', label: 'All Queue Status' },
+      { value: 'pending', label: 'Pending' },
+      { value: 'processing', label: 'Processing' },
+      { value: 'completed', label: 'Completed' },
+      { value: 'failed', label: 'Failed' },
+    ],
+  },
+  {
+    name: 'status',
+    label: 'Eligibility Status',
+    type: 'select',
+    value: filters.status || '',
+    onChange: handleFilterChange,
+    options: [
+      { value: '', label: 'All Eligibility Status' },
+      { value: 'eligible', label: 'Eligible' },
+      { value: 'not_eligible', label: 'Not Eligible' },
+      { value: 'unknown', label: 'Unknown' },
+    ],
+  },
+  {
+    name: 'subscriber_id',
+    label: 'Subscriber ID',
+    type: 'text',
+    value: filters.subscriber_id || '',
+    onChange: handleFilterChange,
+    placeholder: 'Enter Subscriber ID',
+  },
+  {
+    name: 'service_date_from',
+    label: 'Date From',
+    type: 'date',
+    value: filters.service_date_from || '',
+    onChange: handleFilterChange,
+  },
+  {
+    name: 'service_date_to',
+    label: 'Date To',
+    type: 'date',
+    value: filters.service_date_to || '',
+    onChange: handleFilterChange,
+  },
+]

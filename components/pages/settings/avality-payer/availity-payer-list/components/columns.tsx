@@ -16,7 +16,7 @@ export default function AvailityPayerListColumns({
       label: 'Payer ID',
       width: '15%',
       align: 'left' as const,
-      render: (payer: any) => (
+      render: (value: any, payer: any) => (
         <Link href={`/settings/availity-payer/${payer.id || payer.uuid}`}>
           <div
             className="font-semibold truncate"
@@ -34,7 +34,7 @@ export default function AvailityPayerListColumns({
       label: 'Payer Name',
       width: '20%',
       align: 'left' as const,
-      render: (payer: any) => (
+      render: (value: any, payer: any) => (
         <div className="truncate" style={{ color: themeColors.text.primary }}>
           {payer.payer_name || payer.payerName || 'N/A'}
         </div>
@@ -45,7 +45,7 @@ export default function AvailityPayerListColumns({
       label: 'Payer Code',
       width: '15%',
       align: 'left' as const,
-      render: (payer: any) => (
+      render: (value: any, payer: any) => (
         <div className="truncate" style={{ color: themeColors.text.primary }}>
           {payer.payer_code || payer.payerCode || 'N/A'}
         </div>
@@ -56,7 +56,7 @@ export default function AvailityPayerListColumns({
       label: 'City, State',
       width: '15%',
       align: 'left' as const,
-      render: (payer: any) => {
+      render: (value: any, payer: any) => {
         const city = payer.city || 'N/A'
         const state = payer.state || 'N/A'
         return (
@@ -72,7 +72,7 @@ export default function AvailityPayerListColumns({
       label: 'Status',
       width: '15%',
       align: 'center' as const,
-      render: (payer: any) => {
+      render: (value: any, payer: any) => {
         const statusValue =
           typeof payer.is_active === 'boolean'
             ? payer.is_active

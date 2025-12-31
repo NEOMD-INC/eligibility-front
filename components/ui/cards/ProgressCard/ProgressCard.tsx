@@ -1,16 +1,13 @@
-type Props = {
-  title: string
-  value: string
-  used: number
-  total: number
-  footer?: string
-  additionalInfo?: {
-    timePeriod?: string
-    notes?: string
-  }
-}
+import { ProgressCardProps } from '@/types/ui/cards'
 
-export default function ProgressCard({ title, value, used, total, footer, additionalInfo }: Props) {
+export default function ProgressCard({
+  title,
+  value,
+  used,
+  total,
+  footer,
+  additionalInfo,
+}: ProgressCardProps) {
   const remaining = total - used
   // Calculate percentage based on remaining amount (bar fills as remaining increases)
   const percentage = total > 0 ? Math.min(Math.round((remaining / total) * 100), 100) : 0

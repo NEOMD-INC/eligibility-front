@@ -16,7 +16,7 @@ export default function CarrierGroupListColumns({
       label: 'Description',
       width: '25%',
       align: 'left' as const,
-      render: (carrierGroup: any) => (
+      render: (value: any, carrierGroup: any) => (
         <Link href={`/settings/carrier-group/${carrierGroup.id || carrierGroup.uuid}`}>
           <div
             className="font-semibold truncate"
@@ -34,7 +34,7 @@ export default function CarrierGroupListColumns({
       label: 'Code',
       width: '20%',
       align: 'left' as const,
-      render: (carrierGroup: any) => (
+      render: (value: any, carrierGroup: any) => (
         <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierGroup.carrier_group_code || carrierGroup.code || 'N/A'}
         </div>
@@ -45,7 +45,7 @@ export default function CarrierGroupListColumns({
       label: 'Filling Indicator',
       width: '20%',
       align: 'left' as const,
-      render: (carrierGroup: any) => (
+      render: (value: any, carrierGroup: any) => (
         <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierGroup.fillingIndicator || carrierGroup.filling_indicator || 'N/A'}
         </div>
@@ -56,7 +56,7 @@ export default function CarrierGroupListColumns({
       label: 'Status',
       width: '15%',
       align: 'center' as const,
-      render: (carrierGroup: any) => {
+      render: (value: any, carrierGroup: any) => {
         const statusValue =
           typeof carrierGroup.status === 'boolean'
             ? carrierGroup.status
@@ -84,7 +84,7 @@ export default function CarrierGroupListColumns({
       label: 'Actions',
       width: '20%',
       align: 'center' as const,
-      render: (carrierGroup: any) => (
+      render: (value: any, carrierGroup: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={carrierGroup}

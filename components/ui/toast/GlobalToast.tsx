@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { Toast, toastManager } from '@/utils/toast'
+import type { Toast } from '@/types/ui'
+import { toastManager } from '@/utils/toast'
 
 import ToastContainer from './ToastContainer'
 

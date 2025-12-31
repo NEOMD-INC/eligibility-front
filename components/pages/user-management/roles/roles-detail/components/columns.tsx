@@ -6,7 +6,7 @@ export const userWithSameRoleColumns = () => [
     label: 'Name',
     width: '50%',
     align: 'left' as const,
-    render: (user: any) => (
+    render: (value: any, user: any) => (
       <div className="font-medium" style={{ color: themeColors.text.primary }}>
         {user.name || 'N/A'}
       </div>
@@ -17,7 +17,7 @@ export const userWithSameRoleColumns = () => [
     label: 'Email',
     width: '50%',
     align: 'left' as const,
-    render: (user: any) => (
+    render: (value: any, user: any) => (
       <div style={{ color: themeColors.text.secondary }}>{user.email || 'N/A'}</div>
     ),
   },

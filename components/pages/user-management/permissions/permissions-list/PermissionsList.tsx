@@ -4,9 +4,10 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
-import Filters, { FilterField } from '@/components/ui/filters/Filters'
+import Filters from '@/components/ui/filters/Filters'
 import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
   clearPermissionsError,
@@ -16,6 +17,8 @@ import {
 } from '@/redux/slices/user-management/permissions/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { themeColors } from '@/theme'
+import type { FilterField } from '@/types/ui'
+
 import PermissionsListColumns from './components/columns'
 
 export default function PermissionsList() {

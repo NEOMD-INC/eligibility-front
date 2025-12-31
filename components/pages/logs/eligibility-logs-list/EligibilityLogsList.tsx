@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
-import type { FilterField } from '@/components/ui/filters/Filters'
 import Filters from '@/components/ui/filters/Filters'
 import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
@@ -21,6 +20,7 @@ import { themeColors } from '@/theme'
 import { toastManager } from '@/utils/toast'
 
 import EligibilityLogListColumns from './components/columns'
+import { getEligibilityLogsFilter } from './components/eligibility-logs-list.config'
 
 export default function EligibilityLogsList() {
   const dispatch = useDispatch<AppDispatch>()
@@ -116,57 +116,7 @@ export default function EligibilityLogsList() {
 
   const columns = EligibilityLogListColumns({ onRetryClick: handleRetryClick })
 
-  const filterFields: FilterField[] = [
-    {
-      name: 'queue_status',
-      label: 'Queue Status',
-      type: 'select',
-      value: filters.queue_status || '',
-      onChange: handleFilterChange,
-      options: [
-        { value: '', label: 'All Queue Status' },
-        { value: 'pending', label: 'Pending' },
-        { value: 'processing', label: 'Processing' },
-        { value: 'completed', label: 'Completed' },
-        { value: 'failed', label: 'Failed' },
-      ],
-    },
-    {
-      name: 'status',
-      label: 'Eligibility Status',
-      type: 'select',
-      value: filters.status || '',
-      onChange: handleFilterChange,
-      options: [
-        { value: '', label: 'All Eligibility Status' },
-        { value: 'eligible', label: 'Eligible' },
-        { value: 'not_eligible', label: 'Not Eligible' },
-        { value: 'unknown', label: 'Unknown' },
-      ],
-    },
-    {
-      name: 'subscriber_id',
-      label: 'Subscriber ID',
-      type: 'text',
-      value: filters.subscriber_id || '',
-      onChange: handleFilterChange,
-      placeholder: 'Enter Subscriber ID',
-    },
-    {
-      name: 'service_date_from',
-      label: 'Date From',
-      type: 'date',
-      value: filters.service_date_from || '',
-      onChange: handleFilterChange,
-    },
-    {
-      name: 'service_date_to',
-      label: 'Date To',
-      type: 'date',
-      value: filters.service_date_to || '',
-      onChange: handleFilterChange,
-    },
-  ]
+  const filterFields: any[] = getEligibilityLogsFilter({ filters, handleFilterChange })
 
   return (
     <PageTransition>

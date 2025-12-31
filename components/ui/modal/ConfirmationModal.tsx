@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import React from 'react'
 
 import { themeColors } from '@/theme'
+import type { ConfirmationModalProps } from '@/types/ui'
 
 const modalVariants: Variants = {
   hidden: {
@@ -30,18 +31,6 @@ const modalVariants: Variants = {
       ease: 'easeIn',
     },
   },
-}
-
-export interface ConfirmationModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => void
-  title: string
-  message: string
-  confirmText?: string
-  cancelText?: string
-  confirmButtonClass?: string
-  isLoading?: boolean
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -79,7 +68,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           onClick={handleBackdropClick}
         >
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
-            {/* Header */}
             <div
               className="flex items-center justify-between p-4 border-b"
               style={{ borderColor: themeColors.border.default }}
@@ -103,12 +91,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               </button>
             </div>
 
-            {/* Body */}
             <div className="p-6">
               <p style={{ color: themeColors.gray[700] }}>{message}</p>
             </div>
 
-            {/* Footer */}
             <div
               className="flex items-center justify-end gap-3 p-4 border-t"
               style={{ borderColor: themeColors.border.default }}

@@ -108,7 +108,7 @@ export default function AvailityPayerList() {
 
           <DataTable
             columns={columns}
-            data={availityPayers}
+            data={Array.isArray(availityPayers) ? availityPayers : []}
             loading={loading || deleteLoading}
             totalItems={totalItems}
             itemsPerPage={itemsPerPage}

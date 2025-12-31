@@ -11,9 +11,7 @@ import * as Yup from 'yup'
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import ComponentLoader from '@/components/ui/loader/component-loader/ComponentLoader'
-import SearchableSelect, {
-  SearchableSelectOption,
-} from '@/components/ui/select/searchable-select/SearchableSelect'
+import SearchableSelect from '@/components/ui/select/searchable-select/SearchableSelect'
 import SearchableSelectPayer from '@/components/ui/select/searchable-select-payer/SearchableSelectPayer'
 import {
   clearEligibilityIndivitualError,
@@ -26,6 +24,7 @@ import { fetchAllAvailityPayers } from '@/redux/slices/settings/availity-payers/
 import { AppDispatch, RootState } from '@/redux/store'
 import { EligibilityIndivitualService } from '@/services/eligibility/indivitual/indivitual.service'
 import { themeColors } from '@/theme'
+import type { SearchableSelectOption } from '@/types/ui'
 import { getGenderOptions } from '@/utils/constants/gender-options'
 import { PLACE_OF_SERVICE_CODES } from '@/utils/constants/place-of-service'
 import { RELATIONSHIP_CODES } from '@/utils/constants/relationship-codes'
@@ -73,7 +72,6 @@ export default function IndividualEligibilityForm() {
   const [reuseErrorMsg, setReuseErrorMsg] = useState('')
   const [verifyingNpi, setVerifyingNpi] = useState(false)
   const hasMappedLogData = useRef(false)
-
   const serviceDateRestrictions = getServiceDateMinMax()
 
   const validationSchema = Yup.object({

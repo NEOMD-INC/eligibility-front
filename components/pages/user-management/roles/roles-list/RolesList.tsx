@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
-import Filters, { FilterField } from '@/components/ui/filters/Filters'
+import Filters from '@/components/ui/filters/Filters'
 import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
   clearRolesError,
@@ -17,8 +17,9 @@ import {
 } from '@/redux/slices/user-management/roles/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { themeColors } from '@/theme'
+import type { FilterField } from '@/types/ui'
 
-import UsersListColumns from './components/columns'
+import RolesListColumns from './components/columns'
 
 export default function RolesList() {
   const dispatch = useDispatch<AppDispatch>()
@@ -126,7 +127,7 @@ export default function RolesList() {
     },
   ]
 
-  const columns = UsersListColumns({ onDeleteClick: handleDeleteClick })
+  const columns = RolesListColumns({ onDeleteClick: handleDeleteClick })
 
   const handlePageChange = (page: number) => {
     dispatch(setCurrentPage(page))

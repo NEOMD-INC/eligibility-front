@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
 import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
@@ -15,6 +16,7 @@ import {
 } from '@/redux/slices/settings/carrier-setups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { themeColors } from '@/theme'
+
 import CarrierSetupListColumns from './components/columns'
 
 export default function CarrierSetupList() {
@@ -106,7 +108,7 @@ export default function CarrierSetupList() {
 
           <DataTable
             columns={columns}
-            data={carrierSetups}
+            data={Array.isArray(carrierSetups) ? carrierSetups : []}
             loading={loading || deleteLoading}
             totalItems={totalItems}
             itemsPerPage={itemsPerPage}

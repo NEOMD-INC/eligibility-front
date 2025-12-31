@@ -14,7 +14,7 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       label: 'Role Name',
       width: '20%',
       align: 'left' as const,
-      render: (role: any) => {
+      render: (value: any, role: any) => {
         const roleName = role.name || role.role_name || 'N/A'
         const roleId = role.id || role.uuid
 
@@ -46,7 +46,7 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       label: 'Users',
       width: '15%',
       align: 'center' as const,
-      render: (role: any) => {
+      render: (value: any, role: any) => {
         const userCount = role.user_count || role.users_count || 0
         return (
           <div className="flex justify-center">
@@ -65,7 +65,7 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       label: 'Permissions',
       width: '15%',
       align: 'center' as const,
-      render: (role: any) => {
+      render: (value: any, role: any) => {
         const permissions = role.permissions || role.permission_names || []
         const permissionList = Array.isArray(permissions)
           ? permissions.map((perm: any) =>
@@ -109,7 +109,7 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
       label: 'Actions',
       width: '15%',
       align: 'center' as const,
-      render: (role: any) => (
+      render: (value: any, role: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={role}

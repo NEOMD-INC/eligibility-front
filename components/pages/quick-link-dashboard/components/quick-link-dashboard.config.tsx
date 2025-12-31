@@ -62,7 +62,8 @@ export const getCategories = () => [
       },
       {
         name: 'Eligibility Settings',
-        path: '/eligibility/settings',
+        // path: '/eligibility/settings',
+        path: '#',
         icon: <Cog size={24} />,
         description: 'Configure eligibility settings',
       },

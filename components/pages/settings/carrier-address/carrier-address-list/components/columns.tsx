@@ -16,7 +16,7 @@ export default function CarrierAddressListColumns({
       label: 'Carrier Code',
       width: '20%',
       align: 'left' as const,
-      render: (carrierAddress: any) => (
+      render: (value: any, carrierAddress: any) => (
         <Link href={`/settings/carrier-address/${carrierAddress.id || carrierAddress.uuid}`}>
           <div
             className="font-semibold truncate"
@@ -34,7 +34,7 @@ export default function CarrierAddressListColumns({
       label: 'Actual Name',
       width: '30%',
       align: 'left' as const,
-      render: (carrierAddress: any) => (
+      render: (value: any, carrierAddress: any) => (
         <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierAddress.actualName || carrierAddress.actual_name || 'N/A'}
         </div>
@@ -45,7 +45,7 @@ export default function CarrierAddressListColumns({
       label: 'Address ID',
       width: '30%',
       align: 'left' as const,
-      render: (carrierAddress: any) => (
+      render: (value: any, carrierAddress: any) => (
         <div className="truncate" style={{ color: themeColors.text.primary }}>
           {carrierAddress.addressId || carrierAddress.address_id || 'N/A'}
         </div>
@@ -56,7 +56,7 @@ export default function CarrierAddressListColumns({
       label: 'Actions',
       width: '20%',
       align: 'center' as const,
-      render: (carrierAddress: any) => (
+      render: (value: any, carrierAddress: any) => (
         <div className="flex justify-center items-center w-full">
           <GridActionButtons
             data={carrierAddress}

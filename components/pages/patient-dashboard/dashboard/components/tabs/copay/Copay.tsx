@@ -3,22 +3,11 @@
 import InfoCard from '@/components/ui/cards/InfoCard/InfoCard'
 import { themeColors } from '@/theme'
 
-import { CopayItem, RawCopayData } from './types/types'
+import { getCopayData } from './components/copay.config'
+import { CopayItem } from './types/types'
 
 export default function Copay({ copaysData }: any) {
-  const copayData1: CopayItem[] =
-    copaysData?.map((item: RawCopayData) => ({
-      title: item.benefit_type,
-      value: item.copay_value,
-      coverage_level: item.coverage_level,
-      subtitle: item.messages[2],
-      footer: 'Per Visit',
-      messages: item.messages[1] || [],
-      additionalInfo: {
-        timePeriod: 'Per Visit',
-        notes: item.messages[1],
-      },
-    })) || []
+  const copayData1: CopayItem[] = getCopayData(copaysData)
   return (
     <div className="p-6 min-h-[500px]" style={{ backgroundColor: themeColors.gray[50] }}>
       <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text.primary }}>

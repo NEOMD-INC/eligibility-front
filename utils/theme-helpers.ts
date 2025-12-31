@@ -1,14 +1,5 @@
-/**
- * Theme Helper Utilities
- *
- * This file provides helper functions for using theme colors in components
- */
-
 import { themeColors } from '@/theme'
 
-/**
- * Get a theme color value for inline styles
- */
 export const getThemeColor = (path: string): string => {
   const keys = path.split('.')
   let value: any = themeColors
@@ -24,9 +15,6 @@ export const getThemeColor = (path: string): string => {
   return typeof value === 'string' ? value : '#000000'
 }
 
-/**
- * Common theme color shortcuts for inline styles
- */
 export const theme = {
   // Backgrounds
   bg: {

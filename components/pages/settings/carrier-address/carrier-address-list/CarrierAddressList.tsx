@@ -108,7 +108,7 @@ export default function CarrierAddressList() {
 
           <DataTable
             columns={columns}
-            data={carrierAddresses}
+            data={Array.isArray(carrierAddresses) ? carrierAddresses : []}
             loading={loading || deleteLoading}
             totalItems={totalItems}
             itemsPerPage={itemsPerPage}

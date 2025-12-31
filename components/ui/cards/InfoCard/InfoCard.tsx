@@ -1,18 +1,13 @@
-type Props = {
-  title: string
-  value: string | number
-  subtitle?: string
-  footer?: string
-  additionalInfo?: {
-    timePeriod?: string
-    notes?: string
-  }
-}
+import { InfoCardProps } from '@/types/ui/cards'
 
-export default function InfoCard({ title, value, subtitle, footer, additionalInfo }: Props) {
-  // Convert value to string to handle numbers and other types
+export default function InfoCard({
+  title,
+  value,
+  subtitle,
+  footer,
+  additionalInfo,
+}: InfoCardProps) {
   const valueString = String(value || '')
-  // Check if value contains multiple lines (for copay entries with labels)
   const isMultiline = valueString.includes('\n')
   const valueClass = isMultiline
     ? 'text-base font-semibold leading-relaxed whitespace-pre-line'

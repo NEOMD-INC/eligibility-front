@@ -1,12 +1,6 @@
 import React from 'react'
 
-export interface ComponentLoaderProps {
-  component?: string
-  message?: string
-  size?: 'sm' | 'md' | 'lg'
-  variant?: 'default' | 'fullscreen' | 'inline' | 'card'
-  className?: string
-}
+import type { ComponentLoaderProps } from '@/types/ui'
 
 export default function ComponentLoader({
   component,

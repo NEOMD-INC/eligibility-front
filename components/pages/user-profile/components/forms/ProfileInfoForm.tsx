@@ -3,6 +3,7 @@ import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as Yup from 'yup'
+
 import SubmitButton from '@/components/ui/buttons/submit-button/SubmitButton'
 import { setUser } from '@/redux/slices/current-user/userSlice'
 import { clearProfileError, updateUserProfile } from '@/redux/slices/user-profile/reducer'

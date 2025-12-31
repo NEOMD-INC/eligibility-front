@@ -4,9 +4,10 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { PageTransition } from '@/components/providers/page-transition-provider/PageTransitionProvider'
 import DataTable from '@/components/ui/data-table/DataTable'
-import Filters, { FilterField } from '@/components/ui/filters/Filters'
+import Filters from '@/components/ui/filters/Filters'
 import ConfirmationModal from '@/components/ui/modal/ConfirmationModal'
 import {
   clearCarrierGroupsError,
@@ -16,6 +17,8 @@ import {
 } from '@/redux/slices/settings/carrier-groups/actions'
 import { AppDispatch, RootState } from '@/redux/store'
 import { themeColors } from '@/theme'
+import type { FilterField } from '@/types/ui'
+
 import CarrierGroupListColumns from './components/columns'
 
 export default function CarrierGroupList() {
@@ -219,7 +222,7 @@ export default function CarrierGroupList() {
 
           <DataTable
             columns={columns}
-            data={carrierGroups}
+            data={Array.isArray(carrierGroups) ? carrierGroups : []}
             loading={loading || deleteLoading}
             totalItems={totalItems}
             itemsPerPage={itemsPerPage}

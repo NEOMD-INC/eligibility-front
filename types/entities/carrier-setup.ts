@@ -16,7 +16,6 @@ export interface CarrierSetup extends BaseEntity {
   cob?: string
   corrected_claim?: string
   enrollment_required?: string
-  // Legacy/compatibility fields
   carrierGroupCode?: string
   carrierGroupDescription?: string
   carrierCode?: string

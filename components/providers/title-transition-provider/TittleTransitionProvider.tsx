@@ -1,13 +1,7 @@
 import { motion } from 'motion/react'
 import React from 'react'
 
-interface TitleTransitionButtonProps {
-  onClick?: () => void
-  children: React.ReactNode
-  className?: string
-  hoverScale?: number
-  tapScale?: number
-}
+import { TitleTransitionButtonProps } from './types/types'
 
 export function TitleTransitionButton({
   onClick,

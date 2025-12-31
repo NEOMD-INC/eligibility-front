@@ -1,12 +1,8 @@
+'use client'
+
 import React from 'react'
 
-export interface ContentProps {
-  children: React.ReactNode
-  containerType?: 'none' | 'fixed' | 'fluid'
-  padding?: string
-  background?: string
-  isSidebarExpanded?: boolean
-}
+import type { ContentProps } from './types/types'
 
 const Content: React.FC<ContentProps> = ({
   children,
@@ -44,5 +40,5 @@ const Content: React.FC<ContentProps> = ({
     </div>
   )
 }
-
 export { Content }
+

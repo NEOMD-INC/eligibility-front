@@ -3,24 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { themeColors } from '@/theme'
-
-export interface SearchableSelectOption {
-  value: string
-  label: string
-}
-
-interface SearchableSelectProps {
-  name: string
-  value: string
-  options: SearchableSelectOption[]
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
-  onBlur: (e: React.FocusEvent<HTMLSelectElement>) => void
-  placeholder?: string
-  className?: string
-  error?: boolean
-  disabled?: boolean
-  maxVisibleItems?: number
-}
+import { SearchableSelectProps } from '@/types/ui/select'
 
 export default function SearchableSelect({
   name,
@@ -220,7 +203,7 @@ export default function SearchableSelect({
                   }}
                   onMouseEnter={e => {
                     if (value !== option.value) {
-                      e.currentTarget.style.backgroundColor = themeColors.blue[50] || '#eff6ff'
+                      e.currentTarget.style.backgroundColor = themeColors.blue[100] || '#eff6ff'
                     }
                   }}
                   onMouseLeave={e => {
