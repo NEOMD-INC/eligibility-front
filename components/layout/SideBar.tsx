@@ -6,17 +6,14 @@ import {
   Dot,
   HeartPulse,
   House,
-  LucideIcon,
   Receipt,
   UserRound,
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-
 import { themeColors } from '@/theme'
-
-import { MenuItem, OpenMenus, OpenNestedMenus, RegularSubItem } from './types/types'
+import { OpenMenus, OpenNestedMenus, MenuItem, RegularSubItem } from './types/types'
 
 const Sidebar: React.FC = () => {
   const [isHovered, setIsHovered] = useState<boolean>(false)
