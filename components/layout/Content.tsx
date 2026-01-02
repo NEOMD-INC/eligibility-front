@@ -41,4 +41,3 @@ const Content: React.FC<ContentProps> = ({
   )
 }
 export { Content }
-
