@@ -15,6 +15,9 @@ const initialState: CarrierSetupsState = {
   updateLoading: false,
   deleteLoading: false,
   fetchCarrierSetupLoading: false,
+  items: [],
+  currentItem: null,
+  fetchItemLoading: false,
 }
 
 // Helper function to convert form camelCase fields to API snake_case field names

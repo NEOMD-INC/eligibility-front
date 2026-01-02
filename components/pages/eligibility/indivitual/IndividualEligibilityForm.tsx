@@ -131,7 +131,7 @@ export default function IndividualEligibilityForm() {
   useEffect(() => {
     dispatch(clearEligibilityIndivitualError())
     dispatch(fetchEligibilityIndivitualNpiPractice())
-    dispatch(fetchAllAvailityPayers())
+    dispatch(fetchAllAvailityPayers(1))
   }, [dispatch])
 
   useEffect(() => {

@@ -173,7 +173,7 @@ export default function EligibilityHistoryList() {
                 backgroundColor: themeColors.gray[100],
                 borderColor: themeColors.border.default,
               }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[200])}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = themeColors.gray[100])}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = themeColors.gray[100])}
               onFocus={e =>
                 (e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColors.gray[300]}`)

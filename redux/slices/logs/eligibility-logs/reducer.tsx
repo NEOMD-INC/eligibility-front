@@ -8,7 +8,7 @@ interface EligibilityLogItem {
   neoRef?: string
   neo_ref?: string
   neoReferenceId?: string
-  subscriber?: string
+  subscriber?: string | any
   subscriberId?: string
   subscriber_id?: string
   provider?: string
@@ -28,6 +28,8 @@ interface EligibilityLogItem {
   created_at?: string
   created?: string
   name?: string
+  patient?: any
+  [key: string]: any
 }
 
 interface EligibilityLogsFilters {

@@ -142,7 +142,7 @@ export default function ISASettingsForm() {
 
   useEffect(() => {
     if (settings) {
-      const settingsData = settings.data || settings
+      const settingsData = (settings as any).data || settings
       const isaData = settingsData.isa || settingsData
       const subscriberData = settingsData.subscriber || {}
 

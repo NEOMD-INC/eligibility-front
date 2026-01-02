@@ -14,7 +14,7 @@ export default function Deductible({ deductiblesData }: any) {
         Deductible
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {deductibleData1.map((deductible, index) => (
+        {deductibleData1.map((deductible: any, index: number) => (
           <ProgressCard
             key={index}
             title={deductible.title}

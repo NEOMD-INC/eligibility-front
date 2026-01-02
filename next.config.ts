@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
     // Configure image domains if needed
     remotePatterns: [],
   },
+  // Configure Turbopack (empty config to silence warning)
+  turbopack: {},
+  // Remove standalone - let plugin handle output
 }
 
 export default nextConfig

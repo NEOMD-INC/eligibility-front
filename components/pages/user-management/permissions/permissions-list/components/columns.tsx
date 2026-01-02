@@ -65,10 +65,10 @@ export default function PermissionsListColumns({
             showBtnPath={`/user-management/permissions/${permission.id || permission.uuid}`}
             deleteResourceId={
               onDeleteClick
-                ? (id: string) => {
+                ? (id: string | number) => {
                     const permissionName: string =
                       permission.name || permission.slug || 'permission'
-                    onDeleteClick(id, permissionName)
+                    onDeleteClick(String(id), permissionName)
                   }
                 : undefined
             }

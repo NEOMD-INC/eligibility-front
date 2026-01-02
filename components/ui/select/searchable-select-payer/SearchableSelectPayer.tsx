@@ -264,7 +264,7 @@ export default function SearchableSelectPayer({
                     }}
                     onMouseEnter={e => {
                       if (value !== option.value) {
-                        e.currentTarget.style.backgroundColor = themeColors.blue[50] || '#eff6ff'
+                        e.currentTarget.style.backgroundColor = themeColors.blue[100] || '#eff6ff'
                       }
                     }}
                     onMouseLeave={e => {

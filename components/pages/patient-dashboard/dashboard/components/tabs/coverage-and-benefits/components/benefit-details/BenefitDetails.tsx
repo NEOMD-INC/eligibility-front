@@ -40,9 +40,9 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
     if (!benefit || !benefit.copays) return 'N/A'
     if (typeof benefit.copays === 'object') {
       const copayEntries = Object.entries(benefit.copays)
-        .filter(([value]) => {
+        .filter(([, value]) => {
           if (value === null || value === undefined) return false
-          if (value === 0 || value === '0') return false
+          if (value === 0 || value === '0' || String(value) === '0') return false
           if (typeof value === 'string' && value.trim() === '') return false
           if (Array.isArray(value) && value.length === 0) return false
           return true
@@ -200,7 +200,7 @@ export default function BenefitDetails({ benefit, networkType, setNetworkType }:
     const statusLower = status.toLowerCase()
     const isActive = statusLower === 'active'
     const bgColor = isActive ? themeColors.green[100] : themeColors.red[100]
-    const textColor = isActive ? themeColors.green[700] : themeColors.red[700]
+    const textColor = isActive ? themeColors.green[600] : themeColors.red[700]
 
     return (
       <span

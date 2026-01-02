@@ -249,7 +249,7 @@ export default function Dashboard() {
           <div className="space-y-2 pl-2">
             <h1
               className="text-2xl font-semibold flex items-center gap-2"
-              style={{ color: themeColors.green[700] }}
+              style={{ color: themeColors.green[600] }}
             >
               {patientInformation.name || 'Jane Doe'}
               {(() => {
@@ -259,7 +259,7 @@ export default function Dashboard() {
                 const statusLower = status.toLowerCase()
                 const isActive = statusLower === 'active'
                 const bgColor = isActive ? themeColors.green[100] : themeColors.red[100]
-                const textColor = isActive ? themeColors.green[700] : themeColors.red[700]
+                const textColor = isActive ? themeColors.green[600] : themeColors.red[700]
 
                 return (
                   <span
@@ -369,32 +369,32 @@ export default function Dashboard() {
           <div className="bg-white shadow rounded-lg">
             <div className="flex border-b" style={{ borderColor: themeColors.border.default }}>
               {tabs.map((tab, index) => (
-                <TitleTransitionButton
-                  key={index}
-                  onClick={() => setActiveTab(tab)}
-                  className="px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer"
-                  style={{
-                    backgroundColor: activeTab === tab ? themeColors.blue[100] : themeColors.white,
-                    color: activeTab === tab ? themeColors.gray[700] : themeColors.gray[600],
-                  }}
-                  onMouseEnter={(e: any) => {
-                    if (activeTab !== tab) {
-                      e.currentTarget.style.color = themeColors.text.primary
-                    }
-                  }}
-                  onMouseLeave={(e: any) => {
-                    if (activeTab !== tab) {
-                      e.currentTarget.style.color = themeColors.gray[600]
-                    }
-                  }}
-                >
-                  {tab}
-                  {activeTab === tab && (
-                    <div
-                      className="absolute bottom-0 left-0 right-0 h-0.5"
-                      style={{ backgroundColor: themeColors.blue[600] }}
-                    ></div>
-                  )}
+                <TitleTransitionButton key={index} onClick={() => setActiveTab(tab)}>
+                  <div
+                    className="px-6 py-3 text-sm font-medium relative transition-colors flex-1 cursor-pointer"
+                    style={{
+                      backgroundColor: activeTab === tab ? themeColors.blue[100] : themeColors.white,
+                      color: activeTab === tab ? themeColors.gray[700] : themeColors.gray[600],
+                    }}
+                    onMouseEnter={(e: any) => {
+                      if (activeTab !== tab) {
+                        e.currentTarget.style.color = themeColors.text.primary
+                      }
+                    }}
+                    onMouseLeave={(e: any) => {
+                      if (activeTab !== tab) {
+                        e.currentTarget.style.color = themeColors.gray[600]
+                      }
+                    }}
+                  >
+                    {tab}
+                    {activeTab === tab && (
+                      <div
+                        className="absolute bottom-0 left-0 right-0 h-0.5"
+                        style={{ backgroundColor: themeColors.blue[600] }}
+                      ></div>
+                    )}
+                  </div>
                 </TitleTransitionButton>
               ))}
             </div>

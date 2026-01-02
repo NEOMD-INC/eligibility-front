@@ -15,6 +15,9 @@ const initialState: AvailityPayersState = {
   updateLoading: false,
   deleteLoading: false,
   fetchAvailityPayerLoading: false,
+  items: [],
+  currentItem: null,
+  fetchItemLoading: false,
 }
 
 // Helper function to convert form camelCase fields to API snake_case field names
@@ -59,7 +62,7 @@ const mapFormToApi = (obj: any): any => {
 // Async thunk to fetch all availity payers
 export const fetchAllAvailityPayers = createAsyncThunk(
   'availityPayers/fetchAllAvailityPayers',
-  async (page?: number, { rejectWithValue }) => {
+  async (page: number = 1, { rejectWithValue }: any) => {
     try {
       const response = await AvailityPayerService.getAllAvailityPayer(page)
       return response.data

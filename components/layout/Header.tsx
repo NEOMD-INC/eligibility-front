@@ -15,24 +15,25 @@ const Header = () => {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [userMgmtOpen, setUserMgmtOpen] = useState(false)
   const [isProductOpen, setIsProductOpen] = useState(false)
-  const eligibilityRef = useRef(null)
-  const settingsRef = useRef(null)
-  const userMgmtRef = useRef(null)
-  const profileRef = useRef(null)
+  const eligibilityRef = useRef<HTMLDivElement | null>(null)
+  const settingsRef = useRef<HTMLDivElement | null>(null)
+  const userMgmtRef = useRef<HTMLDivElement | null>(null)
+  const profileRef = useRef<HTMLDivElement | null>(null)
   const user = useSelector((state: RootState) => state?.user?.user)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const handleClickOutside = (event: any) => {
-      if (eligibilityRef.current && !eligibilityRef.current.contains(event.target))
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node
+      if (eligibilityRef.current && !eligibilityRef.current.contains(target))
         setEligibilityOpen(false)
 
-      if (settingsRef.current && !settingsRef.current.contains(event.target)) setSettingsOpen(false)
+      if (settingsRef.current && !settingsRef.current.contains(target)) setSettingsOpen(false)
 
-      if (userMgmtRef.current && !userMgmtRef.current.contains(event.target)) setUserMgmtOpen(false)
+      if (userMgmtRef.current && !userMgmtRef.current.contains(target)) setUserMgmtOpen(false)
 
-      if (profileRef.current && !profileRef.current.contains(event.target)) setIsProductOpen(false)
+      if (profileRef.current && !profileRef.current.contains(target)) setIsProductOpen(false)
     }
 
     document.addEventListener('mousedown', handleClickOutside)

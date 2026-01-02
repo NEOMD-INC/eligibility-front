@@ -72,7 +72,7 @@ export default function PermissionsList() {
     }
   }
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setSearchText(e.target.value)
   }
 

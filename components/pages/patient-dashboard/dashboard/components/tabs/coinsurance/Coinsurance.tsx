@@ -16,7 +16,7 @@ export default function Coinsurance({ coinsuranceData }: CoinsuranceProps) {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {coinsuranceData1.length > 0
-          ? coinsuranceData1.map((coinsurance, index) => (
+          ? coinsuranceData1.map((coinsurance: any, index: number) => (
               <InfoCard
                 key={index}
                 title={coinsurance.title}

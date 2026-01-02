@@ -76,14 +76,14 @@ export default function CarrierSetupListColumns({
             showBtnPath={`/settings/carrier-setup/${carrierSetup.id || carrierSetup.uuid}`}
             deleteResourceId={
               onDeleteClick
-                ? (id: string) => {
+                ? (id: string | number) => {
                     const carrierSetupName: string =
                       carrierSetup.groupDescription ||
                       carrierSetup.group_description ||
                       carrierSetup.groupCode ||
                       carrierSetup.group_code ||
                       'carrier setup'
-                    onDeleteClick(id, carrierSetupName)
+                    onDeleteClick(String(id), carrierSetupName)
                   }
                 : undefined
             }

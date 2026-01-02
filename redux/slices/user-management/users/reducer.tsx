@@ -15,6 +15,9 @@ const initialState: UsersState = {
   updateLoading: false,
   deleteLoading: false,
   fetchUserLoading: false,
+  items: [],
+  currentItem: null,
+  fetchItemLoading: false,
 }
 
 // Async thunk to fetch all users

@@ -93,14 +93,14 @@ export default function CarrierGroupListColumns({
             showBtnPath={`/settings/carrier-group/${carrierGroup.id || carrierGroup.uuid}`}
             deleteResourceId={
               onDeleteClick
-                ? (id: string) => {
+                ? (id: string | number) => {
                     const carrierGroupName: string =
                       carrierGroup.carrier_group_description ||
                       carrierGroup.description ||
                       carrierGroup.carrier_group_code ||
                       carrierGroup.code ||
                       'carrier group'
-                    onDeleteClick(id, carrierGroupName)
+                    onDeleteClick(String(id), carrierGroupName)
                   }
                 : undefined
             }

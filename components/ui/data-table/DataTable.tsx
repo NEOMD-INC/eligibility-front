@@ -77,17 +77,18 @@ const DataTable = <T extends TableRow = TableRow>({
       }
 
       if (typeof value === 'object') {
-        if (value.member_id) return String(value.member_id)
-        if (value.name) {
-          if (value.npi) return `${value.name} (${value.npi})`
-          return String(value.name)
+        const obj = value as any
+        if (obj.member_id) return String(obj.member_id)
+        if (obj.name) {
+          if (obj.npi) return `${obj.name} (${obj.npi})`
+          return String(obj.name)
         }
-        if (value.npi) return String(value.npi)
-        if (value.id) return String(value.id)
-        if (value.id_qualifier) return String(value.id_qualifier)
-        if (value.provider_name) return String(value.provider_name)
-        if (value.responseMessage) return String(value.responseMessage)
-        if (value.response_message) return String(value.response_message)
+        if (obj.npi) return String(obj.npi)
+        if (obj.id) return String(obj.id)
+        if (obj.id_qualifier) return String(obj.id_qualifier)
+        if (obj.provider_name) return String(obj.provider_name)
+        if (obj.responseMessage) return String(obj.responseMessage)
+        if (obj.response_message) return String(obj.response_message)
         return '[Object]'
       }
 

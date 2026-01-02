@@ -1,6 +1,22 @@
 [build]
-  command = "npm run build"
+  command = "npm run build -- --webpack"
+  # Force override the cached UI publish directory setting
   publish = ".next"
+
+[functions]
+  directory = "netlify/functions"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Redirect all API calls to the proxy function
+# This allows the frontend to make requests to HTTP backend APIs
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api-proxy/:splat"
+  status = 200
+  force = true
+
+# Environment variables (set these in Netlify dashboard):
+# API_URL=http://178.156.220.94/api/v1
+# NEXT_PUBLIC_API_URL=/api

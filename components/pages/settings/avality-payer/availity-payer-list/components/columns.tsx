@@ -112,14 +112,14 @@ export default function AvailityPayerListColumns({
             showBtnPath={`/settings/availity-payer/${payer.id || payer.uuid}`}
             deleteResourceId={
               onDeleteClick
-                ? (id: string) => {
+                ? (id: string | number) => {
                     const payerName: string =
                       payer.payer_name ||
                       payer.payerName ||
                       payer.payer_id ||
                       payer.payerId ||
                       'payer'
-                    onDeleteClick(id, payerName)
+                    onDeleteClick(String(id), payerName)
                   }
                 : undefined
             }

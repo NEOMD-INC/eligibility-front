@@ -101,18 +101,18 @@ export default function AddUpdateCarrierAddress() {
         actualName: currentCarrierAddress.actual_name || '',
         addressId: currentCarrierAddress.address_id || '',
         addressLine1:
-          currentCarrierAddress.address1 ||
+          (currentCarrierAddress as any).address1 ||
           currentCarrierAddress.address_line1 ||
-          currentCarrierAddress.address_line_1 ||
+          (currentCarrierAddress as any).address_line_1 ||
           '',
         city: currentCarrierAddress.city || '',
         state: currentCarrierAddress.state || '',
         zipCode: currentCarrierAddress.zip_code || '',
         phoneType:
-          currentCarrierAddress.insurance_phone_type1 || currentCarrierAddress.phone_type || '',
+          (currentCarrierAddress as any).insurance_phone_type1 || (currentCarrierAddress as any).phone_type || '',
         phoneNumber:
-          currentCarrierAddress.insurance_phone_number1 || currentCarrierAddress.phone_number || '',
-        insuranceDepartment: currentCarrierAddress.insurance_department || '',
+          (currentCarrierAddress as any).insurance_phone_number1 || (currentCarrierAddress as any).phone_number || '',
+        insuranceDepartment: (currentCarrierAddress as any).insurance_department || '',
       })
     }
   }, [currentCarrierAddress, isEditMode])
@@ -157,7 +157,7 @@ export default function AddUpdateCarrierAddress() {
             }
           }}
           onBlur={e => {
-            e.currentTarget.style.boxShadow = undefined
+            e.currentTarget.style.boxShadow = ''
             formik.handleBlur(e)
           }}
         />

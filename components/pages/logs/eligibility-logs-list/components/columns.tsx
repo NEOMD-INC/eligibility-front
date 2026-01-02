@@ -175,8 +175,8 @@ export default function EligibilityLogListColumns({
             showBtnPath={`/logs/logs-detail/${log.eligibility_id}`}
             retryResourceId={
               onRetryClick && log.eligibility_id
-                ? (id: string) => {
-                    onRetryClick(id)
+                ? (id: string | number) => {
+                    onRetryClick(String(id))
                   }
                 : undefined
             }

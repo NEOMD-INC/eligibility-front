@@ -65,14 +65,14 @@ export default function CarrierAddressListColumns({
             showBtnPath={`/settings/carrier-address/${carrierAddress.id || carrierAddress.uuid}`}
             deleteResourceId={
               onDeleteClick
-                ? (id: string) => {
+                ? (id: string | number) => {
                     const carrierAddressName: string =
                       carrierAddress.actualName ||
                       carrierAddress.actual_name ||
                       carrierAddress.carrierCode ||
                       carrierAddress.carrier_code ||
                       'carrier address'
-                    onDeleteClick(id, carrierAddressName)
+                    onDeleteClick(String(id), carrierAddressName)
                   }
                 : undefined
             }

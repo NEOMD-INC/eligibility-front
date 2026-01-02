@@ -118,9 +118,9 @@ export default function RolesListColumns({ onDeleteClick }: RolesListColumnsProp
             showBtnPath={`/user-management/roles/role-detail/${role.id || role.uuid}`}
             deleteResourceId={
               onDeleteClick
-                ? (id: string) => {
+                ? (id: string | number) => {
                     const roleName: string = role.name || role.role_name || 'role'
-                    onDeleteClick(id, roleName)
+                    onDeleteClick(String(id), roleName)
                   }
                 : undefined
             }

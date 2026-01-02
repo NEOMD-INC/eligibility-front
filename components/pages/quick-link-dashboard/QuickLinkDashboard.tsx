@@ -49,21 +49,23 @@ export default function QuickLinkDashboard() {
                       <TitleTransitionButton
                         key={itemIndex}
                         onClick={() => handleNavigation(item.path)}
-                        className="cursor-pointer group relative p-6 bg-white border-2 rounded-lg hover:shadow-md transition-all duration-200 text-left"
-                        style={{ borderColor: themeColors.border.default }}
-                        onMouseEnter={(e: any) => {
-                          e.currentTarget.style.borderColor = themeColors.blue[500]
-                        }}
-                        onMouseLeave={(e: any) => {
-                          e.currentTarget.style.borderColor = themeColors.border.default
-                        }}
                       >
+                        <div
+                          className="cursor-pointer group relative p-6 bg-white border-2 rounded-lg hover:shadow-md transition-all duration-200 text-left"
+                          style={{ borderColor: themeColors.border.default }}
+                          onMouseEnter={(e: any) => {
+                            e.currentTarget.style.borderColor = themeColors.blue[400]
+                          }}
+                          onMouseLeave={(e: any) => {
+                            e.currentTarget.style.borderColor = themeColors.border.default
+                          }}
+                        >
                         <div className="flex flex-col items-start">
                           <div
                             className="mb-4 p-3 rounded-lg transition-colors"
                             style={{ backgroundColor: themeColors.blue[100] }}
                             onMouseEnter={e =>
-                              (e.currentTarget.style.backgroundColor = themeColors.blue[200])
+                              (e.currentTarget.style.backgroundColor = themeColors.blue[100])
                             }
                             onMouseLeave={e =>
                               (e.currentTarget.style.backgroundColor = themeColors.blue[100])
@@ -104,6 +106,7 @@ export default function QuickLinkDashboard() {
                               d="M9 5l7 7-7 7"
                             />
                           </svg>
+                        </div>
                         </div>
                       </TitleTransitionButton>
                     ))}

@@ -108,7 +108,7 @@ export default function AddUpdateAvailityPayer() {
         addressLine2: currentAvailityPayer.address_line_2 || '',
         city: currentAvailityPayer.city || '',
         state: currentAvailityPayer.state || '',
-        zipCode: currentAvailityPayer.zip || currentAvailityPayer.zip_code || '',
+        zipCode: currentAvailityPayer.zip || (currentAvailityPayer as any).zip_code || '',
         phone: currentAvailityPayer.phone || '',
         email: currentAvailityPayer.email || '',
         isActive:

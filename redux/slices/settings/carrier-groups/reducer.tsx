@@ -15,6 +15,9 @@ const initialState: CarrierGroupsState = {
   updateLoading: false,
   deleteLoading: false,
   fetchCarrierGroupLoading: false,
+  items: [],
+  currentItem: null,
+  fetchItemLoading: false,
 }
 
 // Helper function to convert form fields to API field names

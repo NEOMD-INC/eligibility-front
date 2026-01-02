@@ -94,7 +94,7 @@ export default function AddUpdateCarrierSetup() {
 
   useEffect(() => {
     if (isEditMode && currentCarrierSetup) {
-      const enrollmentValue = currentCarrierSetup.enrollment
+      const enrollmentValue = (currentCarrierSetup as any).enrollment
       const enrollmentRequired =
         enrollmentValue === 1 || enrollmentValue === '1' || enrollmentValue === true
           ? 'Required'

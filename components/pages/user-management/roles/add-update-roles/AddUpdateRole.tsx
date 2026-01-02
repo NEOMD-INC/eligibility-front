@@ -156,7 +156,7 @@ export default function AddUpdateRole() {
           })
 
           if (foundPerm && foundPerm.id) {
-            permissionIds.push(foundPerm.id || foundPerm.uuid)
+            permissionIds.push(foundPerm.id || foundPerm.uuid || '')
           }
         }
       })

@@ -26,8 +26,9 @@ import {
 } from './helper/helper'
 
 const validationSchema = Yup.object({
-  file: Yup.mixed<File | null>()
+  file: Yup.mixed<File>()
     .required('File is required')
+    .nullable()
     .test('fileType', 'Only CSV files are allowed', value => {
       if (!value) return false
       const file = value as File
@@ -117,9 +118,9 @@ export default function BulkEligibilityForm() {
                   className="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
                   style={{
                     borderColor: dragActive
-                      ? themeColors.blue[500]
+                      ? themeColors.blue[400]
                       : formik.touched.file && formik.errors.file
-                        ? themeColors.red[300]
+                        ? themeColors.red[400]
                         : themeColors.border.default,
                     backgroundColor: dragActive
                       ? themeColors.blue[100]
@@ -151,7 +152,7 @@ export default function BulkEligibilityForm() {
                     <Upload
                       className="mx-auto mb-4"
                       size={48}
-                      style={{ color: dragActive ? themeColors.blue[500] : themeColors.gray[400] }}
+                      style={{ color: dragActive ? themeColors.blue[400] : themeColors.gray[400] }}
                     />
                     <p
                       className="text-lg font-medium mb-2"
@@ -168,7 +169,7 @@ export default function BulkEligibilityForm() {
                 <div
                   className="border-2 rounded-lg p-4"
                   style={{
-                    borderColor: themeColors.green[300],
+                    borderColor: themeColors.green[500],
                     backgroundColor: themeColors.green[100],
                   }}
                 >

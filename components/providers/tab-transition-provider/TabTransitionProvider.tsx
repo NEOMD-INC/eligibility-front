@@ -8,7 +8,7 @@ export function TabTransition({ children }: TabTransitionProps) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={children?.type?.name || 'tab'}
+        key={React.isValidElement(children) && children.type && typeof children.type !== 'string' ? (children.type as any).name || 'tab' : 'tab'}
         variants={variants}
         initial="hidden"
         animate="visible"

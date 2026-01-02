@@ -122,13 +122,13 @@ export default function UsersListColumns({ onDeleteClick }: UsersListColumnsProp
             showBtnPath={`/user-management/users/users-detail/${user.id || user.uuid}`}
             deleteResourceId={
               onDeleteClick
-                ? (id: string) => {
+                ? (id: string | number) => {
                     const userName: string =
                       user.full_name ||
                       `${user.first_name || ''} ${user.last_name || ''}`.trim() ||
                       user.email ||
                       'user'
-                    onDeleteClick(id, userName)
+                    onDeleteClick(String(id), userName)
                   }
                 : undefined
             }

@@ -143,8 +143,8 @@ export default function EligibilityHistoryColumns({
           bgColor = themeColors.red[100]
           textColor = themeColors.red[700]
         } else {
-          bgColor = themeColors.yellow[100] || '#fef3c7'
-          textColor = themeColors.yellow[800] || '#92400e'
+          bgColor = '#fef3c7'
+          textColor = '#92400e'
         }
 
         return (
@@ -170,8 +170,8 @@ export default function EligibilityHistoryColumns({
           bgColor = themeColors.green[100]
           textColor = themeColors.green[600]
         } else if (resp === 'in_process' || resp === 'pending' || resp === 'processing') {
-          bgColor = themeColors.yellow[100] || '#fef3c7'
-          textColor = themeColors.yellow[800] || '#92400e'
+          bgColor = '#fef3c7'
+          textColor = '#92400e'
         } else {
           bgColor = themeColors.red[100]
           textColor = themeColors.red[700]
@@ -233,8 +233,8 @@ export default function EligibilityHistoryColumns({
               showBtnPath={`/patient-dashboard?logId=${historyId}`}
               retryResourceId={
                 onRetryClick && historyId
-                  ? (id: string) => {
-                      onRetryClick(id)
+                  ? (id: string | number) => {
+                      onRetryClick(String(id))
                     }
                   : undefined
               }

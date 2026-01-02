@@ -15,6 +15,9 @@ const initialState: RolesState = {
   updateLoading: false,
   deleteLoading: false,
   fetchRoleLoading: false,
+  items: [],
+  currentItem: null,
+  fetchItemLoading: false,
 }
 
 // Async thunk to fetch all roles

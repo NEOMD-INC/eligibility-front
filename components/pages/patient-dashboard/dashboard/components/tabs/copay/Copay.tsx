@@ -19,7 +19,6 @@ export default function Copay({ copaysData }: any) {
             key={index}
             title={copay.title}
             value={copay.value}
-            coverage_level={copay.coverage_level}
             subtitle={copay.subtitle}
             footer={copay.footer}
             additionalInfo={copay.additionalInfo as any}

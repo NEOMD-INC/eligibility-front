@@ -141,7 +141,7 @@ export default function AddUpdateUser() {
 
   const formik = useFormik<UserFormValues>({
     initialValues: {
-      fullName: isEditMode && currentUser ? currentUser.name || currentUser.full_name || '' : '',
+      fullName: isEditMode && currentUser ? (currentUser as any).name || currentUser.full_name || '' : '',
       email: isEditMode && currentUser ? currentUser.email || '' : '',
       password: '',
       confirmPassword: '',
@@ -171,8 +171,12 @@ export default function AddUpdateUser() {
             currentUser.roles.length > 0
           ) {
             const firstRole = currentUser.roles[0]
-            if (firstRole && (firstRole.id || firstRole)) {
-              userData.roles = [firstRole.id || firstRole]
+            if (firstRole) {
+              if (typeof firstRole === 'string') {
+                userData.roles = [firstRole]
+              } else if ((firstRole as any).id) {
+                userData.roles = [(firstRole as any).id || firstRole]
+              }
             }
           }
           const result = await dispatch(updateUser({ userId, userData }))
