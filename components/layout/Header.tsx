@@ -116,8 +116,7 @@ const Header = () => {
                   </Link>
                   <Link
                     className="block px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    // href="/eligibility/settings"
-                    href="#"
+                    href="/eligibility/settings"
                     onClick={() => setEligibilityOpen(!eligibilityOpen)}
                   >
                     Settings
